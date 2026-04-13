@@ -108,10 +108,30 @@
     // CONSTANTES
     // =============================================
 
-    const SEARCH_URL = 'https://www.bing.com/search?q=';
+    const SEARCH_URL = 'https://www.bing.com/search';
     const TOTAL_SEARCHES = 20;
     const MIN_DELAY = 3000;
     const MAX_DELAY = 8000;
+
+    // Parámetros "form" usados por búsquedas reales en Bing.
+    // Microsoft Rewards distingue origen (homepage, sugerencia, historial, mobile, etc.).
+    // Rotarlos hace que las búsquedas se vean más naturales y sean contadas.
+    const FORM_PARAMS_DESKTOP = [
+        'QBLH',   // Desde homepage de Bing (búsqueda principal)
+        'QBRE',   // Desde la barra de direcciones
+        'QSRE1',  // Sugerencia rápida
+        'HDRSC1', // Desde la barra de encabezado
+        'PORE',   // Related search
+    ];
+    const FORM_PARAMS_MOBILE = [
+        'QBLH',   // Mobile homepage
+        'MY0291', // Mobile búsqueda
+        'QSHome', // Mobile home search
+    ];
+
+    // Detectar si el navegador es mobile para usar los form params apropiados
+    const IS_MOBILE = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const FORM_PARAMS = IS_MOBILE ? FORM_PARAMS_MOBILE : FORM_PARAMS_DESKTOP;
 
     const KEY_COUNT = 'bing-rewards-count';
     const KEY_DATE = 'bing-rewards-date';
@@ -228,6 +248,41 @@
         return Math.floor(Math.random() * (MAX_DELAY - MIN_DELAY)) + MIN_DELAY;
     }
 
+    /**
+     * Construye la URL de búsqueda con parámetros que Microsoft Rewards
+     * reconoce como búsquedas legítimas (form rotado, PC, cvid).
+     * @param {string} query - Texto a buscar.
+     * @returns {string} URL completa.
+     */
+    function buildSearchUrl(query) {
+        const form = pickRandom(FORM_PARAMS);
+        const cvid = generateCvid();
+        const params = new URLSearchParams({
+            q: query,
+            form: form,
+            qs: 'n',
+            sp: '-1',
+            pq: query.toLowerCase(),
+            sc: '0-0',
+            sk: '',
+            cvid: cvid,
+        });
+        if (!IS_MOBILE) params.set('PC', 'U316');
+        return `${SEARCH_URL}?${params.toString()}`;
+    }
+
+    /**
+     * Genera un CVID (correlation/conversation ID) alfanumérico de 32 chars,
+     * formato usado por Bing para rastrear sesiones de búsqueda.
+     * @returns {string}
+     */
+    function generateCvid() {
+        const chars = 'ABCDEF0123456789';
+        let id = '';
+        for (let i = 0; i < 32; i++) id += chars[Math.floor(Math.random() * chars.length)];
+        return id;
+    }
+
     /** @type {number|null} */
     let searchTimeout = null;
 
@@ -249,7 +304,7 @@
         const delay = getRandomDelay();
         searchTimeout = setTimeout(() => {
             GM_setValue(KEY_COUNT, count + 1);
-            window.location.href = SEARCH_URL + encodeURIComponent(generateQuery());
+            window.location.href = buildSearchUrl(generateQuery());
         }, delay);
     }
 
