@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.0.0
+// @version      1.1.0
 // @description  Automates daily Bing searches to collect Microsoft Rewards points. Multi-language panel with customizable keywords.
 // @author       g31w0fw0rld
 // @license      MIT
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.0.0';
+    const SCRIPT_VERSION = '1.1.0';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
