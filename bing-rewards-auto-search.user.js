@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.1.0
+// @version      1.1.1
 // @description  Automates daily Bing searches to collect Microsoft Rewards points. Multi-language panel with customizable keywords.
 // @author       g31w0fw0rld
 // @license      MIT
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.1.0';
+    const SCRIPT_VERSION = '1.1.1';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -42,6 +42,9 @@
             paused: 'Pausado',
             ready: 'Sin buscar',
             completed: 'Completado',
+            editTotal: 'Cambiar número de búsquedas',
+            editTotalPrompt: 'Número de búsquedas a realizar (1-100):',
+            invalidNumber: 'Número inválido. Debe estar entre 1 y 100.',
             keywordsTitle: 'Palabras clave (clic para eliminar):',
             addKeyword: 'Añadir palabra clave',
             addKeywordPrompt: 'Nueva palabra o frase (separar varias con coma):',
@@ -56,11 +59,11 @@
             infoName: 'Nombre:',
             infoVersion: 'Versión:',
             infoDescription: 'Descripción:',
-            infoDescriptionText: 'Automatiza búsquedas diarias en Bing para acumular puntos de Microsoft Rewards. Panel con palabras clave personalizables y soporte multiidioma.',
+            infoDescriptionText: 'Automatiza búsquedas diarias en Bing para acumular puntos de Microsoft Rewards sin intervención manual. Número de búsquedas configurable (1-100, por defecto 20), palabras clave personalizables, soporte multiidioma y control de inicio/pausa/reinicio desde el panel flotante.',
             infoAuthor: 'Autor:',
             infoGitHub: 'GitHub:',
             infoHow: 'Cómo funciona:',
-            infoHowText: 'El script genera búsquedas combinando las palabras clave configuradas. Cada búsqueda navega a Bing con un delay aleatorio de 3-8 segundos para simular uso natural. El contador se resetea diariamente.',
+            infoHowText: 'Genera queries combinando 1 a 3 palabras clave y rota entre búsquedas web (70%), imágenes, videos, shopping y noticias para simular navegación humana. Los delays son aleatorios entre 3-10s, con pausas ocasionales de 10-25s que imitan lectura de resultados. Cada URL incluye parámetros rotados (form, cvid, PC) que Bing identifica como tráfico legítimo. Detecta mobile/desktop automáticamente, el progreso persiste entre recargas de página y el contador se resetea cada día a medianoche.',
         },
         en: {
             tabSearch: '🔍',
@@ -81,6 +84,9 @@
             paused: 'Paused',
             ready: 'No searches yet',
             completed: 'Completed',
+            editTotal: 'Change number of searches',
+            editTotalPrompt: 'Number of searches to perform (1-100):',
+            invalidNumber: 'Invalid number. Must be between 1 and 100.',
             keywordsTitle: 'Keywords (click to delete):',
             addKeyword: 'Add keyword',
             addKeywordPrompt: 'New word or phrase (separate multiple with comma):',
@@ -95,11 +101,11 @@
             infoName: 'Name:',
             infoVersion: 'Version:',
             infoDescription: 'Description:',
-            infoDescriptionText: 'Automates daily Bing searches to collect Microsoft Rewards points. Panel with customizable keywords and multi-language support.',
+            infoDescriptionText: 'Automates daily Bing searches to collect Microsoft Rewards points without manual intervention. Configurable search count (1-100, default 20), customizable keywords, multi-language support, and start/pause/restart controls from the floating panel.',
             infoAuthor: 'Author:',
             infoGitHub: 'GitHub:',
             infoHow: 'How it works:',
-            infoHowText: 'The script generates searches by combining configured keywords. Each search navigates to Bing with a random 3-8 second delay to simulate natural usage. The counter resets daily.',
+            infoHowText: 'Generates queries by combining 1 to 3 keywords and rotates between web (70%), image, video, shopping, and news searches to simulate human browsing. Delays are randomized between 3-10s with occasional 10-25s "reading pauses". Each URL includes rotated parameters (form, cvid, PC) that Bing identifies as legitimate traffic. Mobile/desktop detection is automatic, progress persists across page reloads, and the counter resets daily at midnight.',
         },
     };
     const t = i18n[userLang] || i18n.en;
@@ -108,36 +114,44 @@
     // CONSTANTES
     // =============================================
 
-    const SEARCH_URL = 'https://www.bing.com/search';
-    const TOTAL_SEARCHES = 20;
-    const MIN_DELAY = 3000;
-    const MAX_DELAY = 8000;
+    const DEFAULT_TOTAL_SEARCHES = 20;
 
-    // Parámetros "form" usados por búsquedas reales en Bing.
-    // Microsoft Rewards distingue origen (homepage, sugerencia, historial, mobile, etc.).
-    // Rotarlos hace que las búsquedas se vean más naturales y sean contadas.
-    const FORM_PARAMS_DESKTOP = [
-        'QBLH',   // Desde homepage de Bing (búsqueda principal)
-        'QBRE',   // Desde la barra de direcciones
-        'QSRE1',  // Sugerencia rápida
-        'HDRSC1', // Desde la barra de encabezado
-        'PORE',   // Related search
+    // Delays (ms). La duración real se calcula con una distribución sesgada:
+    // la mayoría de pausas son cortas (3-10s), pero ~20% son "pausas de lectura"
+    // largas (10-25s) para simular que el usuario leyó un resultado.
+    const MIN_DELAY = 3000;
+    const MAX_DELAY = 10000;
+    const LONG_PAUSE_MIN = 10000;
+    const LONG_PAUSE_MAX = 25000;
+    const LONG_PAUSE_CHANCE = 0.2;
+
+    // Tipos de búsqueda rotados para parecer navegación humana.
+    // Microsoft Rewards otorga puntos principalmente en búsquedas web,
+    // pero visitar imágenes/videos/shopping entre medio simula uso natural.
+    // Formato: { path, weight, form (desktop), formMobile, extra }
+    const SEARCH_TYPES = [
+        { name: 'web',      path: '/search',         weight: 70, form: 'QBLH',   formMobile: 'QBLH' },
+        { name: 'images',   path: '/images/search',  weight: 12, form: 'QBIR',   formMobile: 'HDRSC2' },
+        { name: 'videos',   path: '/videos/search',  weight: 10, form: 'QBVR',   formMobile: 'HDRSC6' },
+        { name: 'shopping', path: '/search',         weight: 5,  form: 'QBLH',   formMobile: 'QBLH',   extra: { scope: 'shop' } },
+        { name: 'news',     path: '/news/search',    weight: 3,  form: 'QBNH',   formMobile: 'HDRSC3' },
     ];
-    const FORM_PARAMS_MOBILE = [
-        'QBLH',   // Mobile homepage
-        'MY0291', // Mobile búsqueda
-        'QSHome', // Mobile home search
-    ];
+
+    // Parámetros "form" alternativos para búsquedas web (rotados con el principal).
+    // Agrega variedad al origen: homepage, barra direcciones, sugerencia, etc.
+    const WEB_FORMS_DESKTOP = ['QBLH', 'QBRE', 'QSRE1', 'HDRSC1', 'PORE'];
+    const WEB_FORMS_MOBILE = ['QBLH', 'MY0291', 'QSHome'];
 
     // Detectar si el navegador es mobile para usar los form params apropiados
     const IS_MOBILE = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    const FORM_PARAMS = IS_MOBILE ? FORM_PARAMS_MOBILE : FORM_PARAMS_DESKTOP;
+    const BING_BASE = 'https://www.bing.com';
 
     const KEY_COUNT = 'bing-rewards-count';
     const KEY_DATE = 'bing-rewards-date';
     const KEY_ACTIVE = 'bing-rewards-active';
     const KEY_KEYWORDS = 'bing-rewards-keywords';
     const KEY_COLLAPSED = 'bing-rewards-collapsed';
+    const KEY_TOTAL = 'bing-rewards-total';
 
     const PANEL_ID = 'bing-rewards-panel';
 
@@ -206,6 +220,22 @@
         GM_setValue(KEY_KEYWORDS, kws);
     }
 
+    /**
+     * Obtiene el número total de búsquedas configurado (default 20).
+     * @returns {number}
+     */
+    function getTotal() {
+        return GM_getValue(KEY_TOTAL, DEFAULT_TOTAL_SEARCHES);
+    }
+
+    /**
+     * Guarda el número total de búsquedas.
+     * @param {number} n
+     */
+    function setTotal(n) {
+        GM_setValue(KEY_TOTAL, n);
+    }
+
     // =============================================
     // GENERADOR DE QUERIES
     // =============================================
@@ -241,21 +271,49 @@
     // =============================================
 
     /**
-     * Genera un delay aleatorio entre MIN_DELAY y MAX_DELAY.
-     * @returns {number}
+     * Genera un delay aleatorio usando distribución sesgada:
+     * - 80% del tiempo: pausa normal (3-10s)
+     * - 20% del tiempo: pausa larga de "lectura" (10-25s)
+     * Además aplica una variación gaussiana ligera para evitar patrones fijos.
+     * @returns {number} Milisegundos.
      */
     function getRandomDelay() {
-        return Math.floor(Math.random() * (MAX_DELAY - MIN_DELAY)) + MIN_DELAY;
+        const isLongPause = Math.random() < LONG_PAUSE_CHANCE;
+        const [min, max] = isLongPause
+            ? [LONG_PAUSE_MIN, LONG_PAUSE_MAX]
+            : [MIN_DELAY, MAX_DELAY];
+        // Distribución con ligero sesgo hacia el centro del rango
+        const u = (Math.random() + Math.random()) / 2;
+        return Math.floor(u * (max - min)) + min;
+    }
+
+    /**
+     * Selecciona un tipo de búsqueda según los pesos configurados.
+     * @returns {object} Objeto del array SEARCH_TYPES.
+     */
+    function pickSearchType() {
+        const total = SEARCH_TYPES.reduce((sum, t) => sum + t.weight, 0);
+        let roll = Math.random() * total;
+        for (const type of SEARCH_TYPES) {
+            roll -= type.weight;
+            if (roll <= 0) return type;
+        }
+        return SEARCH_TYPES[0];
     }
 
     /**
      * Construye la URL de búsqueda con parámetros que Microsoft Rewards
-     * reconoce como búsquedas legítimas (form rotado, PC, cvid).
+     * reconoce como búsquedas legítimas (form rotado, PC, cvid, tipo rotado).
+     * Rota entre web/imágenes/videos/shopping/news para simular uso humano.
      * @param {string} query - Texto a buscar.
-     * @returns {string} URL completa.
+     * @returns {{ url: string, type: string }}
      */
     function buildSearchUrl(query) {
-        const form = pickRandom(FORM_PARAMS);
+        const type = pickSearchType();
+        // Para búsquedas web usamos form rotado; para otras, el form específico del tipo
+        const form = type.name === 'web'
+            ? pickRandom(IS_MOBILE ? WEB_FORMS_MOBILE : WEB_FORMS_DESKTOP)
+            : (IS_MOBILE ? type.formMobile : type.form);
         const cvid = generateCvid();
         const params = new URLSearchParams({
             q: query,
@@ -268,7 +326,13 @@
             cvid: cvid,
         });
         if (!IS_MOBILE) params.set('PC', 'U316');
-        return `${SEARCH_URL}?${params.toString()}`;
+        if (type.extra) {
+            for (const [k, v] of Object.entries(type.extra)) params.set(k, v);
+        }
+        return {
+            url: `${BING_BASE}${type.path}?${params.toString()}`,
+            type: type.name,
+        };
     }
 
     /**
@@ -293,7 +357,7 @@
     function executeNextSearch(onUpdate) {
         const count = GM_getValue(KEY_COUNT, 0);
 
-        if (count >= TOTAL_SEARCHES) {
+        if (count >= getTotal()) {
             GM_setValue(KEY_ACTIVE, false);
             onUpdate(count, false);
             return;
@@ -304,7 +368,7 @@
         const delay = getRandomDelay();
         searchTimeout = setTimeout(() => {
             GM_setValue(KEY_COUNT, count + 1);
-            window.location.href = buildSearchUrl(generateQuery());
+            window.location.href = buildSearchUrl(generateQuery()).url;
         }, delay);
     }
 
@@ -619,22 +683,23 @@
          */
         function updateUI(count, active) {
             btnRow.innerHTML = '';
+            const total = getTotal();
 
-            if (count >= TOTAL_SEARCHES) {
-                statusText.textContent = `✓ ${t.completed} (${count}/${TOTAL_SEARCHES})`;
+            if (count >= total) {
+                statusText.textContent = `✓ ${t.completed} (${count}/${total})`;
                 statusText.style.color = colors.green;
                 btnRow.appendChild(createActionBtn(t.restart, t.restartTooltip, colors.primary, restartCounter));
             } else if (active) {
-                statusText.textContent = `${t.searching}... ${count}/${TOTAL_SEARCHES}`;
+                statusText.textContent = `${t.searching}... ${count}/${total}`;
                 statusText.style.color = colors.text;
                 btnRow.appendChild(createActionBtn(t.stop, t.stopTooltip, colors.red, stopSession));
             } else if (count > 0) {
-                statusText.textContent = `${t.paused}: ${count}/${TOTAL_SEARCHES}`;
+                statusText.textContent = `${t.paused}: ${count}/${total}`;
                 statusText.style.color = colors.gray;
                 btnRow.appendChild(createActionBtn(t.continue_, t.continueTooltip, colors.primary, startSession));
                 btnRow.appendChild(createActionBtn(t.restart, t.restartTooltip, colors.red, restartCounter));
             } else {
-                statusText.textContent = `${t.ready}: 0/${TOTAL_SEARCHES}`;
+                statusText.textContent = `${t.ready}: 0/${total}`;
                 statusText.style.color = colors.gray;
                 btnRow.appendChild(createActionBtn(t.start, t.startTooltip, colors.primary, startSession));
             }
@@ -762,6 +827,49 @@
             kwBtnRow.appendChild(resetKwBtn);
 
             kwTab.pane.appendChild(kwBtnRow);
+
+            // Fila de configuración: número total de búsquedas
+            const configRow = document.createElement('div');
+            Object.assign(configRow.style, {
+                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                gap: '6px', marginTop: '10px', paddingTop: '8px',
+                borderTop: `1px solid ${colors.border}`,
+            });
+
+            const configLabel = document.createElement('span');
+            configLabel.textContent = `${t.editTotal}: ${getTotal()}`;
+            Object.assign(configLabel.style, {
+                fontSize: '11px', color: colors.gray,
+            });
+            configRow.appendChild(configLabel);
+
+            const editTotalBtn = document.createElement('button');
+            editTotalBtn.textContent = '⚙️';
+            editTotalBtn.title = t.editTotal;
+            Object.assign(editTotalBtn.style, {
+                padding: '2px 8px', backgroundColor: colors.bg,
+                color: colors.gray, border: `1px solid ${colors.border}`,
+                borderRadius: '6px', cursor: 'pointer', fontSize: '11px',
+                fontFamily: 'inherit', transition: 'all 0.15s',
+            });
+            editTotalBtn.onmouseenter = () => { editTotalBtn.style.borderColor = colors.primary; };
+            editTotalBtn.onmouseleave = () => { editTotalBtn.style.borderColor = colors.border; };
+            editTotalBtn.onclick = async () => {
+                const val = await inputModal(t.editTotalPrompt, String(getTotal()));
+                if (val !== null) {
+                    const n = parseInt(val, 10);
+                    if (!isNaN(n) && n >= 1 && n <= 100) {
+                        setTotal(n);
+                        updateUI(GM_getValue(KEY_COUNT, 0), GM_getValue(KEY_ACTIVE, false));
+                        renderKeywordsTab();
+                    } else {
+                        await confirmModal(t.invalidNumber);
+                    }
+                }
+            };
+            configRow.appendChild(editTotalBtn);
+
+            kwTab.pane.appendChild(configRow);
         }
 
         renderKeywordsTab();
@@ -829,7 +937,7 @@
         const count = GM_getValue(KEY_COUNT, 0);
         const active = GM_getValue(KEY_ACTIVE, false);
 
-        if (active && count < TOTAL_SEARCHES) {
+        if (active && count < getTotal()) {
             executeNextSearch(updateUI);
         } else {
             updateUI(count, active);
