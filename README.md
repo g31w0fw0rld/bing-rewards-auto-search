@@ -13,7 +13,7 @@ Userscript de Tampermonkey que automatiza búsquedas diarias en Bing para acumul
 
 **Instalación:**
 1. Instala [Tampermonkey](https://www.tampermonkey.net/).
-2. Abre el instalador: [bing-rewards-auto-search.user.js](https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js) (también disponible en GreasyFork y OpenUserJS).
+2. Abre el instalador: [bing-rewards-auto-search.user.js](https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js) (también disponible en [GreasyFork](https://greasyfork.org/es-419/users/1590477-g31w) y [OpenUserJS](https://openuserjs.org/users/g31w0fw0rldgmail.com/scripts)).
 
 **Sitio:** `bing.com`
 
@@ -30,7 +30,7 @@ Userscript de Tampermonkey que automatiza búsquedas diarias en Bing para acumul
 
 **Install:**
 1. Install [Tampermonkey](https://www.tampermonkey.net/).
-2. Open the installer: [bing-rewards-auto-search.user.js](https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js) (also on GreasyFork and OpenUserJS).
+2. Open the installer: [bing-rewards-auto-search.user.js](https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js) (also on [GreasyFork](https://greasyfork.org/es-419/users/1590477-g31w) and [OpenUserJS](https://openuserjs.org/users/g31w0fw0rldgmail.com/scripts)).
 
 **Site:** `bing.com`
 
