@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.1.1
+// @version      1.1.2
 // @description  Automates daily Bing searches to collect Microsoft Rewards points. Multi-language panel with customizable keywords.
 // @author       g31w0fw0rld
 // @license      MIT
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.1.1';
+    const SCRIPT_VERSION = '1.1.2';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -884,6 +884,7 @@
             { label: t.infoDescription, value: t.infoDescriptionText },
             { label: t.infoAuthor, value: 'g31w0fw0rld' },
             { label: t.infoGitHub, value: 'github.com/g31w0fw0rld/bing-rewards-auto-search', isLink: true },
+            { label: '☕ Ko-fi:', value: 'ko-fi.com/g31w0fw0rld', isLink: true },
             { label: t.infoHow, value: t.infoHowText },
         ];
 
