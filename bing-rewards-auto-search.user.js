@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.1.2
+// @version      1.1.3
 // @description  Automates daily Bing searches to collect Microsoft Rewards points. Multi-language panel with customizable keywords.
 // @author       g31w0fw0rld
 // @license      MIT
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.1.2';
+    const SCRIPT_VERSION = '1.1.3';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -62,6 +62,8 @@
             infoDescriptionText: 'Automatiza búsquedas diarias en Bing para acumular puntos de Microsoft Rewards sin intervención manual. Número de búsquedas configurable (1-100, por defecto 20), palabras clave personalizables, soporte multiidioma y control de inicio/pausa/reinicio desde el panel flotante.',
             infoAuthor: 'Autor:',
             infoGitHub: 'GitHub:',
+            infoPrivacy: 'Privacidad:',
+            infoPrivacyText: 'Tus palabras clave y el contador de búsquedas se guardan solo en el almacenamiento local del gestor de userscripts, en tu navegador. El script no hace ninguna petición de red propia: únicamente navega a URLs de búsqueda de bing.com, igual que si las escribieras tú. No hay terceros involucrados y no se envía nada al autor del script.',
             infoHow: 'Cómo funciona:',
             infoHowText: 'Genera queries combinando 1 a 3 palabras clave y rota entre búsquedas web (70%), imágenes, videos, shopping y noticias para simular navegación humana. Los delays son aleatorios entre 3-10s, con pausas ocasionales de 10-25s que imitan lectura de resultados. Cada URL incluye parámetros rotados (form, cvid, PC) que Bing identifica como tráfico legítimo. Detecta mobile/desktop automáticamente, el progreso persiste entre recargas de página y el contador se resetea cada día a medianoche.',
         },
@@ -104,6 +106,8 @@
             infoDescriptionText: 'Automates daily Bing searches to collect Microsoft Rewards points without manual intervention. Configurable search count (1-100, default 20), customizable keywords, multi-language support, and start/pause/restart controls from the floating panel.',
             infoAuthor: 'Author:',
             infoGitHub: 'GitHub:',
+            infoPrivacy: 'Privacy:',
+            infoPrivacyText: 'Your keywords and the search counter are stored only in your userscript manager\'s local storage, in your browser. The script makes no network requests of its own: it only navigates to bing.com search URLs, exactly as if you typed them yourself. No third parties are involved and nothing is sent to the script author.',
             infoHow: 'How it works:',
             infoHowText: 'Generates queries by combining 1 to 3 keywords and rotates between web (70%), image, video, shopping, and news searches to simulate human browsing. Delays are randomized between 3-10s with occasional 10-25s "reading pauses". Each URL includes rotated parameters (form, cvid, PC) that Bing identifies as legitimate traffic. Mobile/desktop detection is automatic, progress persists across page reloads, and the counter resets daily at midnight.',
         },
@@ -885,6 +889,7 @@
             { label: t.infoAuthor, value: 'g31w0fw0rld' },
             { label: t.infoGitHub, value: 'github.com/g31w0fw0rld/bing-rewards-auto-search', isLink: true },
             { label: '☕ Ko-fi:', value: 'ko-fi.com/g31w0fw0rld', isLink: true },
+            { label: t.infoPrivacy, value: t.infoPrivacyText },
             { label: t.infoHow, value: t.infoHowText },
         ];
 
@@ -904,6 +909,7 @@
                 a.href = 'https://' + line.value;
                 a.textContent = line.value;
                 a.target = '_blank';
+                a.rel = 'noopener noreferrer';
                 a.style.color = colors.primary;
                 a.style.textDecoration = 'underline';
                 a.style.fontSize = '11px';
