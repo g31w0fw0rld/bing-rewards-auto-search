@@ -36,6 +36,12 @@ Userscript de Tampermonkey que automatiza búsquedas diarias en Bing para acumul
 
 > ⚠️ Automating activity may violate Microsoft Rewards terms. Use at your own risk.
 
+## Privacidad / Privacy
+
+**ES:** el script no hace ninguna petición a servidores externos: para buscar cambia la URL dentro de `bing.com`, igual que si escribieras la consulta a mano. Guarda en el almacenamiento del gestor de userscripts (`GM_setValue`, en tu navegador) solo tus palabras clave, el total de búsquedas configurado, el contador y la fecha del día, y si el panel está plegado. No lee tu cuenta de Microsoft ni tu historial, y no se envía nada a terceros ni al autor. Ten en cuenta que las búsquedas quedan en tu historial de Bing / Microsoft Rewards como cualquier búsqueda normal.
+
+**EN:** the script makes no requests to external servers: to search it changes the URL within `bing.com`, exactly as if you typed the query yourself. It stores in the userscript manager's storage (`GM_setValue`, in your browser) only your keywords, the configured search total, the daily counter and date, and whether the panel is collapsed. It does not read your Microsoft account or your history, and nothing is sent to third parties or to the author. Note that the searches appear in your Bing / Microsoft Rewards history like any normal search.
+
 ## Apoyar / Support
 
 Esto es parte de algo que estoy construyendo para crecer. Si te sirve y quieres apoyar, puedes invitarme un café en **[Ko-fi](https://ko-fi.com/g31w0fw0rld)** —solo si quieres—; y si hay una causa que lo necesite más que yo, ayúdala a ella.
