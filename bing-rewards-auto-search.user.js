@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.1.3
-// @description  Automates daily Bing searches to collect Microsoft Rewards points. Multi-language panel with customizable keywords.
+// @version      1.1.4
+// @description  Runs your daily Bing searches to collect Microsoft Rewards points: 1 to 100 per day, queries built from one to three of your own keywords, rotating search types (70% web plus images, videos, shopping, news), delays randomised between 3 and 10s with occasional 10-25s reading pauses, rotated URL parameters and automatic mobile/desktop detection. Editable keywords, progress that survives reloads, a daily reset at midnight, and a manual script-language selector. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @author       g31w0fw0rld
 // @license      MIT
 // @match        https://www.bing.com/*
@@ -15,13 +15,31 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.1.3';
+    const SCRIPT_VERSION = '1.1.4';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
     // =============================================
 
-    const userLang = (navigator.language || 'en').split('-')[0];
+    // Idioma del script. A diferencia de los otros userscripts del conjunto,
+    // aqui NO sirve mirar el `lang` del documento: Bing lo fija segun el
+    // mercado de la cuenta, asi que poner el sitio en ingles no cambiaria nada
+    // y el widget seguiria en el idioma del navegador. Por eso hace falta una
+    // preferencia manual: es la unica via para leer el script en un idioma
+    // distinto al del navegador.
+    //   'es' | 'en' -> forzado por el usuario
+    //   ''          -> automatico (idioma del navegador)
+    // Se lee con GM_getValue directo porque esto corre antes de que existan los
+    // helpers de storage, y se necesita resuelto para elegir el diccionario.
+    const LANG_KEY = 'bing-rewards-lang';
+    function readLangPref() {
+        try {
+            const v = GM_getValue(LANG_KEY, '');
+            return (v === 'es' || v === 'en') ? v : '';
+        } catch (e) { return ''; }
+    }
+    const LANG_PREF = readLangPref();
+    const userLang = LANG_PREF || (navigator.language || 'en').split('-')[0];
     const i18n = {
         es: {
             tabSearch: '🔍',
@@ -30,6 +48,9 @@
             tabSearchTooltip: 'Búsqueda',
             tabKeywordsTooltip: 'Palabras clave',
             tabInfoTooltip: 'Información',
+            langLabel: 'Idioma del script:',
+            langAuto: 'Auto (navegador)',
+            langTip: 'Idioma de ESTE script. Bing no expone su idioma a la página de forma que el script pueda leerlo, así que sin esto el widget sigue el idioma del navegador. "Auto" hace justo eso. Al cambiarlo se recarga la página.',
             start: '▶',
             continue_: '⏩',
             stop: '⏹',
@@ -55,17 +76,16 @@
             resetKeywordsConfirm: '¿Restaurar palabras clave por defecto?',
             accept: 'Aceptar',
             cancel: 'Cancelar',
-            infoTitle: 'Información del script',
             infoName: 'Nombre:',
             infoVersion: 'Versión:',
             infoDescription: 'Descripción:',
-            infoDescriptionText: 'Automatiza búsquedas diarias en Bing para acumular puntos de Microsoft Rewards sin intervención manual. Número de búsquedas configurable (1-100, por defecto 20), palabras clave personalizables, soporte multiidioma y control de inicio/pausa/reinicio desde el panel flotante.',
+            infoDescriptionText: 'Automatiza búsquedas diarias en Bing para acumular puntos de Microsoft Rewards sin intervención manual. Número de búsquedas configurable con ⚙ (1-100, por defecto 20) y controles de iniciar / continuar / detener / reiniciar que cambian según el estado. En la pestaña de palabras clave puedes borrar cada una con un clic, añadir varias separadas por coma, editarlas todas de golpe o restaurar la lista original. El panel flotante se pliega y recuerda cómo lo dejaste, y el idioma del script se elige aquí arriba.',
             infoAuthor: 'Autor:',
             infoGitHub: 'GitHub:',
             infoPrivacy: 'Privacidad:',
             infoPrivacyText: 'Tus palabras clave y el contador de búsquedas se guardan solo en el almacenamiento local del gestor de userscripts, en tu navegador. El script no hace ninguna petición de red propia: únicamente navega a URLs de búsqueda de bing.com, igual que si las escribieras tú. No hay terceros involucrados y no se envía nada al autor del script.',
             infoHow: 'Cómo funciona:',
-            infoHowText: 'Genera queries combinando 1 a 3 palabras clave y rota entre búsquedas web (70%), imágenes, videos, shopping y noticias para simular navegación humana. Los delays son aleatorios entre 3-10s, con pausas ocasionales de 10-25s que imitan lectura de resultados. Cada URL incluye parámetros rotados (form, cvid, PC) que Bing identifica como tráfico legítimo. Detecta mobile/desktop automáticamente, el progreso persiste entre recargas de página y el contador se resetea cada día a medianoche.',
+            infoHowText: 'Genera queries combinando 1 a 3 palabras clave y rota entre búsquedas web (70%), imágenes, videos, shopping y noticias para simular navegación humana. Los delays son aleatorios entre 3-10s, con pausas ocasionales de 10-25s que imitan lectura de resultados. Cada URL incluye parámetros rotados (form, cvid, PC) que Bing identifica como tráfico legítimo. Detecta mobile/desktop automáticamente, el progreso persiste entre recargas de página y el contador se resetea cada día a medianoche.'
         },
         en: {
             tabSearch: '🔍',
@@ -74,6 +94,9 @@
             tabSearchTooltip: 'Search',
             tabKeywordsTooltip: 'Keywords',
             tabInfoTooltip: 'Information',
+            langLabel: 'Script language:',
+            langAuto: 'Auto (browser)',
+            langTip: 'Language of THIS script. Bing does not expose its own language to the page in a way the script can read, so without this the widget follows your browser language. "Auto" does exactly that. Changing it reloads the page.',
             start: '▶',
             continue_: '⏩',
             stop: '⏹',
@@ -99,18 +122,17 @@
             resetKeywordsConfirm: 'Reset keywords to default?',
             accept: 'Accept',
             cancel: 'Cancel',
-            infoTitle: 'Script Information',
             infoName: 'Name:',
             infoVersion: 'Version:',
             infoDescription: 'Description:',
-            infoDescriptionText: 'Automates daily Bing searches to collect Microsoft Rewards points without manual intervention. Configurable search count (1-100, default 20), customizable keywords, multi-language support, and start/pause/restart controls from the floating panel.',
+            infoDescriptionText: 'Automates daily Bing searches to collect Microsoft Rewards points without manual intervention. Search count configurable with ⚙ (1-100, default 20) and start / continue / stop / restart controls that change with the state. In the keywords tab you can delete each one with a click, add several separated by commas, edit them all at once or restore the original list. The floating panel collapses and remembers how you left it, and the script language is picked right above.',
             infoAuthor: 'Author:',
             infoGitHub: 'GitHub:',
             infoPrivacy: 'Privacy:',
             infoPrivacyText: 'Your keywords and the search counter are stored only in your userscript manager\'s local storage, in your browser. The script makes no network requests of its own: it only navigates to bing.com search URLs, exactly as if you typed them yourself. No third parties are involved and nothing is sent to the script author.',
             infoHow: 'How it works:',
-            infoHowText: 'Generates queries by combining 1 to 3 keywords and rotates between web (70%), image, video, shopping, and news searches to simulate human browsing. Delays are randomized between 3-10s with occasional 10-25s "reading pauses". Each URL includes rotated parameters (form, cvid, PC) that Bing identifies as legitimate traffic. Mobile/desktop detection is automatic, progress persists across page reloads, and the counter resets daily at midnight.',
-        },
+            infoHowText: 'Generates queries by combining 1 to 3 keywords and rotates between web (70%), image, video, shopping, and news searches to simulate human browsing. Delays are randomized between 3-10s with occasional 10-25s "reading pauses". Each URL includes rotated parameters (form, cvid, PC) that Bing identifies as legitimate traffic. Mobile/desktop detection is automatic, progress persists across page reloads, and the counter resets daily at midnight.'
+        }
     };
     const t = i18n[userLang] || i18n.en;
 
@@ -138,7 +160,7 @@
         { name: 'images',   path: '/images/search',  weight: 12, form: 'QBIR',   formMobile: 'HDRSC2' },
         { name: 'videos',   path: '/videos/search',  weight: 10, form: 'QBVR',   formMobile: 'HDRSC6' },
         { name: 'shopping', path: '/search',         weight: 5,  form: 'QBLH',   formMobile: 'QBLH',   extra: { scope: 'shop' } },
-        { name: 'news',     path: '/news/search',    weight: 3,  form: 'QBNH',   formMobile: 'HDRSC3' },
+        { name: 'news',     path: '/news/search',    weight: 3,  form: 'QBNH',   formMobile: 'HDRSC3' }
     ];
 
     // Parámetros "form" alternativos para búsquedas web (rotados con el principal).
@@ -168,7 +190,7 @@
         text: '#e0e0e0',
         gray: '#8892a0',
         green: '#4caf50',
-        red: '#e74c3c',
+        red: '#e74c3c'
     };
 
     // =============================================
@@ -182,7 +204,7 @@
         'coffee', 'pizza', 'guitar', 'bicycle', 'keyboard', 'monitor',
         'weather forecast', 'movie reviews', 'sports scores', 'tech news',
         'recipe ideas', 'travel destinations', 'cooking tips', 'music playlist',
-        'how to make', 'what is the best', 'where to find', 'how to learn',
+        'how to make', 'what is the best', 'where to find', 'how to learn'
     ];
 
     // =============================================
@@ -327,7 +349,7 @@
             pq: query.toLowerCase(),
             sc: '0-0',
             sk: '',
-            cvid: cvid,
+            cvid: cvid
         });
         if (!IS_MOBILE) params.set('PC', 'U316');
         if (type.extra) {
@@ -335,7 +357,7 @@
         }
         return {
             url: `${BING_BASE}${type.path}?${params.toString()}`,
-            type: type.name,
+            type: type.name
         };
     }
 
@@ -390,7 +412,7 @@
             position: 'fixed', left: '0', top: '0', width: '100%', height: '100%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             backgroundColor: 'rgba(0,0,0,0.6)', zIndex: '999999',
-            transition: 'opacity 180ms ease', opacity: '0',
+            transition: 'opacity 180ms ease', opacity: '0'
         });
         const box = document.createElement('div');
         Object.assign(box.style, {
@@ -399,7 +421,7 @@
             boxShadow: '0 8px 32px rgba(0,0,0,0.5)', border: `1px solid ${colors.primary}`,
             fontFamily: 'Segoe UI, system-ui, sans-serif', fontSize: '13px',
             transition: 'transform 180ms ease, opacity 180ms ease',
-            transform: 'translateY(8px) scale(0.98)', opacity: '0',
+            transform: 'translateY(8px) scale(0.98)', opacity: '0'
         });
         overlay.appendChild(box);
         return { overlay, box };
@@ -441,7 +463,7 @@
         Object.assign(btn.style, {
             padding: '6px 16px', backgroundColor: colors.surface,
             color: color, border: `1px solid ${color}`, borderRadius: '6px',
-            cursor: 'pointer', fontSize: '12px', fontFamily: 'inherit',
+            cursor: 'pointer', fontSize: '12px', fontFamily: 'inherit'
         });
         btn.onmouseenter = () => { btn.style.backgroundColor = color; btn.style.color = '#fff'; };
         btn.onmouseleave = () => { btn.style.backgroundColor = colors.surface; btn.style.color = color; };
@@ -494,7 +516,7 @@
                 boxSizing: 'border-box', borderRadius: '6px',
                 border: `1px solid ${colors.primary}`,
                 background: colors.bg, color: colors.text,
-                fontFamily: 'inherit', fontSize: '13px',
+                fontFamily: 'inherit', fontSize: '13px'
             });
             input.addEventListener('keydown', e => {
                 if (e.key === 'Enter') { closeModal(overlay); resolve(input.value); }
@@ -533,7 +555,7 @@
             padding: '0', fontFamily: 'Segoe UI, system-ui, sans-serif',
             fontSize: '13px', boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
             minWidth: '240px', maxWidth: '300px',
-            display: 'flex', flexDirection: 'column', overflow: 'hidden',
+            display: 'flex', flexDirection: 'column', overflow: 'hidden'
         });
 
         // --- Header ---
@@ -541,7 +563,7 @@
         Object.assign(header.style, {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '8px 12px', borderBottom: `1px solid ${colors.border}`,
-            background: `linear-gradient(135deg, ${colors.primaryDark}22, ${colors.surface})`,
+            background: `linear-gradient(135deg, ${colors.primaryDark}22, ${colors.surface})`
         });
 
         const titleEl = document.createElement('span');
@@ -564,7 +586,7 @@
         const body = document.createElement('div');
         Object.assign(body.style, {
             display: isCollapsed ? 'none' : 'flex',
-            flexDirection: 'column', overflow: 'hidden',
+            flexDirection: 'column', overflow: 'hidden'
         });
 
         collapseBtn.onclick = () => {
@@ -577,7 +599,7 @@
         // --- Tabs ---
         const tabBar = document.createElement('div');
         Object.assign(tabBar.style, {
-            display: 'flex', borderBottom: `1px solid ${colors.border}`,
+            display: 'flex', borderBottom: `1px solid ${colors.border}`
         });
 
         const tabs = [];
@@ -591,7 +613,7 @@
                 flex: '1', padding: '6px 0', cursor: 'pointer', fontSize: '13px',
                 fontWeight: 'bold', borderBottom: `2px solid transparent`,
                 backgroundColor: 'transparent', color: colors.gray,
-                border: 'none', fontFamily: 'inherit',
+                border: 'none', fontFamily: 'inherit'
             });
             tab.onmouseenter = () => { if (!tab.dataset.active) tab.style.color = colors.text; };
             tab.onmouseleave = () => { if (!tab.dataset.active) tab.style.color = colors.gray; };
@@ -640,7 +662,7 @@
 
         const btnRow = document.createElement('div');
         Object.assign(btnRow.style, {
-            display: 'flex', gap: '6px', justifyContent: 'center',
+            display: 'flex', gap: '6px', justifyContent: 'center'
         });
 
         function createActionBtn(icon, tooltip, color, onClick) {
@@ -651,7 +673,7 @@
                 padding: '6px 18px', backgroundColor: color, color: '#fff',
                 border: 'none', borderRadius: '6px', cursor: 'pointer',
                 fontSize: '14px', fontFamily: 'inherit',
-                transition: 'opacity 0.15s',
+                transition: 'opacity 0.15s'
             });
             btn.onmouseenter = () => { btn.style.opacity = '0.8'; };
             btn.onmouseleave = () => { btn.style.opacity = '1'; };
@@ -729,7 +751,7 @@
             const chipsContainer = document.createElement('div');
             Object.assign(chipsContainer.style, {
                 display: 'flex', flexWrap: 'wrap', gap: '4px',
-                maxHeight: '150px', overflowY: 'auto', marginBottom: '10px',
+                maxHeight: '150px', overflowY: 'auto', marginBottom: '10px'
             });
 
             const kws = getKeywords();
@@ -740,7 +762,7 @@
                     padding: '2px 8px', backgroundColor: colors.bg,
                     border: `1px solid ${colors.border}`, borderRadius: '12px',
                     fontSize: '11px', cursor: 'pointer', transition: 'all 0.15s',
-                    color: colors.text,
+                    color: colors.text
                 });
                 chip.onmouseenter = () => { chip.style.borderColor = colors.red; chip.style.color = colors.red; };
                 chip.onmouseleave = () => { chip.style.borderColor = colors.border; chip.style.color = colors.text; };
@@ -763,7 +785,7 @@
                 padding: '2px 8px', backgroundColor: colors.bg,
                 border: `1px solid ${colors.primary}`, borderRadius: '12px',
                 fontSize: '11px', cursor: 'pointer', transition: 'all 0.15s',
-                color: colors.primary, fontWeight: 'bold',
+                color: colors.primary, fontWeight: 'bold'
             });
             addChip.onmouseenter = () => { addChip.style.backgroundColor = colors.primary; addChip.style.color = '#fff'; };
             addChip.onmouseleave = () => { addChip.style.backgroundColor = colors.bg; addChip.style.color = colors.primary; };
@@ -783,7 +805,7 @@
             // Fila de botones
             const kwBtnRow = document.createElement('div');
             Object.assign(kwBtnRow.style, {
-                display: 'flex', gap: '6px',
+                display: 'flex', gap: '6px'
             });
 
             // Botón editar todas (separadas por coma)
@@ -793,7 +815,7 @@
                 padding: '4px 10px', backgroundColor: colors.bg,
                 color: colors.gray, border: `1px solid ${colors.border}`,
                 borderRadius: '6px', cursor: 'pointer', fontSize: '11px',
-                fontFamily: 'inherit', flex: '1', transition: 'all 0.15s',
+                fontFamily: 'inherit', flex: '1', transition: 'all 0.15s'
             });
             editKwBtn.onmouseenter = () => { editKwBtn.style.borderColor = colors.primary; editKwBtn.style.color = colors.primary; };
             editKwBtn.onmouseleave = () => { editKwBtn.style.borderColor = colors.border; editKwBtn.style.color = colors.gray; };
@@ -817,7 +839,7 @@
                 padding: '4px 10px', backgroundColor: colors.bg,
                 color: colors.gray, border: `1px solid ${colors.border}`,
                 borderRadius: '6px', cursor: 'pointer', fontSize: '11px',
-                fontFamily: 'inherit', flex: '1', transition: 'all 0.15s',
+                fontFamily: 'inherit', flex: '1', transition: 'all 0.15s'
             });
             resetKwBtn.onmouseenter = () => { resetKwBtn.style.borderColor = colors.primary; resetKwBtn.style.color = colors.primary; };
             resetKwBtn.onmouseleave = () => { resetKwBtn.style.borderColor = colors.border; resetKwBtn.style.color = colors.gray; };
@@ -837,13 +859,13 @@
             Object.assign(configRow.style, {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 gap: '6px', marginTop: '10px', paddingTop: '8px',
-                borderTop: `1px solid ${colors.border}`,
+                borderTop: `1px solid ${colors.border}`
             });
 
             const configLabel = document.createElement('span');
             configLabel.textContent = `${t.editTotal}: ${getTotal()}`;
             Object.assign(configLabel.style, {
-                fontSize: '11px', color: colors.gray,
+                fontSize: '11px', color: colors.gray
             });
             configRow.appendChild(configLabel);
 
@@ -854,7 +876,7 @@
                 padding: '2px 8px', backgroundColor: colors.bg,
                 color: colors.gray, border: `1px solid ${colors.border}`,
                 borderRadius: '6px', cursor: 'pointer', fontSize: '11px',
-                fontFamily: 'inherit', transition: 'all 0.15s',
+                fontFamily: 'inherit', transition: 'all 0.15s'
             });
             editTotalBtn.onmouseenter = () => { editTotalBtn.style.borderColor = colors.primary; };
             editTotalBtn.onmouseleave = () => { editTotalBtn.style.borderColor = colors.border; };
@@ -882,6 +904,53 @@
         // TAB: INFO
         // =============================================
 
+        // Selector de idioma, arriba del bloque informativo: es un ajuste, no un
+        // dato, asi que no entra en infoLines (que son pares etiqueta/valor).
+        {
+            const langRow = document.createElement('div');
+            langRow.style.display = 'flex';
+            langRow.style.alignItems = 'center';
+            langRow.style.gap = '6px';
+            langRow.style.marginBottom = '10px';
+            langRow.style.paddingBottom = '10px';
+            langRow.style.borderBottom = `1px solid ${colors.border}`;
+            langRow.title = t.langTip;
+            const langLabel = document.createElement('span');
+            langLabel.textContent = t.langLabel;
+            langLabel.style.fontWeight = 'bold';
+            langLabel.style.fontSize = '11px';
+            langRow.appendChild(langLabel);
+            const langSel = document.createElement('select');
+            langSel.style.flex = '1';
+            langSel.style.fontSize = '11px';
+            langSel.style.padding = '3px 4px';
+            langSel.style.background = colors.surface;
+            langSel.style.color = colors.text;
+            langSel.style.border = `1px solid ${colors.border}`;
+            langSel.style.borderRadius = '4px';
+            langSel.style.cursor = 'pointer';
+            [
+                { v: '', label: t.langAuto },
+                { v: 'es', label: 'Español' },
+                { v: 'en', label: 'English' }
+            ].forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.v;
+                opt.textContent = o.label;
+                if (o.v === LANG_PREF) opt.selected = true;
+                langSel.appendChild(opt);
+            });
+            // Recargar en vez de re-renderizar: `t` se resuelve una vez al
+            // cargar y esta cableado en todos los nodos ya creados, asi que
+            // repintar solo este panel dejaria el resto en el idioma viejo.
+            langSel.onchange = () => {
+                const v = langSel.value;
+                GM_setValue(LANG_KEY, (v === 'es' || v === 'en') ? v : '');
+                location.reload();
+            };
+            langRow.appendChild(langSel);
+            infoTab.pane.appendChild(langRow);
+        }
         const infoLines = [
             { label: t.infoName, value: 'Bing Rewards Auto Search' },
             { label: t.infoVersion, value: SCRIPT_VERSION },
@@ -890,7 +959,7 @@
             { label: t.infoGitHub, value: 'github.com/g31w0fw0rld/bing-rewards-auto-search', isLink: true },
             { label: '☕ Ko-fi:', value: 'ko-fi.com/g31w0fw0rld', isLink: true },
             { label: t.infoPrivacy, value: t.infoPrivacyText },
-            { label: t.infoHow, value: t.infoHowText },
+            { label: t.infoHow, value: t.infoHowText }
         ];
 
         infoLines.forEach(line => {
