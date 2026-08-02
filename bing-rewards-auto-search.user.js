@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.1.4
+// @version      1.1.5
 // @description  Runs your daily Bing searches to collect Microsoft Rewards points: 1 to 100 per day, queries built from one to three of your own keywords, rotating search types (70% web plus images, videos, shopping, news), delays randomised between 3 and 10s with occasional 10-25s reading pauses, rotated URL parameters and automatic mobile/desktop detection. Editable keywords, progress that survives reloads, a daily reset at midnight, and a manual script-language selector. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @author       g31w0fw0rld
 // @license      MIT
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.1.4';
+    const SCRIPT_VERSION = '1.1.5';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -555,6 +555,11 @@
             padding: '0', fontFamily: 'Segoe UI, system-ui, sans-serif',
             fontSize: '13px', boxShadow: '0 4px 20px rgba(0,0,0,0.4)',
             minWidth: '240px', maxWidth: '300px',
+            // El panel esta anclado abajo a la derecha y crece hacia arriba, asi que
+            // sin tope la pestaña Info (textos largos) se sale por arriba de la pantalla.
+            // El tope deja los 16px de margen de arriba y de abajo; el desbordamiento
+            // lo absorbe el scroll de cada pane.
+            maxHeight: 'calc(100vh - 32px)',
             display: 'flex', flexDirection: 'column', overflow: 'hidden'
         });
 
@@ -563,7 +568,8 @@
         Object.assign(header.style, {
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '8px 12px', borderBottom: `1px solid ${colors.border}`,
-            background: `linear-gradient(135deg, ${colors.primaryDark}22, ${colors.surface})`
+            background: `linear-gradient(135deg, ${colors.primaryDark}22, ${colors.surface})`,
+            flexShrink: '0'
         });
 
         const titleEl = document.createElement('span');
@@ -586,7 +592,10 @@
         const body = document.createElement('div');
         Object.assign(body.style, {
             display: isCollapsed ? 'none' : 'flex',
-            flexDirection: 'column', overflow: 'hidden'
+            // minHeight 0 anula el min-height:auto de los items flex; sin el, el body
+            // se niega a encoger por debajo de su contenido y el maxHeight del panel
+            // no sirve de nada.
+            flexDirection: 'column', overflow: 'hidden', minHeight: '0'
         });
 
         collapseBtn.onclick = () => {
@@ -599,7 +608,8 @@
         // --- Tabs ---
         const tabBar = document.createElement('div');
         Object.assign(tabBar.style, {
-            display: 'flex', borderBottom: `1px solid ${colors.border}`
+            display: 'flex', borderBottom: `1px solid ${colors.border}`,
+            flexShrink: '0'
         });
 
         const tabs = [];
@@ -621,8 +631,14 @@
             tabs.push(tab);
 
             const pane = document.createElement('div');
-            pane.style.display = 'none';
-            pane.style.padding = '10px 12px';
+            Object.assign(pane.style, {
+                display: 'none', padding: '10px 12px',
+                // El pane es quien scrollea cuando el contenido no cabe en el tope
+                // del panel. overscrollBehavior evita que al llegar al final el
+                // scroll se propague y mueva la pagina de Bing por detras.
+                overflowY: 'auto', minHeight: '0', overscrollBehavior: 'contain',
+                scrollbarWidth: 'thin', scrollbarColor: `${colors.border} transparent`
+            });
             panes.push(pane);
 
             return { tab, pane };
