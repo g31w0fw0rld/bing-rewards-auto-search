@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.1.5
-// @description  Runs your daily Bing searches to collect Microsoft Rewards points: 1 to 100 per day, queries built from one to three of your own keywords, rotating search types (70% web plus images, videos, shopping, news), delays randomised between 3 and 10s with occasional 10-25s reading pauses, rotated URL parameters and automatic mobile/desktop detection. Editable keywords, progress that survives reloads, a daily reset at midnight, and a manual script-language selector. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
+// @version      1.1.6
+// @description  Runs your daily Bing searches to collect Microsoft Rewards points: 1 to 100 per day, queries built from your own keywords, rotating search types (70% web plus images, videos, shopping, news), delays randomised 3-10s with occasional 10-25s reading pauses, rotated URL parameters and automatic mobile/desktop detection. Progress survives reloads, daily reset at midnight, and a script-language selector. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @author       g31w0fw0rld
 // @license      MIT
 // @match        https://www.bing.com/*
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.1.5';
+    const SCRIPT_VERSION = '1.1.6';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
