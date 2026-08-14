@@ -5,17 +5,17 @@ Tampermonkey userscript that automates daily Bing searches to collect Microsoft 
 > [!WARNING]
 > **USE AT YOUR OWN RISK / USO BAJO TU PROPIO RIESGO:** automating activity may violate the Microsoft Rewards terms and put your account at risk. / Automatizar la actividad puede infringir los términos de Microsoft Rewards y poner tu cuenta en riesgo.
 
-<img src="docs/screenshot-search.png" width="330" alt="The search tab of the floating panel, showing the counter and the start button">
+<img src="docs/screenshot-search.png" width="330" alt="The search tab of the floating panel, showing the day complete at 60 of 60 points, the restart button, and the points balance converted to Xbox credit">
 
-*Search tab: progress and the controls, which change with the state — start, continue, stop or restart. / Pestaña de búsqueda: el progreso y los controles, que cambian según el estado — iniciar, continuar, detener o reiniciar.*
+*Search tab: the day's progress in points as Rewards counts it, the controls for the current state, and what your points are worth — balance, its equivalent in Xbox / Microsoft Store credit, and the cheapest card with a tick once you can afford it. / Pestaña de búsqueda: el progreso del día en puntos, tal como los cuenta Rewards, los controles según el estado, y cuánto valen tus puntos — saldo, su equivalente en saldo Xbox / Microsoft Store, y la tarjeta más barata con una marca en cuanto te alcanza.*
 
-<img src="docs/screenshot-keywords.png" width="330" alt="The keywords tab, with the keyword chips and the edit, reset and count controls">
+<img src="docs/screenshot-keywords.png" width="330" alt="The keywords tab, with the keyword chips, the edit and reset buttons, the Use my Rewards progress checkbox and the manual search count">
 
-*Keywords tab: every keyword as a chip you can click to delete, plus bulk edit, reset to defaults and the search-count setting. / Pestaña de palabras clave: cada palabra como una etiqueta que se borra con un clic, más edición masiva, restaurar predeterminadas y el ajuste del número de búsquedas.*
+*Keywords tab: every keyword as a chip you can click to delete, plus bulk edit and reset to defaults. Below, *Use my Rewards progress* — the switch that decides whether Rewards works out how many searches are left, or the manual count below it does. / Pestaña de palabras clave: cada palabra como una etiqueta que se borra con un clic, más edición masiva y restaurar predeterminadas. Debajo, *Usar mi progreso de Rewards*: el interruptor que decide si es Rewards quien calcula cuántas búsquedas faltan, o el número manual de abajo.*
 
 <img src="docs/screenshot-info.png" width="330" alt="The info tab, showing the language selector and the full script information">
 
-*Info tab: the script's own language selector, then what it does, how it works and its privacy terms. / Pestaña de información: el selector de idioma del propio script, y luego qué hace, cómo funciona y sus términos de privacidad.*
+*Info tab: the script's own language selector, then what it does, how it works, and the privacy terms — including exactly which request it makes to Bing and how to turn it off. / Pestaña de información: el selector de idioma del propio script, y luego qué hace, cómo funciona y los términos de privacidad — incluida la petición exacta que hace a Bing y cómo desactivarla.*
 
 ## English
 
@@ -23,10 +23,18 @@ Tampermonkey userscript that automates daily Bing searches to collect Microsoft 
 
 **Searching**
 - Runs your daily Bing searches automatically so you can collect the Microsoft Rewards search points without doing them one by one.
-- **How many is up to you:** anywhere from 1 to 100, set with the ⚙ button (20 by default). The counter shows progress against that number.
+- **It works out how many are left, so you don't have to.** With *Use my Rewards progress* on, the script asks Bing how many search points you are still missing today, runs only those, and stops on its own once Rewards marks the day complete.
+- **It does not trust its own arithmetic.** The "searches left" figure is an estimate: Rewards counts in points, not searches, and several markets do not credit the first searches of the day, so the estimate runs low. The decision to stop therefore comes from Rewards' own *complete* flag, never from the estimate.
+- **It stops if the points stop coming.** If several searches in a row go by without the Rewards counter moving, Bing has most likely stopped crediting this session, so the script stops rather than burn searches for nothing. There is an absolute daily cap behind that as a last resort.
+- **The manual number is the fallback:** 1 to 100, set with the ⚙ button (20 by default). It takes over whenever there is no Rewards session, and it is the only thing that counts if you clear the checkbox.
 - **Start, continue, stop and restart.** The controls change with the state: a paused run offers *continue* and *restart*, a finished one only *restart*.
 - **Progress survives reloads.** Each search is a real navigation, so the counter lives in storage rather than in the page — closing the tab or navigating away does not lose your place.
 - **The counter resets on its own each day at midnight,** which is when Rewards resets too.
+
+**What your points are worth**
+- The panel shows your Rewards balance, what it converts to in Xbox / Microsoft Store credit, and the cheapest Xbox card together with how many points you still need for it.
+- **The rate comes from Rewards, not from guesswork.** Where your market offers a variable-amount redemption, its official points-to-currency ratio is read straight from the catalogue. Only where that does not exist is the rate inferred from card prices, and the tooltip says as much.
+- **Careful with the cheap cards:** within a single market the same card sells at different rates, and the small ones are the worst deal — in Mexico a MXN 20 card costs 57.25 points per peso while a MXN 100 one costs 48.95. That is why the cheapest card is used as the "you can redeem now" threshold and not as the exchange rate.
 
 **How it avoids looking like a robot**
 - **Queries are built, not repeated:** each one combines one to three of your keywords at random, so no two runs look alike.
@@ -41,9 +49,9 @@ Tampermonkey userscript that automates daily Bing searches to collect Microsoft 
 
 **Panel**
 - Three tabs — search, keywords, info — in a floating panel you can **collapse**, and it remembers whether you left it open.
-- **Script language selector** in the info tab: Spanish, English or Auto. Bing does not expose its own language to the page in a way the script can read, so without this the panel would always follow your browser rather than the store you set. Changing it reloads the page.
+- **Script language selector** in the info tab: 22 languages plus *Auto*. On *Auto* it follows the language you are viewing Bing in — Bing does declare that on the page — and falls back to your browser's language if the page does not say. Pick one from the list to pin it; changing it reloads the page.
 
-**Language:** your browser's, or whichever you pick in the info tab.
+**Language:** whichever you are viewing Bing in, your browser's as a fallback, or whichever you pin in the info tab.
 
 **Install:**
 1. Install [Tampermonkey](https://www.tampermonkey.net/).
@@ -57,10 +65,18 @@ Tampermonkey userscript that automates daily Bing searches to collect Microsoft 
 
 **Búsquedas**
 - Ejecuta tus búsquedas diarias en Bing automáticamente, para juntar los puntos de búsqueda de Microsoft Rewards sin hacerlas una por una.
-- **Cuántas lo decides tú:** de 1 a 100, con el botón ⚙ (20 por defecto). El contador muestra el avance sobre ese número.
+- **Calcula cuántas faltan, para que no tengas que hacerlo tú.** Con *Usar mi progreso de Rewards* activado, el script le pregunta a Bing cuántos puntos de búsqueda te faltan hoy, ejecuta solo esos y se detiene solo en cuanto Rewards marca el día como completo.
+- **No se fía de su propia cuenta.** El número de «búsquedas restantes» es un estimado: Rewards cuenta en puntos, no en búsquedas, y en varios mercados las primeras del día no acreditan, así que el estimado se queda corto. Por eso la decisión de parar la toma la marca *complete* de Rewards, nunca el estimado.
+- **Para si los puntos dejan de llegar.** Si pasan varias búsquedas seguidas sin que suba el contador de Rewards, lo más probable es que Bing haya dejado de acreditar esta sesión, así que el script para en vez de gastar búsquedas para nada. Detrás de eso hay además un tope diario absoluto, como último recurso.
+- **El número manual es el suplente:** de 1 a 100, con el botón ⚙ (20 por defecto). Toma el mando siempre que no haya sesión de Rewards, y es lo único que cuenta si desmarcas la casilla.
 - **Iniciar, continuar, detener y reiniciar.** Los controles cambian según el estado: una corrida en pausa ofrece *continuar* y *reiniciar*, una terminada solo *reiniciar*.
 - **El progreso sobrevive a las recargas.** Cada búsqueda es una navegación real, así que el contador vive en el almacenamiento y no en la página — cerrar la pestaña o irte a otro sitio no pierde tu avance.
 - **El contador se reinicia solo cada día a medianoche,** que es cuando Rewards también se reinicia.
+
+**Cuánto valen tus puntos**
+- El panel muestra tu saldo de Rewards, en cuánto se convierte en saldo Xbox / Microsoft Store, y la tarjeta Xbox más barata junto con los puntos que te faltan para ella.
+- **La tasa la da Rewards, no una suposición.** Donde tu mercado ofrece canje de importe variable, su tasa oficial de puntos a moneda se lee directamente del catálogo. Solo donde eso no existe la tasa se deduce del precio de las tarjetas, y el tooltip lo dice.
+- **Ojo con las tarjetas baratas:** dentro de un mismo mercado la misma tarjeta se vende a tasas distintas, y las pequeñas son el peor negocio — en México una tarjeta de MXN 20 sale a 57,25 puntos por peso y una de MXN 100 a 48,95. Por eso la tarjeta más barata se usa como umbral de «ya puedes canjear» y no como tipo de cambio.
 
 **Cómo evita parecer un robot**
 - **Las consultas se construyen, no se repiten:** cada una combina al azar entre una y tres de tus palabras clave, así que no hay dos corridas iguales.
@@ -75,9 +91,9 @@ Tampermonkey userscript that automates daily Bing searches to collect Microsoft 
 
 **Panel**
 - Tres pestañas —búsqueda, palabras clave, información— en un panel flotante que puedes **plegar**, y recuerda si lo dejaste abierto.
-- **Selector de idioma del script** en la pestaña de información: español, inglés o Auto. Bing no expone su propio idioma a la página de forma que el script pueda leerlo, así que sin esto el panel seguiría siempre al navegador y no a la tienda que hayas configurado. Al cambiarlo se recarga la página.
+- **Selector de idioma del script** en la pestaña de información: 22 idiomas más *Auto*. Con *Auto* sigue el idioma en que estés viendo Bing —Bing sí lo declara en la página— y cae al del navegador si la página no lo dijera. Elige uno de la lista para fijarlo; al cambiarlo se recarga la página.
 
-**Idioma:** el de tu navegador, o el que elijas en la pestaña de información.
+**Idioma:** el que estés viendo en Bing, el del navegador como respaldo, o el que fijes en la pestaña de información.
 
 **Instalación:**
 1. Instala [Tampermonkey](https://www.tampermonkey.net/).
@@ -87,9 +103,9 @@ Tampermonkey userscript that automates daily Bing searches to collect Microsoft 
 
 ## Privacy / Privacidad
 
-**EN:** the script makes no requests to external servers: to search it changes the URL within `bing.com`, exactly as if you typed the query yourself. It stores in the userscript manager's storage (`GM_setValue`, in your browser) only your keywords, the configured search total, the daily counter and date, whether the panel is collapsed, and your language preference. It does not read your Microsoft account or your history, and nothing is sent to third parties or to the author. Note that the searches appear in your Bing / Microsoft Rewards history like any normal search.
+**EN:** the script makes no requests to servers outside `bing.com`, and none at all to third parties or to the author. With *Use my Rewards progress* on, it sends one `GET` to `bing.com/rewards/panelflyout/getuserinfo` — the very endpoint that feeds the points panel in Bing's own header — to read your progress for the day, your balance and the redemption catalogue. That request is same-origin and rides your existing Bing session, which is why the script needs neither `GM_xmlhttpRequest` nor `@connect`. Clear the checkbox and it makes no network requests of its own: to search it changes the URL within `bing.com`, exactly as if you typed the query yourself. It stores in the userscript manager's storage (`GM_setValue`, in your browser) only your keywords, the manual search total, the daily counter and date, the last reading of your Rewards progress, whether the panel is collapsed, and your language preference. It does not read your Microsoft account or your history. Note that the searches appear in your Bing / Microsoft Rewards history like any normal search.
 
-**ES:** el script no hace ninguna petición a servidores externos: para buscar cambia la URL dentro de `bing.com`, igual que si escribieras la consulta a mano. Guarda en el almacenamiento del gestor de userscripts (`GM_setValue`, en tu navegador) solo tus palabras clave, el total de búsquedas configurado, el contador y la fecha del día, si el panel está plegado y tu preferencia de idioma. No lee tu cuenta de Microsoft ni tu historial, y no se envía nada a terceros ni al autor. Ten en cuenta que las búsquedas quedan en tu historial de Bing / Microsoft Rewards como cualquier búsqueda normal.
+**ES:** el script no hace peticiones a servidores fuera de `bing.com`, y ninguna en absoluto a terceros ni al autor. Con *Usar mi progreso de Rewards* activado, envía un `GET` a `bing.com/rewards/panelflyout/getuserinfo` —el mismo endpoint que alimenta el panel de puntos de la propia cabecera de Bing— para leer tu progreso del día, tu saldo y el catálogo de canje. Esa petición es del mismo origen y viaja con tu sesión de Bing ya abierta, y por eso el script no necesita ni `GM_xmlhttpRequest` ni `@connect`. Si desmarcas la casilla, no hace ninguna petición de red propia: para buscar cambia la URL dentro de `bing.com`, igual que si escribieras la consulta a mano. Guarda en el almacenamiento del gestor de userscripts (`GM_setValue`, en tu navegador) solo tus palabras clave, el total manual de búsquedas, el contador y la fecha del día, la última lectura de tu progreso de Rewards, si el panel está plegado y tu preferencia de idioma. No lee tu cuenta de Microsoft ni tu historial. Ten en cuenta que las búsquedas quedan en tu historial de Bing / Microsoft Rewards como cualquier búsqueda normal.
 
 ## Support / Apoyar
 
