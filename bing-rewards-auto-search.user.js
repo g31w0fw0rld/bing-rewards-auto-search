@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.2
+// @version      1.3.3
 // @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Waits out late crediting and links the other daily tasks. Queries from your own keywords, rotating search types (70% web plus images, videos, shopping, news), 3-10s delays with 10-25s reading pauses, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @author       g31w0fw0rld
 // @license      MIT
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.2';
+    const SCRIPT_VERSION = '1.3.3';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -2461,6 +2461,40 @@
     // =============================================
 
     /**
+     * Corta un texto en frases. El punto solo cuenta como final si le sigue un
+     * espacio, para no partir "v1.3.2" ni "ko-fi.com"; el punto japonés y el chino
+     * (。！？) y el danda del hindi (।) no llevan espacio detrás, así que valen solos.
+     */
+    function splitSentences(text) {
+        const out = [];
+        let buf = '';
+        for (let i = 0; i < text.length; i++) {
+            const c = text[i];
+            buf += c;
+            const cjkEnd = c === '。' || c === '！' || c === '？';
+            const plainEnd = (c === '.' || c === '!' || c === '?' || c === '।') &&
+                (i + 1 >= text.length || /\s/.test(text[i + 1]));
+            if (cjkEnd || plainEnd) { out.push(buf.trim()); buf = ''; }
+        }
+        if (buf.trim()) out.push(buf.trim());
+        return out;
+    }
+
+    /** Agrupa las frases en párrafos de `perPara`, para que la prosa respire. */
+    function infoParagraphs(text, perPara) {
+        const src = String(text || '');
+        const sentences = splitSentences(src);
+        // Japonés y chino no separan frases con espacio: unirlas con uno metería un
+        // hueco que el original no tiene.
+        const joiner = /^(ja|zh)/.test(LANG) ? '' : ' ';
+        const out = [];
+        for (let i = 0; i < sentences.length; i += perPara) {
+            out.push(sentences.slice(i, i + perPara).join(joiner));
+        }
+        return out.length ? out : [src];
+    }
+
+    /**
      * Construye el panel flotante con tabs: Búsqueda, Keywords, Info.
      * @returns {{ updateUI: function }}
      */
@@ -3257,28 +3291,34 @@
             langRow.appendChild(langSel);
             infoTab.pane.appendChild(langRow);
         }
-        const infoLines = [
+        // Ficha en rejilla de dos columnas y prosa en bloques aparte, como el modal
+        // de informacion de los scripts de Twitch y Kick. Antes los ocho datos —los
+        // cuatro cortos y los tres parrafos largos— iban por igual como "etiqueta en
+        // negrita + valor" en la misma linea: el ancho de cada etiqueta empujaba a su
+        // valor, asi que los cortos salian escalonados, y los largos arrancaban a
+        // media linea y seguian hasta el final sin un solo corte.
+        const infoMeta = document.createElement('div');
+        Object.assign(infoMeta.style, {
+            display: 'grid', gridTemplateColumns: 'auto minmax(0, 1fr)',
+            columnGap: '8px', rowGap: '4px', fontSize: '11px', lineHeight: '1.4'
+        });
+        [
             { label: t.infoName, value: 'Bing Rewards Auto Search' },
             { label: t.infoVersion, value: SCRIPT_VERSION },
-            { label: t.infoDescription, value: t.infoDescriptionText },
             { label: t.infoAuthor, value: 'g31w0fw0rld' },
             { label: t.infoGitHub, value: 'github.com/g31w0fw0rld/bing-rewards-auto-search', isLink: true },
-            { label: '☕ Ko-fi:', value: 'ko-fi.com/g31w0fw0rld', isLink: true },
-            { label: t.infoPrivacy, value: t.infoPrivacyText },
-            { label: t.infoHow, value: t.infoHowText }
-        ];
+            { label: '☕ Ko-fi:', value: 'ko-fi.com/g31w0fw0rld', isLink: true }
+        ].forEach(line => {
+            const labelEl = document.createElement('div');
+            labelEl.textContent = line.label;
+            Object.assign(labelEl.style, {
+                fontWeight: 'bold', color: colors.gray, whiteSpace: 'nowrap'
+            });
+            infoMeta.appendChild(labelEl);
 
-        infoLines.forEach(line => {
-            const row = document.createElement('div');
-            row.style.marginBottom = '6px';
-            row.style.lineHeight = '1.4';
-
-            const labelEl = document.createElement('span');
-            labelEl.textContent = line.label + ' ';
-            labelEl.style.fontWeight = 'bold';
-            labelEl.style.fontSize = '11px';
-            row.appendChild(labelEl);
-
+            const val = document.createElement('div');
+            // Sin esto la URL no parte y estira el panel mas alla de su ancho.
+            Object.assign(val.style, { minWidth: '0', overflowWrap: 'anywhere' });
             if (line.isLink) {
                 const a = document.createElement('a');
                 a.href = 'https://' + line.value;
@@ -3287,16 +3327,40 @@
                 a.rel = 'noopener noreferrer';
                 a.style.color = colors.primary;
                 a.style.textDecoration = 'underline';
-                a.style.fontSize = '11px';
-                row.appendChild(a);
+                val.appendChild(a);
             } else {
-                const val = document.createElement('span');
                 val.textContent = line.value;
-                val.style.fontSize = '11px';
-                row.appendChild(val);
             }
+            infoMeta.appendChild(val);
+        });
+        infoTab.pane.appendChild(infoMeta);
 
-            infoTab.pane.appendChild(row);
+        // Los tres bloques de prosa, cada uno con su encabezado y troceado en
+        // parrafos. La descripcion pasa de 1000 caracteres: en un solo bloque no se
+        // lee, y aqui no hay markdown que la estructure.
+        [
+            { title: t.infoDescription, text: t.infoDescriptionText },
+            { title: t.infoPrivacy, text: t.infoPrivacyText },
+            { title: t.infoHow, text: t.infoHowText }
+        ].forEach(sec => {
+            const h = document.createElement('div');
+            // La misma etiqueta de antes, sin los dos puntos: ya no encabeza una
+            // linea, encabeza un bloque. Se quitan tambien los de ancho completo del
+            // chino y el espacio previo del frances.
+            h.textContent = String(sec.title || '').replace(/\s*[:：]\s*$/, '');
+            Object.assign(h.style, {
+                fontWeight: 'bold', color: colors.primary, fontSize: '11px',
+                marginTop: '12px', marginBottom: '4px'
+            });
+            infoTab.pane.appendChild(h);
+            infoParagraphs(sec.text, 2).forEach(p => {
+                const para = document.createElement('div');
+                para.textContent = p;
+                Object.assign(para.style, {
+                    fontSize: '11px', lineHeight: '1.45', marginBottom: '6px'
+                });
+                infoTab.pane.appendChild(para);
+            });
         });
 
         // --- Ensamblar panel ---
