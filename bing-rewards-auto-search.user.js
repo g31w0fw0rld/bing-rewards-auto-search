@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.3
+// @version      1.3.4
 // @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Waits out late crediting and links the other daily tasks. Queries from your own keywords, rotating search types (70% web plus images, videos, shopping, news), 3-10s delays with 10-25s reading pauses, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @author       g31w0fw0rld
 // @license      MIT
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.3';
+    const SCRIPT_VERSION = '1.3.4';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -1329,11 +1329,25 @@
     // =============================================
 
     /**
-     * Obtiene la fecha de hoy en formato YYYY-MM-DD.
+     * Fecha de hoy en formato YYYY-MM-DD y en hora LOCAL.
+     *
+     * Aquí NO vale `toISOString()`, que es UTC: al oeste de Greenwich la fecha
+     * UTC cambia por la tarde, y a partir de esa hora todo lo que este valor
+     * decide se adelanta un día. Decide dos cosas, las dos «de hoy»: el reseteo
+     * del contador (`checkDailyReset`) y la validez del snapshot de Rewards
+     * (`readSnapshot`). Con UTC, en México (UTC−6) el contador se reiniciaba a
+     * las 18:00 —no a medianoche, como dice la pestaña de información— y un
+     * snapshot guardado ayer por la tarde llegaba a hoy marcado como del día en
+     * curso: el panel pintaba el progreso de ayer y, si venía completo,
+     * bloqueaba las búsquedas de hoy sin gastar ninguna. Con el mismo origen se
+     * arrastraba `KEY_SEEN_POINTS`, así que el progreso de hoy quedaba por
+     * debajo del de ayer y cada relectura contaba como atasco.
      * @returns {string}
      */
     function getToday() {
-        return new Date().toISOString().slice(0, 10);
+        const d = new Date();
+        const pad = (n) => String(n).padStart(2, '0');
+        return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
     }
 
     /**
@@ -1528,10 +1542,11 @@
 
     /**
      * Fecha de hoy en el formato MM/DD/YYYY de `daily_set_date`, y en hora
-     * LOCAL. Aquí NO sirve `getToday()`: sale de `toISOString()`, que es UTC, y
-     * al oeste de Greenwich a media tarde ya devolvería la fecha de mañana. Como
-     * el conjunto de mañana viene en la misma respuesta, eso no daría un fallo
-     * visible: daría tres actividades "pendientes" que aún no se pueden hacer.
+     * LOCAL, como `getToday()`. Son dos funciones porque el formato es otro:
+     * aquí hay que casar contra el MM/DD/YYYY que manda Bing. Lo de la hora
+     * local no es cosmético: el conjunto de mañana viene en la misma respuesta,
+     * así que una fecha adelantada daría tres actividades "pendientes" que aún
+     * no se pueden hacer.
      * @returns {string}
      */
     function todaySlash() {
@@ -1843,6 +1858,24 @@
 
     function writeSnapshot(s) {
         GM_setValue(KEY_SNAPSHOT, s);
+    }
+
+    /**
+     * ¿El snapshot que hay en memoria sirve para decidir? No sirve si no hay, si
+     * es de otro día o si pasó el TTL.
+     *
+     * Hace falta porque el script solo corre al CARGAR la página: una pestaña de
+     * Bing abierta desde ayer sigue con su panel pintado y su `rewards` de
+     * entonces, sin nada que lo caduque, y quien decide si el día está hecho es
+     * el `complete` de ese dato (`decideNext`). Verificado el 2026-08-20: el
+     * teléfono mostraba el estado del día anterior —racha, saldo y conjunto
+     * diario incluidos— con el escritorio marcando 12/60 pendientes en el mismo
+     * momento.
+     * @returns {boolean}
+     */
+    function snapshotStale() {
+        return !rewards || rewards.day !== getToday() ||
+            (Date.now() - rewards.at) > SNAPSHOT_TTL;
     }
 
     // =============================================
@@ -2663,10 +2696,40 @@
             return btn;
         }
 
+        /**
+         * Corre `next` con el progreso del día ya releído, si el que hay en
+         * memoria no sirve para decidir (ver snapshotStale).
+         *
+         * Lo usan los DOS botones con los que el usuario reconsidera el día, y
+         * hacen falta los dos: en el estado «completado» el panel no ofrece ▶,
+         * solo 🔄, así que sin esto de un «completado» heredado de ayer no se
+         * sale más que recargando la página. Releer no gasta una búsqueda.
+         * @param {function} next
+         */
+        function withFreshRewards(next) {
+            if (!getAuto() || !snapshotStale()) { next(); return; }
+            requestRewards().then((snap) => {
+                rewards = snap;
+                writeSnapshot(snap);
+                // La sesión está parada, así que esto solo pone al día la
+                // referencia del detector de atascos; su rama de atasco pide
+                // KEY_ACTIVE y no cuenta ninguno.
+                trackProgress(snap);
+                next();
+            }).catch((e) => {
+                // Un fallo de red no puede dejar el botón muerto: se sigue
+                // igual y manda el número manual, como en el resto del script.
+                console.error('(bing-rewards-auto-search): al releer:', e);
+                next();
+            });
+        }
+
         /** Inicia búsquedas desde el conteo actual. */
         function startSession() {
-            GM_setValue(KEY_ACTIVE, true);
-            executeNextSearch(updateUI);
+            withFreshRewards(() => {
+                GM_setValue(KEY_ACTIVE, true);
+                executeNextSearch(updateUI);
+            });
         }
 
         /** Detiene la sesión activa. */
@@ -2686,7 +2749,9 @@
             GM_setValue(KEY_STALL, 0);
             GM_setValue(KEY_STALL_RETRY, 0);
             if (searchTimeout) clearTimeout(searchTimeout);
-            updateUI(0, false, '');
+            // Reiniciar es también la única salida del estado «completado», que
+            // es donde un dato viejo encierra al panel: de ahí la relectura.
+            withFreshRewards(() => updateUI(0, false, ''));
         }
 
         /** Números con el separador de miles del idioma del panel. */
@@ -3393,8 +3458,7 @@
         // búsqueda hecha y el progreso de hace un minuto ya no vale. Parado,
         // basta el snapshot mientras esté fresco, para no lanzar una petición
         // por cada página de Bing que se visite navegando normalmente.
-        const stale = !rewards || (Date.now() - rewards.at) > SNAPSHOT_TTL;
-        const needsFetch = getAuto() && (active || stale);
+        const needsFetch = getAuto() && (active || snapshotStale());
 
         if (needsFetch) {
             requestRewards().then(snap => {
