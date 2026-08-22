@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.4
+// @version      1.3.5
 // @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Waits out late crediting and links the other daily tasks. Queries from your own keywords, rotating search types (70% web plus images, videos, shopping, news), 3-10s delays with 10-25s reading pauses, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @author       g31w0fw0rld
 // @license      MIT
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.4';
+    const SCRIPT_VERSION = '1.3.5';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -1263,6 +1263,11 @@
     const KEY_SEEN_POINTS = 'bing-rewards-seen-points';
     const KEY_STALL = 'bing-rewards-stall';
     const KEY_STALL_RETRY = 'bing-rewards-stall-retry';
+    // Búsquedas forzadas: la salida de mano cuando Rewards dice que el día está
+    // completo y el usuario sabe que no. Guarda el día —para que caduque solo—
+    // y el contador desde el que se forzó, que es lo que hace que ▶ signifique
+    // «busca otras N» y no «vuelve a empezar»: el contador del día no se toca.
+    const KEY_FORCE = 'bing-rewards-force';
 
     // Tope absoluto de búsquedas por día. En modo automático quien manda es la
     // API, pero si su contador se quedara congelado el bucle no tendría freno,
@@ -1363,7 +1368,20 @@
             GM_setValue(KEY_SEEN_POINTS, -1);
             GM_setValue(KEY_STALL, 0);
             GM_setValue(KEY_STALL_RETRY, 0);
+            // Forzar es cosa de un día: mañana vuelve a mandar Rewards.
+            GM_setValue(KEY_FORCE, null);
         }
+    }
+
+    /**
+     * ¿Hay búsquedas forzadas a mano HOY? Devuelve desde qué cuenta se forzó,
+     * o null. El día se comprueba aquí y no solo en `checkDailyReset` porque una
+     * pestaña abierta desde ayer no pasa por el reseteo hasta que se recarga.
+     * @returns {{day:string,from:number}|null}
+     */
+    function getForce() {
+        const f = GM_getValue(KEY_FORCE, null);
+        return (f && typeof f === 'object' && f.day === getToday()) ? f : null;
     }
 
     /**
@@ -1857,6 +1875,13 @@
     }
 
     function writeSnapshot(s) {
+        // Un fallo de red NO se guarda. Guardarlo hacía dos daños a la vez:
+        // satisfacía el TTL —o sea que bloqueaba los reintentos cinco minutos,
+        // y en el móvil el timeout de 8 s se agota con mucha más facilidad— y
+        // tiraba el progreso bueno del día, dejando el panel en modo manual sin
+        // más síntoma que un aviso gris. Sin guardarlo, la siguiente carga
+        // vuelve a encontrar el último dato bueno y lo relee en cuanto caduque.
+        if (!s || !s.ok) return;
         GM_setValue(KEY_SNAPSHOT, s);
     }
 
@@ -1871,11 +1896,37 @@
      * teléfono mostraba el estado del día anterior —racha, saldo y conjunto
      * diario incluidos— con el escritorio marcando 12/60 pendientes en el mismo
      * momento.
+     *
+     * Y no sirve tampoco si el último intento falló: guardar el fallo dejaba el
+     * panel en modo manual y sin reintentar hasta que caducara el TTL (ver
+     * `writeSnapshot`).
      * @returns {boolean}
      */
     function snapshotStale() {
-        return !rewards || rewards.day !== getToday() ||
+        return !rewards || !rewards.ok || rewards.day !== getToday() ||
             (Date.now() - rewards.at) > SNAPSHOT_TTL;
+    }
+
+    /**
+     * ¿La página se cargó porque el usuario la recargó a mano (F5, tirar hacia
+     * abajo en el móvil)?
+     *
+     * Eso es una ORDEN de releer, no una consulta, así que no puede mirar el
+     * TTL: recargar era justamente lo que el usuario hacía para salir de un
+     * «✓ Completado» heredado, y no servía de nada. Navegar por Bing sí sigue
+     * mirándolo, que es para lo que existe —si no, sería una petición por
+     * página—.
+     * @returns {boolean}
+     */
+    function reloadedByHand() {
+        try {
+            const nav = performance.getEntriesByType('navigation')[0];
+            if (nav) return nav.type === 'reload';
+            // Safari viejo (iOS < 15) no trae la entrada de navegación; el API
+            // obsoleto sigue ahí y para esto vale igual (1 === TYPE_RELOAD).
+            if (performance.navigation) return performance.navigation.type === 1;
+        } catch (e) { /* sin dato, se sigue mirando el TTL */ }
+        return false;
     }
 
     // =============================================
@@ -2014,6 +2065,20 @@
     function trackProgress(snap) {
         if (!snap || !snap.ok || !snap.search) return;
         const seen = GM_getValue(KEY_SEEN_POINTS, -1);
+        // El contador BAJANDO no es un atasco: es Rewards estrenando su día.
+        // Y no rueda a la medianoche local, sino con el reloj de Microsoft, así
+        // que basta con abrir Bing en esa franja para que la referencia se
+        // quede con los 60 puntos de ayer. A partir de ahí NINGUNA búsqueda del
+        // día puede superarla —el máximo es justo ese 60—, con lo que todas
+        // contaban como atasco: a la quinta se gastaban las tres esperas de
+        // medio minuto y el resto del día el panel avisaba en rojo de que Bing
+        // había dejado de acreditar, siendo falso.
+        if (snap.search.progress < seen) {
+            GM_setValue(KEY_SEEN_POINTS, snap.search.progress);
+            GM_setValue(KEY_STALL, 0);
+            GM_setValue(KEY_STALL_RETRY, 0);
+            return;
+        }
         if (snap.search.progress > seen) {
             GM_setValue(KEY_SEEN_POINTS, snap.search.progress);
             GM_setValue(KEY_STALL, 0);
@@ -2022,9 +2087,15 @@
             // siguiente. Sin esto, tres retrasos sueltos a lo largo del día se
             // sumarían y el tercero pararía la sesión sin motivo.
             GM_setValue(KEY_STALL_RETRY, 0);
-        } else if (seen >= 0 && GM_getValue(KEY_ACTIVE, false)) {
+        } else if (seen >= 0 && GM_getValue(KEY_ACTIVE, false) && !getForce()) {
             // Solo cuenta como atasco mientras se busca: con el panel parado es
             // normal que el contador no se mueva entre cargas.
+            //
+            // Y tampoco en forzado, donde el contador quieto no es un atasco
+            // sino lo esperable: el día está completo y por eso se forzó. Sin
+            // esta condición, una sesión pedida a mano se llevaba tres esperas
+            // de medio minuto y un aviso en rojo de que Bing dejó de acreditar,
+            // que ahí es cierto y no le sirve de nada a quien ya lo sabe.
             GM_setValue(KEY_STALL, GM_getValue(KEY_STALL, 0) + 1);
         }
     }
@@ -2048,6 +2119,14 @@
         // solo cambia el ritmo (una espera para releer) y pinta el aviso. Lo
         // único que detiene la sesión sola es completar el día o el tope de
         // seguridad de arriba.
+        // Forzado a mano: manda el número manual y NO el `complete` de la API,
+        // que es justo lo que se está sorteando. Se cuenta desde donde se forzó,
+        // así que son N búsquedas más y no N en total.
+        const forced = getForce();
+        if (forced) {
+            return (count - forced.from) >= getTotal()
+                ? { go: false, reason: 'done' } : { go: true, reason: '' };
+        }
         if (usingApi()) {
             return rewards.search.complete ? { go: false, reason: 'done' } : { go: true, reason: '' };
         }
@@ -2675,6 +2754,15 @@
             color: colors.gray, display: 'none'
         });
 
+        // Cuarta línea: la edad del dato de Rewards. En el móvil no hay
+        // consola, así que es la única forma de contestar «¿esto es de ahora o
+        // es la caché?» —la pregunta que dejó el panel clavado en 60/60—.
+        const ageText = document.createElement('div');
+        Object.assign(ageText.style, {
+            marginTop: '6px', textAlign: 'center', fontSize: '10px',
+            color: colors.gray, display: 'none'
+        });
+
         const btnRow = document.createElement('div');
         Object.assign(btnRow.style, {
             display: 'flex', gap: '6px', justifyContent: 'center'
@@ -2697,17 +2785,18 @@
         }
 
         /**
-         * Corre `next` con el progreso del día ya releído, si el que hay en
-         * memoria no sirve para decidir (ver snapshotStale).
+         * Corre `next` con el progreso del día ya releído.
          *
          * Lo usan los DOS botones con los que el usuario reconsidera el día, y
-         * hacen falta los dos: en el estado «completado» el panel no ofrece ▶,
-         * solo 🔄, así que sin esto de un «completado» heredado de ayer no se
-         * sale más que recargando la página. Releer no gasta una búsqueda.
+         * releen SIEMPRE, sin mirar el TTL: un clic es una orden. Mirándolo, de
+         * un «✓ Completado» heredado no se salía durante los cinco minutos
+         * siguientes —el estado completado no ofrece ▶, solo 🔄, y 🔄 repintaba
+         * la misma caché—, que es el mismo encierro de 1.3.4 con otra cerradura.
+         * Releer no gasta una búsqueda.
          * @param {function} next
          */
         function withFreshRewards(next) {
-            if (!getAuto() || !snapshotStale()) { next(); return; }
+            if (!getAuto()) { next(); return; }
             requestRewards().then((snap) => {
                 rewards = snap;
                 writeSnapshot(snap);
@@ -2732,6 +2821,28 @@
             });
         }
 
+        /**
+         * Arranca una sesión saltándose el «completado» de Rewards: N búsquedas
+         * más contadas desde ahora, con N el número manual de la pestaña ⚙.
+         *
+         * Releer primero no sobra: casi siempre el «completado» es de verdad y
+         * el usuario está viendo dato viejo, y en ese caso lo que quiere es el
+         * dato bueno, no gastar veinte búsquedas. Si tras releer sigue completo,
+         * el ▶ que pulsó ya dejó el forzado puesto y la sesión sale igual.
+         */
+        function forceSession() {
+            withFreshRewards(() => {
+                GM_setValue(KEY_FORCE, { day: getToday(), from: GM_getValue(KEY_COUNT, 0) });
+                // Forzar es soltar todos los frenos del día, como reiniciar: si
+                // quedó marcado como atascado, el primer paso serían tres
+                // esperas de medio minuto antes de buscar nada.
+                GM_setValue(KEY_STALL, 0);
+                GM_setValue(KEY_STALL_RETRY, 0);
+                GM_setValue(KEY_ACTIVE, true);
+                executeNextSearch(updateUI);
+            });
+        }
+
         /** Detiene la sesión activa. */
         function stopSession() {
             GM_setValue(KEY_ACTIVE, false);
@@ -2748,10 +2859,31 @@
             // reintentos, que si no el primer atasco pararía la sesión en seco.
             GM_setValue(KEY_STALL, 0);
             GM_setValue(KEY_STALL_RETRY, 0);
+            // Y el forzado, que si no el contador a cero se leería contra el
+            // punto desde el que se forzó y el panel arrancaría en negativo.
+            GM_setValue(KEY_FORCE, null);
             if (searchTimeout) clearTimeout(searchTimeout);
-            // Reiniciar es también la única salida del estado «completado», que
-            // es donde un dato viejo encierra al panel: de ahí la relectura.
+            // Reiniciar vuelve a poner a Rewards al mando, así que relee: es el
+            // camino de vuelta del forzado al automático.
             withFreshRewards(() => updateUI(0, false, ''));
+        }
+
+        /**
+         * Edad del dato de Rewards, en el idioma del panel y SIN cadenas nuevas:
+         * Intl.RelativeTimeFormat ya sabe decir «hace 12 segundos» en los 22
+         * idiomas del script, así que esto no pasa por el diccionario.
+         * @param {number} at - Sello del snapshot (Date.now() de su lectura).
+         */
+        function ago(at) {
+            const secs = Math.max(0, Math.round((Date.now() - at) / 1000));
+            const [n, unit] = secs < 60 ? [secs, 'second']
+                : secs < 3600 ? [Math.round(secs / 60), 'minute']
+                : [Math.round(secs / 3600), 'hour'];
+            try {
+                return new Intl.RelativeTimeFormat(LANG, { numeric: 'auto' }).format(-n, unit);
+            } catch (e) {
+                return `-${n} ${unit}`;
+            }
         }
 
         /** Números con el separador de miles del idioma del panel. */
@@ -2776,17 +2908,32 @@
          */
         function updateUI(count, active, reason) {
             btnRow.innerHTML = '';
-            const api = usingApi();
+            // Forzado se pinta como el modo manual: lo que gobierna es el número
+            // de búsquedas, no los puntos. Enseñar «60/60 pts» mientras busca a
+            // propósito por encima de eso, con un estimado de «~0 restantes»,
+            // sería el panel contradiciéndose a sí mismo.
+            const forced = getForce();
+            const api = usingApi() && !forced;
             const s = api ? rewards.search : null;
             const total = getTotal();
-            const done = api ? s.complete : count >= total;
-            const progress = api ? `${fmt(s.progress)}/${fmt(s.max)} ${t.pointsShort}` : `${count}/${total}`;
+            const local = count - (forced ? forced.from : 0);
+            const done = api ? s.complete : local >= total;
+            const progress = api ? `${fmt(s.progress)}/${fmt(s.max)} ${t.pointsShort}` : `${local}/${total}`;
 
             hintText.style.display = 'none';
             // Por setTipText y no por `title` directo: este repintado corre en cada
             // búsqueda y puede pillar el ratón encima de la pista, con su aviso ya
             // abierto (ver la sección TOOLTIP PROPIO).
             setTipText(hintText, '');
+
+            // Va antes de cualquier return de esta función: el estado que más
+            // necesita saber la edad del dato es justo el que corta arriba.
+            if (rewards && rewards.ok) {
+                ageText.textContent = `↻ ${ago(rewards.at)}`;
+                ageText.style.display = 'block';
+            } else {
+                ageText.style.display = 'none';
+            }
 
             /** Aviso bajo el progreso: estimado si sigue, motivo si paró. */
             function hint(text, tip, color) {
@@ -2808,6 +2955,13 @@
             if (done) {
                 statusText.textContent = `✓ ${t.completed} (${progress})`;
                 statusText.style.color = colors.green;
+                // ▶ TAMBIÉN en completado, y es la única salida de mano que hay
+                // cuando Rewards dice que el día está hecho y el usuario sabe
+                // que no: antes el estado terminal solo ofrecía 🔄, que releía
+                // el mismo «completo» y volvía aquí. Reutiliza la etiqueta y el
+                // aviso de ▶ a propósito, para no meter una cadena nueva en los
+                // 22 idiomas por un botón que hace lo mismo que dice: buscar.
+                btnRow.appendChild(createActionBtn(t.start, t.startTooltip, colors.primary, forceSession));
                 btnRow.appendChild(createActionBtn(t.restart, t.restartTooltip, colors.primary, restartCounter));
             } else if (active) {
                 statusText.textContent = `${t.searching}... ${progress}`;
@@ -3084,6 +3238,7 @@
         searchTab.pane.appendChild(statusText);
         searchTab.pane.appendChild(hintText);
         searchTab.pane.appendChild(btnRow);
+        searchTab.pane.appendChild(ageText);
         searchTab.pane.appendChild(tasksBox);
         searchTab.pane.appendChild(valueBox);
 
@@ -3455,10 +3610,11 @@
         updateUI(count, active, '');
 
         // Con sesión activa se relee siempre: cada carga de página es una
-        // búsqueda hecha y el progreso de hace un minuto ya no vale. Parado,
+        // búsqueda hecha y el progreso de hace un minuto ya no vale. Y con una
+        // recarga a mano también, que es una orden explícita. Navegando parado
         // basta el snapshot mientras esté fresco, para no lanzar una petición
-        // por cada página de Bing que se visite navegando normalmente.
-        const needsFetch = getAuto() && (active || snapshotStale());
+        // por cada página de Bing que se visite.
+        const needsFetch = getAuto() && (active || reloadedByHand() || snapshotStale());
 
         if (needsFetch) {
             requestRewards().then(snap => {
