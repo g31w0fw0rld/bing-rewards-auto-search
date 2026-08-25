@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.5
+// @version      1.3.6
 // @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Waits out late crediting and links the other daily tasks. Queries from your own keywords, rotating search types (70% web plus images, videos, shopping, news), 3-10s delays with 10-25s reading pauses, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @author       g31w0fw0rld
 // @license      MIT
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.5';
+    const SCRIPT_VERSION = '1.3.6';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -126,7 +126,7 @@
             dailySetTip: 'Las tres actividades del día en Rewards, aparte de las búsquedas: cuentan para la racha. Cada enlace abre en una pestaña nueva la que falta. Si hay búsquedas automáticas en marcha, se detienen al abrirla, para que no te saquen de la página antes de completarla.',
             dailySet: 'Conjunto diario',
             streakDays: 'Racha: {n} días',
-            streakTip: 'Días seguidos cumpliendo con Rewards. Cada línea es una racha aparte de siete pasos: los seis primeros días pagan poco y el séptimo da el premio gordo. El ✓ es lo que ya cuenta hoy; lo demás abre donde se hace.',
+            streakTip: 'Cada línea es una racha aparte de siete pasos: los seis primeros días pagan poco y el séptimo da el premio gordo. El ✓ es lo que ya cuenta hoy; lo demás abre donde se hace.',
             extraOffersNote: 'Más actividades en Rewards',
             extraOffersTip: 'En el panel de Rewards y en la app de Bing suele haber actividades extra que dan más puntos que estas. No son siempre las mismas: unas son búsquedas y otras no (puzles, preguntas, encuestas).',
             autoLabel: 'Usar mi progreso de Rewards',
@@ -194,7 +194,7 @@
             dailySetTip: 'The three Rewards activities of the day, separate from searches: they count towards your streak. Each link opens a pending one in a new tab. If automatic searches are running, they stop when you open it, so they do not navigate you away before you finish it.',
             dailySet: 'Daily set',
             streakDays: 'Streak: {n} days',
-            streakTip: 'Days in a row keeping up with Rewards. Each line is a separate seven-step streak: the first six days pay little and the seventh pays the big one. A ✓ is what already counts today; the rest open where you do it.',
+            streakTip: 'Each line is a separate seven-step streak: the first six days pay little and the seventh pays the big one. A ✓ is what already counts today; the rest open where you do it.',
             extraOffersNote: 'More activities in Rewards',
             extraOffersTip: 'The Rewards dashboard and the Bing app usually carry extra activities worth more points than these. They are not always the same: some are searches and some are not (puzzles, questions, polls).',
             autoLabel: 'Use my Rewards progress',
@@ -248,7 +248,7 @@
             dailySetTip: 'Die drei Rewards-Aktivitäten des Tages, getrennt von den Suchen: Sie zählen für deine Serie. Jeder Link öffnet eine offene Aktivität in einem neuen Tab. Laufen gerade automatische Suchen, werden sie beim Öffnen angehalten, damit sie dich nicht von der Seite wegführen, bevor du fertig bist.',
             dailySet: 'Tagesset',
             streakDays: 'Serie: {n} Tage',
-            streakTip: 'Tage in Folge mit erledigten Rewards-Aufgaben. Jede Zeile ist eine eigene Serie über sieben Schritte: Die ersten sechs Tage bringen wenig, der siebte den großen Bonus. Ein ✓ zählt heute schon; alles andere öffnet dort, wo es erledigt wird.',
+            streakTip: 'Jede Zeile ist eine eigene Serie über sieben Schritte: Die ersten sechs Tage bringen wenig, der siebte den großen Bonus. Ein ✓ zählt heute schon; alles andere öffnet dort, wo es erledigt wird.',
             extraOffersNote: 'Mehr Aktivitäten in Rewards',
             extraOffersTip: 'Im Rewards-Dashboard und in der Bing-App gibt es meist zusätzliche Aktivitäten, die mehr Punkte bringen als diese. Sie sind nicht immer dieselben: Manche sind Suchen, andere nicht (Puzzles, Quizfragen, Umfragen).',
             autoLabel: 'Meinen Rewards-Fortschritt verwenden',
@@ -297,7 +297,7 @@
             dailySetTip: 'Les trois activités Rewards du jour, distinctes des recherches : elles comptent pour votre série. Chaque lien ouvre dans un nouvel onglet celle qui reste. Si des recherches automatiques sont en cours, elles s’arrêtent à l’ouverture, pour ne pas vous faire quitter la page avant la fin.',
             dailySet: 'Ensemble quotidien',
             streakDays: 'Série : {n} jours',
-            streakTip: 'Jours d’affilée à remplir vos tâches Rewards. Chaque ligne est une série distincte de sept étapes : les six premiers jours rapportent peu et le septième donne le gros lot. Un ✓ compte déjà aujourd’hui ; le reste ouvre là où cela se fait.',
+            streakTip: 'Chaque ligne est une série distincte de sept étapes : les six premiers jours rapportent peu et le septième donne le gros lot. Un ✓ compte déjà aujourd’hui ; le reste ouvre là où cela se fait.',
             extraOffersNote: 'Plus d’activités dans Rewards',
             extraOffersTip: 'Le tableau de bord Rewards et l’application Bing proposent en général des activités supplémentaires qui rapportent plus que celles-ci. Elles ne sont pas toujours les mêmes : certaines sont des recherches, d’autres non (puzzles, questions, sondages).',
             autoLabel: 'Utiliser ma progression Rewards',
@@ -346,7 +346,7 @@
             dailySetTip: 'As três atividades do dia no Rewards, à parte das pesquisas: contam para a sua sequência. Cada ligação abre num separador novo a que falta. Se houver pesquisas automáticas a decorrer, param ao abri-la, para não o tirarem da página antes de a concluir.',
             dailySet: 'Conjunto diário',
             streakDays: 'Sequência: {n} dias',
-            streakTip: 'Dias seguidos a cumprir no Rewards. Cada linha é uma sequência à parte de sete passos: os seis primeiros dias pagam pouco e o sétimo dá o prémio grande. O ✓ é o que já conta hoje; o resto abre onde se faz.',
+            streakTip: 'Cada linha é uma sequência à parte de sete passos: os seis primeiros dias pagam pouco e o sétimo dá o prémio grande. O ✓ é o que já conta hoje; o resto abre onde se faz.',
             extraOffersNote: 'Mais atividades no Rewards',
             extraOffersTip: 'No painel do Rewards e na aplicação Bing costuma haver atividades extra que dão mais pontos do que estas. Nem sempre são as mesmas: umas são pesquisas e outras não (puzzles, perguntas, sondagens).',
             autoLabel: 'Usar o meu progresso do Rewards',
@@ -395,7 +395,7 @@
             dailySetTip: 'Три задания Rewards на сегодня, помимо поиска: они идут в зачёт серии. Каждая ссылка открывает невыполненное задание в новой вкладке. Если идёт автоматический поиск, при открытии он останавливается, чтобы не увести вас со страницы, пока вы его не закончите.',
             dailySet: 'Ежедневный набор',
             streakDays: 'Серия дней подряд: {n}',
-            streakTip: 'Дни подряд с выполненными заданиями Rewards. Каждая строка — отдельная серия из семи шагов: первые шесть дней дают немного, а седьмой — крупный бонус. Галочка означает, что на сегодня уже засчитано; остальные строки открывают то, где это делается.',
+            streakTip: 'Каждая строка — отдельная серия из семи шагов: первые шесть дней дают немного, а седьмой — крупный бонус. Галочка означает, что на сегодня уже засчитано; остальные строки открывают то, где это делается.',
             extraOffersNote: 'Больше заданий в Rewards',
             extraOffersTip: 'На панели Rewards и в приложении Bing обычно есть дополнительные задания, которые дают больше баллов, чем эти. Они не всегда одинаковые: часть — поиски, часть — нет (головоломки, викторины, опросы).',
             autoLabel: 'Использовать мой прогресс Rewards',
@@ -444,7 +444,7 @@
             dailySetTip: 'Günün üç Rewards etkinliği; aramalardan ayrıdır ve seriye sayılır. Her bağlantı, kalan etkinliği yeni bir sekmede açar. Otomatik aramalar sürüyorsa açtığınızda durur; böylece siz bitirmeden sizi sayfadan uzaklaştırmazlar.',
             dailySet: 'Günlük set',
             streakDays: 'Seri: {n} gün',
-            streakTip: 'Rewards görevlerini üst üste tamamladığınız günler. Her satır, yedi adımlık ayrı bir seridir: ilk altı gün az kazandırır, yedincisi büyük ikramiyeyi verir. ✓ bugün için zaten sayılanı gösterir; diğerleri yapıldığı yeri açar.',
+            streakTip: 'Her satır, yedi adımlık ayrı bir seridir: ilk altı gün az kazandırır, yedincisi büyük ikramiyeyi verir. ✓ bugün için zaten sayılanı gösterir; diğerleri yapıldığı yeri açar.',
             extraOffersNote: 'Rewards’ta daha fazla etkinlik',
             extraOffersTip: 'Rewards panelinde ve Bing uygulamasında genellikle bunlardan daha çok puan veren ek etkinlikler bulunur. Hep aynı olmazlar: bazıları aramadır, bazıları değil (yapbozlar, sorular, anketler).',
             autoLabel: 'Rewards ilerlememi kullan',
@@ -493,7 +493,7 @@
             dailySetTip: '検索とは別の、その日の Rewards アクティビティ3つです。連続記録の対象になります。各リンクは未完了のものを新しいタブで開きます。自動検索が動いている場合は開いた時点で停止します。終わる前にページから移動させないためです。',
             dailySet: 'デイリーセット',
             streakDays: '連続記録: {n}日',
-            streakTip: 'Rewards の課題を続けた日数です。各行はそれぞれ7段階の連続記録で、最初の6日は少しずつ、7日目にまとめて入ります。✓ は今日ぶんがすでに数えられているもの、それ以外は実施する場所を開きます。',
+            streakTip: '各行はそれぞれ7段階の連続記録で、最初の6日は少しずつ、7日目にまとめて入ります。✓ は今日ぶんがすでに数えられているもの、それ以外は実施する場所を開きます。',
             extraOffersNote: 'Rewards の他のアクティビティ',
             extraOffersTip: 'Rewards のダッシュボードや Bing アプリには、これらより点数の高い追加アクティビティがあるのが普通です。毎回同じとは限らず、検索のものもあれば、そうでないもの（パズル、クイズ、アンケート）もあります。',
             autoLabel: 'Rewards の進捗を使う',
@@ -542,7 +542,7 @@
             dailySetTip: '검색과는 별개인 오늘의 Rewards 활동 세 가지입니다. 연속 기록에 반영됩니다. 각 링크는 남은 활동을 새 탭에서 엽니다. 자동 검색이 실행 중이면 열 때 멈춥니다. 끝내기 전에 페이지를 벗어나지 않도록 하기 위해서입니다.',
             dailySet: '데일리 세트',
             streakDays: '연속 기록: {n}일',
-            streakTip: 'Rewards 과제를 이어간 일수입니다. 각 줄은 7단계짜리 별도의 연속 기록으로, 처음 엿새는 조금씩 주고 이레째에 크게 줍니다. ✓ 는 오늘 몫이 이미 반영된 것이고, 나머지는 해당 작업을 하는 곳을 엽니다.',
+            streakTip: '각 줄은 7단계짜리 별도의 연속 기록으로, 처음 엿새는 조금씩 주고 이레째에 크게 줍니다. ✓ 는 오늘 몫이 이미 반영된 것이고, 나머지는 해당 작업을 하는 곳을 엽니다.',
             extraOffersNote: 'Rewards의 다른 활동',
             extraOffersTip: 'Rewards 대시보드와 Bing 앱에는 보통 이보다 점수가 높은 추가 활동이 있습니다. 매번 같지도 않아서 검색인 것도 있고 아닌 것도 있습니다(퍼즐, 퀴즈, 설문).',
             autoLabel: '내 Rewards 진행 상황 사용',
@@ -591,7 +591,7 @@
             dailySetTip: 'Trzy dzisiejsze aktywności Rewards, osobne od wyszukiwań: liczą się do serii. Każdy odnośnik otwiera brakującą w nowej karcie. Jeśli trwają automatyczne wyszukiwania, po otwarciu zostają zatrzymane, żeby nie zabrały cię ze strony przed jej ukończeniem.',
             dailySet: 'Zestaw dzienny',
             streakDays: 'Seria dni z rzędu: {n}',
-            streakTip: 'Dni z rzędu z wykonanymi zadaniami Rewards. Każdy wiersz to osobna seria z siedmiu kroków: pierwsze sześć dni daje niewiele, a siódmy dużą premię. Znak ✓ oznacza, że na dziś już się liczy; pozostałe otwierają miejsce, gdzie się to robi.',
+            streakTip: 'Każdy wiersz to osobna seria z siedmiu kroków: pierwsze sześć dni daje niewiele, a siódmy dużą premię. Znak ✓ oznacza, że na dziś już się liczy; pozostałe otwierają miejsce, gdzie się to robi.',
             extraOffersNote: 'Więcej aktywności w Rewards',
             extraOffersTip: 'W panelu Rewards i w aplikacji Bing zwykle są dodatkowe aktywności dające więcej punktów niż te. Nie zawsze są takie same: jedne to wyszukiwania, inne nie (układanki, pytania, ankiety).',
             autoLabel: 'Używaj mojego postępu Rewards',
@@ -640,7 +640,7 @@
             dailySetTip: 'Päivän kolme Rewards-tehtävää, hauista erillään: ne kerryttävät putkea. Kukin linkki avaa puuttuvan tehtävän uuteen välilehteen. Jos automaattiset haut ovat käynnissä, ne pysähtyvät avattaessa, jotta ne eivät vie sinua pois sivulta ennen kuin saat sen valmiiksi.',
             dailySet: 'Päivän setti',
             streakDays: 'Putki: {n} päivää',
-            streakTip: 'Peräkkäiset päivät, joina Rewards-tehtävät on tehty. Kukin rivi on oma seitsenaskelinen putkensa: kuusi ensimmäistä päivää tuottavat vähän ja seitsemäs ison bonuksen. ✓ tarkoittaa, että tämä päivä on jo laskettu; muut avaavat paikan, jossa tehtävä tehdään.',
+            streakTip: 'Kukin rivi on oma seitsenaskelinen putkensa: kuusi ensimmäistä päivää tuottavat vähän ja seitsemäs ison bonuksen. ✓ tarkoittaa, että tämä päivä on jo laskettu; muut avaavat paikan, jossa tehtävä tehdään.',
             extraOffersNote: 'Lisää tehtäviä Rewardsissa',
             extraOffersTip: 'Rewards-koontinäytöllä ja Bing-sovelluksessa on yleensä lisätehtäviä, joista saa enemmän pisteitä kuin näistä. Ne eivät ole aina samoja: osa on hakuja, osa ei (palapelit, kysymykset, kyselyt).',
             autoLabel: 'Käytä Rewards-edistymistäni',
@@ -689,7 +689,7 @@
             dailySetTip: 'Ba hoạt động Rewards trong ngày, tách khỏi phần tìm kiếm: chúng được tính cho chuỗi ngày. Mỗi liên kết mở hoạt động còn thiếu trong tab mới. Nếu đang chạy tìm kiếm tự động, chúng sẽ dừng khi bạn mở, để không kéo bạn rời trang trước khi hoàn thành.',
             dailySet: 'Bộ nhiệm vụ hằng ngày',
             streakDays: 'Chuỗi: {n} ngày',
-            streakTip: 'Số ngày liên tiếp bạn hoàn thành nhiệm vụ Rewards. Mỗi dòng là một chuỗi bảy bước riêng: sáu ngày đầu trả ít, ngày thứ bảy trả phần lớn nhất. Dấu ✓ nghĩa là hôm nay đã được tính; các dòng còn lại mở nơi thực hiện.',
+            streakTip: 'Mỗi dòng là một chuỗi bảy bước riêng: sáu ngày đầu trả ít, ngày thứ bảy trả phần lớn nhất. Dấu ✓ nghĩa là hôm nay đã được tính; các dòng còn lại mở nơi thực hiện.',
             extraOffersNote: 'Thêm hoạt động trong Rewards',
             extraOffersTip: 'Bảng điều khiển Rewards và ứng dụng Bing thường có thêm những hoạt động cho nhiều điểm hơn các mục này. Chúng không cố định: có cái là tìm kiếm, có cái không (xếp hình, câu hỏi, khảo sát).',
             autoLabel: 'Dùng tiến độ Rewards của tôi',
@@ -738,7 +738,7 @@
             dailySetTip: '当天的三项 Rewards 活动，与搜索分开计算，会计入连续天数。每个链接会在新标签页中打开尚未完成的那一项。如果自动搜索正在进行，打开时会停止，以免在你完成之前把页面跳走。',
             dailySet: '每日任务',
             streakDays: '连续天数：{n} 天',
-            streakTip: '连续完成 Rewards 任务的天数。每一行都是一个独立的七步连续记录：前六天给得少，第七天一次给足。✓ 表示今天这一份已经算上了，其余会打开完成任务的地方。',
+            streakTip: '每一行都是一个独立的七步连续记录：前六天给得少，第七天一次给足。✓ 表示今天这一份已经算上了，其余会打开完成任务的地方。',
             extraOffersNote: 'Rewards 里还有更多活动',
             extraOffersTip: 'Rewards 面板和 Bing 应用里通常还有额外活动，给的分比这些多。它们并不固定：有的是搜索，有的不是（拼图、问答、问卷）。',
             autoLabel: '使用我的 Rewards 进度',
@@ -787,7 +787,7 @@
             dailySetTip: 'أنشطة Rewards الثلاثة لليوم، منفصلة عن عمليات البحث، وتُحتسب لسلسلتك. يفتح كل رابط النشاط الناقص في علامة تبويب جديدة. وإذا كانت عمليات البحث التلقائية جارية، فإنها تتوقف عند فتحه، حتى لا تنقلك من الصفحة قبل إتمامه.',
             dailySet: 'المجموعة اليومية',
             streakDays: 'سلسلة الأيام المتتالية: {n}',
-            streakTip: 'أيام متتالية أنجزت فيها مهام Rewards. كل سطر سلسلة مستقلة من سبع خطوات: الأيام الستة الأولى تمنح القليل، واليوم السابع يمنح الجائزة الكبرى. وعلامة ✓ تعني أن نصيب اليوم محسوب بالفعل؛ أما البقية فتفتح المكان الذي تُنجَز فيه.',
+            streakTip: 'كل سطر سلسلة مستقلة من سبع خطوات: الأيام الستة الأولى تمنح القليل، واليوم السابع يمنح الجائزة الكبرى. وعلامة ✓ تعني أن نصيب اليوم محسوب بالفعل؛ أما البقية فتفتح المكان الذي تُنجَز فيه.',
             extraOffersNote: 'أنشطة أخرى في Rewards',
             extraOffersTip: 'عادةً ما توجد في لوحة Rewards وفي تطبيق Bing أنشطة إضافية تمنح نقاطًا أكثر من هذه. وهي ليست الأنشطة نفسها دائمًا: بعضها عمليات بحث وبعضها لا (ألغاز وأسئلة واستطلاعات).',
             autoLabel: 'استخدام تقدّمي في Rewards',
@@ -836,7 +836,7 @@
             dailySetTip: 'आज की तीन Rewards गतिविधियाँ, खोजों से अलग: ये आपकी लगातार दिनों की गिनती में जुड़ती हैं। हर लिंक बाकी गतिविधि को नए टैब में खोलता है। अगर स्वचालित खोजें चल रही हों, तो खोलते ही वे रुक जाती हैं, ताकि पूरा करने से पहले वे आपको पेज से हटा न दें।',
             dailySet: 'दैनिक सेट',
             streakDays: 'लगातार दिनों की शृंखला: {n}',
-            streakTip: 'लगातार वे दिन जिनमें आपने Rewards के काम पूरे किए। हर पंक्ति सात चरणों की अलग शृंखला है: पहले छह दिन थोड़े अंक देते हैं और सातवाँ दिन बड़ा बोनस। ✓ का मतलब है कि आज का हिस्सा पहले ही गिना जा चुका है; बाकी पंक्तियाँ वह जगह खोलती हैं जहाँ यह किया जाता है।',
+            streakTip: 'हर पंक्ति सात चरणों की अलग शृंखला है: पहले छह दिन थोड़े अंक देते हैं और सातवाँ दिन बड़ा बोनस। ✓ का मतलब है कि आज का हिस्सा पहले ही गिना जा चुका है; बाकी पंक्तियाँ वह जगह खोलती हैं जहाँ यह किया जाता है।',
             extraOffersNote: 'Rewards में और गतिविधियाँ',
             extraOffersTip: 'Rewards के पैनल और Bing ऐप में आम तौर पर अतिरिक्त गतिविधियाँ होती हैं जो इनसे ज़्यादा अंक देती हैं। वे हमेशा एक जैसी नहीं होतीं: कुछ खोजें होती हैं और कुछ नहीं (पहेलियाँ, सवाल, सर्वेक्षण)।',
             autoLabel: 'मेरी Rewards प्रगति इस्तेमाल करें',
@@ -885,7 +885,7 @@
             dailySetTip: 'Tiga aktivitas Rewards hari ini, terpisah dari penelusuran: semuanya dihitung untuk runtunan Anda. Setiap tautan membuka aktivitas yang belum selesai di tab baru. Jika penelusuran otomatis sedang berjalan, semuanya berhenti saat Anda membukanya, supaya tidak memindahkan Anda dari halaman sebelum selesai.',
             dailySet: 'Set harian',
             streakDays: 'Runtunan: {n} hari',
-            streakTip: 'Hari berturut-turut Anda menyelesaikan tugas Rewards. Setiap baris adalah runtunan tujuh langkah tersendiri: enam hari pertama memberi sedikit dan hari ketujuh memberi hadiah besarnya. Tanda ✓ berarti bagian hari ini sudah dihitung; sisanya membuka tempat mengerjakannya.',
+            streakTip: 'Setiap baris adalah runtunan tujuh langkah tersendiri: enam hari pertama memberi sedikit dan hari ketujuh memberi hadiah besarnya. Tanda ✓ berarti bagian hari ini sudah dihitung; sisanya membuka tempat mengerjakannya.',
             extraOffersNote: 'Aktivitas lain di Rewards',
             extraOffersTip: 'Di dasbor Rewards dan aplikasi Bing biasanya ada aktivitas tambahan yang memberi lebih banyak poin daripada ini. Tidak selalu sama: sebagian berupa penelusuran dan sebagian bukan (teka-teki, pertanyaan, jajak pendapat).',
             autoLabel: 'Gunakan progres Rewards saya',
@@ -934,7 +934,7 @@
             dailySetTip: 'Le tre attività Rewards del giorno, separate dalle ricerche: contano per la tua serie. Ogni collegamento apre in una nuova scheda quella che manca. Se ci sono ricerche automatiche in corso, si fermano all’apertura, così non ti portano via dalla pagina prima di averla completata.',
             dailySet: 'Set giornaliero',
             streakDays: 'Serie: {n} giorni',
-            streakTip: 'Giorni di fila in cui hai completato le attività Rewards. Ogni riga è una serie a sé di sette passi: i primi sei giorni rendono poco e il settimo dà il premio grosso. Il ✓ è ciò che oggi conta già; il resto apre il punto in cui si fa.',
+            streakTip: 'Ogni riga è una serie a sé di sette passi: i primi sei giorni rendono poco e il settimo dà il premio grosso. Il ✓ è ciò che oggi conta già; il resto apre il punto in cui si fa.',
             extraOffersNote: 'Altre attività in Rewards',
             extraOffersTip: 'Nel pannello Rewards e nell’app Bing di solito ci sono attività extra che danno più punti di queste. Non sono sempre le stesse: alcune sono ricerche e altre no (rompicapi, domande, sondaggi).',
             autoLabel: 'Usa i miei progressi Rewards',
@@ -983,7 +983,7 @@
             dailySetTip: 'De drie Rewards-activiteiten van de dag, los van de zoekopdrachten: ze tellen mee voor je reeks. Elke link opent een openstaande activiteit in een nieuw tabblad. Lopen er automatische zoekopdrachten, dan stoppen die bij het openen, zodat ze je niet van de pagina halen voordat je klaar bent.',
             dailySet: 'Dagelijkse set',
             streakDays: 'Reeks: {n} dagen',
-            streakTip: 'Dagen op rij waarop je je Rewards-taken hebt gedaan. Elke regel is een eigen reeks van zeven stappen: de eerste zes dagen leveren weinig op en de zevende de grote bonus. Een ✓ telt vandaag al mee; de rest opent de plek waar je het doet.',
+            streakTip: 'Elke regel is een eigen reeks van zeven stappen: de eerste zes dagen leveren weinig op en de zevende de grote bonus. Een ✓ telt vandaag al mee; de rest opent de plek waar je het doet.',
             extraOffersNote: 'Meer activiteiten in Rewards',
             extraOffersTip: 'In het Rewards-dashboard en de Bing-app staan meestal extra activiteiten die meer punten opleveren dan deze. Ze zijn niet altijd hetzelfde: sommige zijn zoekopdrachten en andere niet (puzzels, vragen, peilingen).',
             autoLabel: 'Mijn Rewards-voortgang gebruiken',
@@ -1032,7 +1032,7 @@
             dailySetTip: 'Dagens tre Rewards-aktiviteter, skilda från sökningarna: de räknas till din svit. Varje länk öppnar den som återstår i en ny flik. Om automatiska sökningar pågår stoppas de när du öppnar den, så att de inte lämnar sidan innan du är klar.',
             dailySet: 'Dagens uppsättning',
             streakDays: 'Svit: {n} dagar',
-            streakTip: 'Dagar i rad med klarade Rewards-uppgifter. Varje rad är en egen svit på sju steg: de sex första dagarna ger lite och den sjunde ger den stora bonusen. Ett ✓ räknas redan i dag; de övriga öppnar där uppgiften görs.',
+            streakTip: 'Varje rad är en egen svit på sju steg: de sex första dagarna ger lite och den sjunde ger den stora bonusen. Ett ✓ räknas redan i dag; de övriga öppnar där uppgiften görs.',
             extraOffersNote: 'Fler aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelen och i Bing-appen finns oftast extra aktiviteter som ger mer poäng än de här. De är inte alltid desamma: vissa är sökningar och andra inte (pussel, frågor, enkäter).',
             autoLabel: 'Använd mina Rewards-framsteg',
@@ -1081,7 +1081,7 @@
             dailySetTip: 'Dagens tre Rewards-aktiviteter, adskilt fra søgningerne: de tæller med til din stime. Hvert link åbner den manglende i en ny fane. Kører der automatiske søgninger, stopper de, når du åbner den, så de ikke fører dig væk fra siden, før du er færdig.',
             dailySet: 'Dagens sæt',
             streakDays: 'Stime: {n} dage',
-            streakTip: 'Dage i træk med klarede Rewards-opgaver. Hver linje er en selvstændig stime på syv trin: de første seks dage giver lidt, og den syvende giver den store bonus. Et ✓ tæller allerede med i dag; resten åbner der, hvor opgaven løses.',
+            streakTip: 'Hver linje er en selvstændig stime på syv trin: de første seks dage giver lidt, og den syvende giver den store bonus. Et ✓ tæller allerede med i dag; resten åbner der, hvor opgaven løses.',
             extraOffersNote: 'Flere aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelet og i Bing-appen er der som regel ekstra aktiviteter, der giver flere point end disse. De er ikke altid de samme: nogle er søgninger, andre ikke (puslespil, spørgsmål, afstemninger).',
             autoLabel: 'Brug mine Rewards-fremskridt',
@@ -1130,7 +1130,7 @@
             dailySetTip: 'Dagens tre Rewards-aktiviteter, atskilt fra søkene: de teller med i rekken din. Hver lenke åpner den som mangler i en ny fane. Hvis automatiske søk pågår, stopper de når du åpner den, så de ikke tar deg bort fra siden før du er ferdig.',
             dailySet: 'Dagens sett',
             streakDays: 'Rekke: {n} dager',
-            streakTip: 'Dager på rad med fullførte Rewards-oppgaver. Hver linje er en egen rekke på sju trinn: de seks første dagene gir lite, og den sjuende gir den store bonusen. En ✓ teller allerede i dag; resten åpner der oppgaven gjøres.',
+            streakTip: 'Hver linje er en egen rekke på sju trinn: de seks første dagene gir lite, og den sjuende gir den store bonusen. En ✓ teller allerede i dag; resten åpner der oppgaven gjøres.',
             extraOffersNote: 'Flere aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelet og i Bing-appen finnes det som regel ekstra aktiviteter som gir flere poeng enn disse. De er ikke alltid de samme: noen er søk og andre ikke (puslespill, spørsmål, spørreundersøkelser).',
             autoLabel: 'Bruk fremgangen min i Rewards',
@@ -1179,7 +1179,7 @@
             dailySetTip: '當天的三項 Rewards 活動，與搜尋分開計算，會計入連續天數。每個連結會在新分頁中開啟尚未完成的那一項。如果自動搜尋正在進行，開啟時會停止，以免在你完成之前把頁面跳走。',
             dailySet: '每日任務',
             streakDays: '連續天數：{n} 天',
-            streakTip: '連續完成 Rewards 任務的天數。每一行都是獨立的七步連續記錄：前六天給得少，第七天一次給足。✓ 表示今天這一份已經算進去了，其餘會開啟完成任務的地方。',
+            streakTip: '每一行都是獨立的七步連續記錄：前六天給得少，第七天一次給足。✓ 表示今天這一份已經算進去了，其餘會開啟完成任務的地方。',
             extraOffersNote: 'Rewards 裡還有更多活動',
             extraOffersTip: 'Rewards 面板和 Bing 應用程式裡通常還有額外活動，給的分比這些多。它們並不固定：有的是搜尋，有的不是（拼圖、問答、問卷）。',
             autoLabel: '使用我的 Rewards 進度',
@@ -1625,20 +1625,27 @@
     }
 
     /**
-     * Días seguidos de la racha global, o null si no llega el dato.
+     * El contador global, con la etiqueta que le pone Bing, o null si no llega.
      *
      * Sale de `Gamification_Streak_Counter_Promotion` (`activity_progress`), que
      * viene con `hidden: "True"`. Ahí ese atributo NO significa lo mismo que en
      * las ofertas: el flyout enseña este contador —es su «Jornada actual»—, y
      * con `hidden` vienen también `level_info` y los `layout_*`. Marca «esto no
      * es una tarjeta de la lista», no «esto no se enseña».
+     *
+     * Y NO son días seguidos, aunque el panel lo llamara «Racha: N días» hasta
+     * 1.3.6: el 2026-08-22 este contador marcaba 228 con las tres escaleras del
+     * check-in en 4/7, 3/7 y 4/7 el mismo día, así que es acumulado. La racha de
+     * verdad es la de cada socio (`currentStep`). Por eso la etiqueta se toma del
+     * `title` de la propia promo —«Jornada actual», ya traducido al idioma del
+     * mercado—: es la única que no miente y no cuesta una cadena en 22 idiomas.
      * @param {object[]} promotions
-     * @returns {number|null}
+     * @returns {{n:number,title:string}|null}
      */
     function readStreak(promotions) {
         const p = (promotions || []).filter(Boolean).find((x) => (x.attributes || {}).type === 'streak');
         const n = p ? num(p.attributes.activity_progress) : 0;
-        return n > 0 ? n : null;
+        return n > 0 ? { n: n, title: String(p.attributes.title || '') } : null;
     }
 
     // Socios del check-in que van primero, en este orden: buscar en Bing, el
@@ -1671,9 +1678,22 @@
      * los títulos de las actividades del conjunto diario, y la alternativa sería
      * reescribir a mano un texto que Bing ya da bien.
      *
+     * De la misma promo salen dos cosas más, verificadas atributo por atributo
+     * el 2026-08-22:
+     *
+     *  - **Los sellos del puzle**: `activityProgress` / `activity_max` (10 de 12
+     *    en el volcado) y `point_max`, que es lo que paga completarlo (1000).
+     *    El `offerid` lo dice: `DailyCheckIn_Parent_PuzzleOffer`.
+     *  - **El premio del séptimo paso** de cada socio, en `partner_X_points`:
+     *    una lista de siete pagos donde el último es el gordo —búsquedas y
+     *    conjunto diario `[3…,100]` y `[30…,100]`, la app
+     *    `[5,5,10,10,15,15,50]`, Edge `[5,10,20,30,40,80,120]`—. Llega como
+     *    TEXTO, como todo lo demás, así que se lee con una regex y no con
+     *    JSON.parse.
+     *
      * @param {object[]} promotions
      * @param {object} strings - `localizedStrings` de la respuesta (raíz, no userInfo).
-     * @returns {{partners:{key:string,label:string,done:boolean,step:number,total:number,url:string}[]}|null}
+     * @returns {{partners:object[],stamps:{done:number,max:number,points:number,label:string}|null}|null}
      */
     function readCheckIn(promotions, strings) {
         const promo = (promotions || []).filter(Boolean)
@@ -1701,7 +1721,14 @@
                     step: num(a[`partner_${k}_currentStep`]),
                     total: num(a[`partner_${k}_totalSteps`]),
                     url: a[`partner_${k}_destinationUrl`] || '',
-                    priority: num(a[`partner_${k}_cardPriority`])
+                    priority: num(a[`partner_${k}_cardPriority`]),
+                    // El último de la lista de pagos: lo que da llegar al final
+                    // de la escalera, que es lo que hace que valga la pena
+                    // seguirla y lo único que el panel no decía.
+                    prize: (() => {
+                        const nums = String(a[`partner_${k}_points`] || '').match(/\d+/g);
+                        return nums ? num(nums[nums.length - 1]) : 0;
+                    })()
                 };
             })
             // Orden propio, y NO el `cardPriority` de Bing: primero lo que se
@@ -1712,7 +1739,26 @@
             // orden de Bing.
             .sort((x, y) => (partnerRank(x.key) - partnerRank(y.key)) || (x.priority - y.priority));
 
-        return partners.length ? { partners: partners } : null;
+        // Los sellos van SIN etiqueta de Bing, al contrario que los socios. Sus
+        // `title` y `description` también son claves de `localizedStrings`, pero
+        // ahí no son plantillas de dato sino texto motivacional que Bing elige
+        // SEGÚN EL ESTADO, y sus huecos no significan lo mismo en cada uno:
+        // verificado el 2026-08-25 con 10 de 12 sellos, `DailyCheckIn_Title_Progress`
+        // es «¡Ya casi está!» —sin huecos— y `DailyCheckIn_Description_Progress`
+        // «¡Estás cerca del gran premio de {0} puntos!», donde {0} son los PUNTOS
+        // del premio y no el número de sellos. Rellenarlo como se rellenan los
+        // socios habría escrito «el gran premio de 10 puntos». Y como el texto
+        // cambia con el estado, tampoco vale fijar qué es {0}: en 3 de 12 la
+        // plantilla es otra. Los dos números de la línea (`10/12 · ✱1000`) se
+        // entienden solos, así que no hay nada que explicar mal.
+        const stampsMax = num(a.activity_max);
+        const stamps = stampsMax > 0 ? {
+            done: num(a.activityProgress),
+            max: stampsMax,
+            points: num(a.point_max)
+        } : null;
+
+        return partners.length ? { partners: partners, stamps: stamps } : null;
     }
 
     /**
@@ -1858,7 +1904,12 @@
             // Las etiquetas del check-in salen de `localizedStrings`, que cuelga
             // de la RAÍZ de la respuesta y no de userInfo.
             checkIn: readCheckIn(info.promotions, data.localizedStrings),
-            streak: readStreak(info.promotions),
+            // `streak` se queda como número y la etiqueta va aparte a
+            // propósito: así un snapshot guardado por una versión anterior
+            // —que lo tiene como número— sigue pintándose, solo que con la
+            // etiqueta vieja del diccionario hasta la siguiente lectura.
+            streak: (readStreak(info.promotions) || {}).n || null,
+            streakTitle: (readStreak(info.promotions) || {}).title || '',
             value: catalog.value,
             cheapest: catalog.cheapest
         };
@@ -3087,11 +3138,37 @@
 
             if (ok && rewards.streak) {
                 const head = document.createElement('div');
-                head.textContent = t.streakDays.replace('{n}', fmt(rewards.streak));
-                head.title = t.streakTip;
-                head.style.cursor = 'help';
+                // Con la etiqueta de Bing («Jornada actual») no va tooltip: el
+                // que había decía «días seguidos cumpliendo con Rewards», y este
+                // contador no es eso (ver readStreak). Un aviso propio costaría
+                // una cadena en 22 idiomas para explicar un número que Bing ya
+                // nombra bien. Sin `streakTitle` —snapshot de una versión
+                // anterior— se cae a la cadena vieja hasta la siguiente lectura.
+                head.textContent = rewards.streakTitle
+                    ? `${rewards.streakTitle}: ${fmt(rewards.streak)}`
+                    : t.streakDays.replace('{n}', fmt(rewards.streak));
                 head.style.color = colors.gray;
                 tasksBox.appendChild(head);
+
+                // Los sellos, justo debajo: es el marcador de todo lo de abajo
+                // —cada escalera completada da uno— y lo que paga cerrarlo. El
+                // ✱ es el mismo glifo con el que Bing marca los puntos en sus
+                // propias tarjetas, así que no hace falta ninguna etiqueta.
+                const st = ci ? ci.stamps : null;
+                if (st && st.max) {
+                    const line = document.createElement('div');
+                    line.textContent = `🧩 ${fmt(st.done)}/${fmt(st.max)}` +
+                        (st.points ? ` · ✱${fmt(st.points)}` : '');
+                    // Aquí sí va `streakTip`, que era el aviso de la jornada: su
+                    // primera frase —«días seguidos cumpliendo con Rewards»— era
+                    // falsa y se quitó de los 22 idiomas, y lo que queda explica
+                    // justo esto: las escaleras de siete pasos de abajo, de las
+                    // que sale cada sello, y que el séptimo paga el premio gordo.
+                    line.title = t.streakTip;
+                    line.style.cursor = 'help';
+                    line.style.color = colors.gray;
+                    tasksBox.appendChild(line);
+                }
             }
 
             /** Las actividades que faltan, colgando del conjunto diario. */
@@ -3142,11 +3219,13 @@
                 let noted = false;
                 ci.partners.forEach((p) => {
                     if (!noted && partnerRank(p.key) >= rest) { appendExtraNote(); noted = true; }
-                    const steps = p.total ? `${fmt(p.step)}/${fmt(p.total)} · ` : '';
+                    const steps = p.total ? `${fmt(p.step)}/${fmt(p.total)}` : '';
+                    const prize = p.prize ? `${steps ? ' ' : ''}✱${fmt(p.prize)}` : '';
+                    const lead = (steps || prize) ? `${steps}${prize} · ` : '';
                     // El conjunto diario va a su sección del panel de Rewards,
                     // que es donde de verdad se hacen sus actividades.
                     const url = p.key === 'dset' ? REWARDS_DAILYSET : p.url;
-                    tasksBox.appendChild(taskLine(`${steps}${p.label}`, p.done, url));
+                    tasksBox.appendChild(taskLine(`${lead}${p.label}`, p.done, url));
                     if (p.key === 'dset') { dsetShown = true; appendDailySetLinks(); }
                 });
                 if (!noted) appendExtraNote();
