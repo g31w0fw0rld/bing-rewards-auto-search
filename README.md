@@ -5,7 +5,7 @@ Tampermonkey userscript that automates daily Bing searches to collect Microsoft 
 > [!WARNING]
 > **USE AT YOUR OWN RISK / USO BAJO TU PROPIO RIESGO:** automating activity may violate the Microsoft Rewards terms and put your account at risk. / Automatizar la actividad puede infringir los términos de Microsoft Rewards y poner tu cuenta en riesgo.
 
-<img src="docs/screenshot-search.png" width="330" alt="The search tab of the floating panel: the day complete at 60 of 60 points, with the start button still offered to search anyway and a line saying how long ago the Rewards data was read, the day's tasks with the journey counter, the check-in partners with the step each streak is on, and the points balance converted to Xbox credit">
+<img src="docs/screenshot-search.png" width="330" alt="The search tab of the floating panel: the day complete at 60 of 60 points, with the start button still offered to search anyway and a line saying how long ago the Rewards data was read; below it the journey counter, the puzzle of stamps with the bonus for completing it, and one line per check-in partner with the step its streak is on and what the seventh step pays; at the bottom, the points balance converted to Xbox credit">
 
 *Search tab: the day's progress in points as Rewards counts it, the controls for the current state, the day's tasks — your streak, each check-in partner with its step, and the daily set with a link to every activity still pending — and what your points are worth. / Pestaña de búsqueda: el progreso del día en puntos, tal como los cuenta Rewards, los controles según el estado, las tareas del día —tu racha, cada socio del check-in con su paso, y el conjunto diario con enlace a cada actividad que falte— y cuánto valen tus puntos.*
 
