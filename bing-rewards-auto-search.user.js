@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.6
+// @version      1.3.7
 // @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Waits out late crediting and links the other daily tasks. Queries from your own keywords, rotating search types (70% web plus images, videos, shopping, news), 3-10s delays with 10-25s reading pauses, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @author       g31w0fw0rld
 // @license      MIT
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.6';
+    const SCRIPT_VERSION = '1.3.7';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -129,6 +129,8 @@
             streakTip: 'Cada línea es una racha aparte de siete pasos: los seis primeros días pagan poco y el séptimo da el premio gordo. El ✓ es lo que ya cuenta hoy; lo demás abre donde se hace.',
             extraOffersNote: 'Más actividades en Rewards',
             extraOffersTip: 'En el panel de Rewards y en la app de Bing suele haber actividades extra que dan más puntos que estas. No son siempre las mismas: unas son búsquedas y otras no (puzles, preguntas, encuestas).',
+            xboxNote: 'Más puntos en Xbox',
+            xboxTip: 'Xbox tiene sus propias tareas diarias, semanales y mensuales, que dan puntos aparte de estas. No aparecen ni aquí ni en el panel de Rewards: se acreditan desde la app o la consola, así que hay que mirarlas allí.',
             autoLabel: 'Usar mi progreso de Rewards',
             autoTip: 'Con esto activado el script le pregunta a Bing cuántos puntos de búsqueda te faltan hoy, ejecuta solo las búsquedas necesarias, se detiene solo al completarlas y muestra cuánto valen tus puntos. Desactivado no hace ninguna petición de red y usa el número manual de abajo.',
             manualFallbackTip: 'No se pudo leer tu progreso de Rewards, así que manda el número manual de la pestaña de palabras clave.',
@@ -197,6 +199,8 @@
             streakTip: 'Each line is a separate seven-step streak: the first six days pay little and the seventh pays the big one. A ✓ is what already counts today; the rest open where you do it.',
             extraOffersNote: 'More activities in Rewards',
             extraOffersTip: 'The Rewards dashboard and the Bing app usually carry extra activities worth more points than these. They are not always the same: some are searches and some are not (puzzles, questions, polls).',
+            xboxNote: 'More points on Xbox',
+            xboxTip: 'Xbox has its own daily, weekly and monthly tasks, worth points on top of these. They show up neither here nor in the Rewards dashboard: they credit from the app or the console, so that is where you have to look.',
             autoLabel: 'Use my Rewards progress',
             autoTip: 'With this on, the script asks Bing how many search points you still need today, runs only the searches required, stops on its own once they are done, and shows what your points are worth. With it off it makes no network request and uses the manual number below.',
             manualFallbackTip: 'Your Rewards progress could not be read, so the manual number in the keywords tab is what counts.',
@@ -251,6 +255,8 @@
             streakTip: 'Jede Zeile ist eine eigene Serie über sieben Schritte: Die ersten sechs Tage bringen wenig, der siebte den großen Bonus. Ein ✓ zählt heute schon; alles andere öffnet dort, wo es erledigt wird.',
             extraOffersNote: 'Mehr Aktivitäten in Rewards',
             extraOffersTip: 'Im Rewards-Dashboard und in der Bing-App gibt es meist zusätzliche Aktivitäten, die mehr Punkte bringen als diese. Sie sind nicht immer dieselben: Manche sind Suchen, andere nicht (Puzzles, Quizfragen, Umfragen).',
+            xboxNote: 'Mehr Punkte auf Xbox',
+            xboxTip: 'Xbox hat eigene tägliche, wöchentliche und monatliche Aufgaben, die zusätzlich zu diesen Punkte bringen. Sie erscheinen weder hier noch im Rewards-Dashboard: Sie werden über die App oder die Konsole gutgeschrieben, dort muss man also nachsehen.',
             autoLabel: 'Meinen Rewards-Fortschritt verwenden',
             autoTip: 'Ist das aktiv, fragt das Skript bei Bing nach, wie viele Suchpunkte dir heute noch fehlen, führt nur die nötigen Suchen aus, hört von selbst auf, wenn sie erledigt sind, und zeigt, was deine Punkte wert sind. Ist es aus, stellt es keine Netzwerkanfrage und nutzt die manuelle Zahl darunter.',
             manualFallbackTip: 'Dein Rewards-Fortschritt ließ sich nicht lesen, also zählt die manuelle Zahl im Reiter für Schlüsselwörter.',
@@ -300,6 +306,8 @@
             streakTip: 'Chaque ligne est une série distincte de sept étapes : les six premiers jours rapportent peu et le septième donne le gros lot. Un ✓ compte déjà aujourd’hui ; le reste ouvre là où cela se fait.',
             extraOffersNote: 'Plus d’activités dans Rewards',
             extraOffersTip: 'Le tableau de bord Rewards et l’application Bing proposent en général des activités supplémentaires qui rapportent plus que celles-ci. Elles ne sont pas toujours les mêmes : certaines sont des recherches, d’autres non (puzzles, questions, sondages).',
+            xboxNote: 'Plus de points sur Xbox',
+            xboxTip: 'Xbox a ses propres tâches quotidiennes, hebdomadaires et mensuelles, qui rapportent des points en plus de celles-ci. Elles n’apparaissent ni ici ni dans le tableau de bord Rewards : elles sont créditées depuis l’application ou la console, c’est donc là qu’il faut regarder.',
             autoLabel: 'Utiliser ma progression Rewards',
             autoTip: 'Avec cette option activée, le script demande à Bing combien de points de recherche vous manquent aujourd’hui, effectue uniquement les recherches nécessaires, s’arrête de lui-même une fois terminé et affiche ce que valent vos points. Désactivée, il ne fait aucune requête réseau et utilise le nombre manuel ci-dessous.',
             manualFallbackTip: 'Votre progression Rewards n’a pas pu être lue : c’est donc le nombre manuel de l’onglet des mots-clés qui compte.',
@@ -349,6 +357,8 @@
             streakTip: 'Cada linha é uma sequência à parte de sete passos: os seis primeiros dias pagam pouco e o sétimo dá o prémio grande. O ✓ é o que já conta hoje; o resto abre onde se faz.',
             extraOffersNote: 'Mais atividades no Rewards',
             extraOffersTip: 'No painel do Rewards e na aplicação Bing costuma haver atividades extra que dão mais pontos do que estas. Nem sempre são as mesmas: umas são pesquisas e outras não (puzzles, perguntas, sondagens).',
+            xboxNote: 'Mais pontos na Xbox',
+            xboxTip: 'A Xbox tem as suas próprias tarefas diárias, semanais e mensais, que dão pontos além destas. Não aparecem aqui nem no painel do Rewards: são creditadas a partir da aplicação ou da consola, por isso é lá que há que ver.',
             autoLabel: 'Usar o meu progresso do Rewards',
             autoTip: 'Com isto ativado o script pergunta ao Bing quantos pontos de pesquisa lhe faltam hoje, faz apenas as pesquisas necessárias, para sozinho quando terminam e mostra quanto valem os seus pontos. Desativado não faz qualquer pedido de rede e usa o número manual abaixo.',
             manualFallbackTip: 'Não foi possível ler o seu progresso do Rewards, por isso vale o número manual do separador de palavras-chave.',
@@ -398,6 +408,8 @@
             streakTip: 'Каждая строка — отдельная серия из семи шагов: первые шесть дней дают немного, а седьмой — крупный бонус. Галочка означает, что на сегодня уже засчитано; остальные строки открывают то, где это делается.',
             extraOffersNote: 'Больше заданий в Rewards',
             extraOffersTip: 'На панели Rewards и в приложении Bing обычно есть дополнительные задания, которые дают больше баллов, чем эти. Они не всегда одинаковые: часть — поиски, часть — нет (головоломки, викторины, опросы).',
+            xboxNote: 'Больше баллов в Xbox',
+            xboxTip: 'У Xbox есть свои ежедневные, еженедельные и ежемесячные задания, которые дают баллы сверх этих. Их нет ни здесь, ни на панели Rewards: они начисляются из приложения или с консоли, там их и надо смотреть.',
             autoLabel: 'Использовать мой прогресс Rewards',
             autoTip: 'Когда включено, скрипт спрашивает у Bing, сколько поисковых баллов вам осталось получить сегодня, выполняет только нужные запросы, сам останавливается по завершении и показывает, сколько стоят ваши баллы. Когда выключено, он не делает ни одного сетевого запроса и берёт число, заданное вручную ниже.',
             manualFallbackTip: 'Прочитать ваш прогресс Rewards не удалось, поэтому решает число, заданное вручную на вкладке ключевых слов.',
@@ -447,6 +459,8 @@
             streakTip: 'Her satır, yedi adımlık ayrı bir seridir: ilk altı gün az kazandırır, yedincisi büyük ikramiyeyi verir. ✓ bugün için zaten sayılanı gösterir; diğerleri yapıldığı yeri açar.',
             extraOffersNote: 'Rewards’ta daha fazla etkinlik',
             extraOffersTip: 'Rewards panelinde ve Bing uygulamasında genellikle bunlardan daha çok puan veren ek etkinlikler bulunur. Hep aynı olmazlar: bazıları aramadır, bazıları değil (yapbozlar, sorular, anketler).',
+            xboxNote: 'Xbox’ta daha fazla puan',
+            xboxTip: 'Xbox’un kendi günlük, haftalık ve aylık görevleri var; bunlara ek puan verirler. Ne burada ne de Rewards panelinde görünürler: uygulamadan ya da konsoldan işlenirler, dolayısıyla oradan bakmak gerekir.',
             autoLabel: 'Rewards ilerlememi kullan',
             autoTip: 'Bu açıkken betik Bing’e bugün kaç arama puanınızın eksik olduğunu sorar, yalnızca gereken aramaları yapar, bitince kendiliğinden durur ve puanlarınızın ne değerde olduğunu gösterir. Kapalıyken hiçbir ağ isteği yapmaz ve aşağıdaki elle girilen sayıyı kullanır.',
             manualFallbackTip: 'Rewards ilerlemeniz okunamadı, bu yüzden anahtar kelimeler sekmesindeki elle girilen sayı geçerli.',
@@ -496,6 +510,8 @@
             streakTip: '各行はそれぞれ7段階の連続記録で、最初の6日は少しずつ、7日目にまとめて入ります。✓ は今日ぶんがすでに数えられているもの、それ以外は実施する場所を開きます。',
             extraOffersNote: 'Rewards の他のアクティビティ',
             extraOffersTip: 'Rewards のダッシュボードや Bing アプリには、これらより点数の高い追加アクティビティがあるのが普通です。毎回同じとは限らず、検索のものもあれば、そうでないもの（パズル、クイズ、アンケート）もあります。',
+            xboxNote: 'Xbox でさらにポイント',
+            xboxTip: 'Xbox には独自の日次・週次・月次のタスクがあり、これらとは別にポイントがもらえます。ここにも Rewards のダッシュボードにも出てきません。アプリか本体から加算されるので、確認はそちらで行います。',
             autoLabel: 'Rewards の進捗を使う',
             autoTip: 'オンにすると、今日あと何ポイント足りないかを Bing に問い合わせ、必要な回数だけ検索し、終われば自動で停止して、ポイントの価値を表示します。オフにするとネットワーク要求は一切行わず、下の手動の回数を使います。',
             manualFallbackTip: 'Rewards の進捗を読めなかったので、キーワードのタブにある手動の回数が有効になります。',
@@ -545,6 +561,8 @@
             streakTip: '각 줄은 7단계짜리 별도의 연속 기록으로, 처음 엿새는 조금씩 주고 이레째에 크게 줍니다. ✓ 는 오늘 몫이 이미 반영된 것이고, 나머지는 해당 작업을 하는 곳을 엽니다.',
             extraOffersNote: 'Rewards의 다른 활동',
             extraOffersTip: 'Rewards 대시보드와 Bing 앱에는 보통 이보다 점수가 높은 추가 활동이 있습니다. 매번 같지도 않아서 검색인 것도 있고 아닌 것도 있습니다(퍼즐, 퀴즈, 설문).',
+            xboxNote: 'Xbox에서 더 많은 포인트',
+            xboxTip: 'Xbox에는 자체 일간·주간·월간 과제가 있어 이와 별도로 포인트를 줍니다. 여기에도 Rewards 대시보드에도 나오지 않습니다. 앱이나 콘솔에서 적립되므로 확인은 그쪽에서 해야 합니다.',
             autoLabel: '내 Rewards 진행 상황 사용',
             autoTip: '켜 두면 스크립트가 오늘 검색 포인트가 얼마나 남았는지 Bing에 물어보고, 필요한 만큼만 검색하고, 끝나면 스스로 멈추며, 포인트의 가치를 보여줍니다. 끄면 네트워크 요청을 전혀 하지 않고 아래의 수동 횟수를 씁니다.',
             manualFallbackTip: 'Rewards 진행 상황을 읽지 못했으므로 키워드 탭의 수동 횟수가 기준이 됩니다.',
@@ -594,6 +612,8 @@
             streakTip: 'Każdy wiersz to osobna seria z siedmiu kroków: pierwsze sześć dni daje niewiele, a siódmy dużą premię. Znak ✓ oznacza, że na dziś już się liczy; pozostałe otwierają miejsce, gdzie się to robi.',
             extraOffersNote: 'Więcej aktywności w Rewards',
             extraOffersTip: 'W panelu Rewards i w aplikacji Bing zwykle są dodatkowe aktywności dające więcej punktów niż te. Nie zawsze są takie same: jedne to wyszukiwania, inne nie (układanki, pytania, ankiety).',
+            xboxNote: 'Więcej punktów na Xbox',
+            xboxTip: 'Xbox ma własne zadania dzienne, tygodniowe i miesięczne, dające punkty poza tymi. Nie widać ich ani tutaj, ani w panelu Rewards: naliczają się z aplikacji lub konsoli, więc tam trzeba zaglądać.',
             autoLabel: 'Używaj mojego postępu Rewards',
             autoTip: 'Gdy to jest włączone, skrypt pyta Bing, ile punktów za wyszukiwania brakuje ci dzisiaj, wykonuje tylko potrzebne wyszukiwania, sam się zatrzymuje po ich ukończeniu i pokazuje, ile warte są twoje punkty. Gdy jest wyłączone, nie wykonuje żadnego żądania sieciowego i używa ręcznej liczby poniżej.',
             manualFallbackTip: 'Nie udało się odczytać twojego postępu Rewards, więc liczy się ręczna liczba z zakładki słów kluczowych.',
@@ -643,6 +663,8 @@
             streakTip: 'Kukin rivi on oma seitsenaskelinen putkensa: kuusi ensimmäistä päivää tuottavat vähän ja seitsemäs ison bonuksen. ✓ tarkoittaa, että tämä päivä on jo laskettu; muut avaavat paikan, jossa tehtävä tehdään.',
             extraOffersNote: 'Lisää tehtäviä Rewardsissa',
             extraOffersTip: 'Rewards-koontinäytöllä ja Bing-sovelluksessa on yleensä lisätehtäviä, joista saa enemmän pisteitä kuin näistä. Ne eivät ole aina samoja: osa on hakuja, osa ei (palapelit, kysymykset, kyselyt).',
+            xboxNote: 'Lisää pisteitä Xboxissa',
+            xboxTip: 'Xboxilla on omat päivittäiset, viikoittaiset ja kuukausittaiset tehtävänsä, joista saa pisteitä näiden lisäksi. Ne eivät näy täällä eivätkä Rewards-koontinäytöllä: ne kirjautuvat sovelluksesta tai konsolista, joten sieltä ne pitää katsoa.',
             autoLabel: 'Käytä Rewards-edistymistäni',
             autoTip: 'Kun tämä on käytössä, skripti kysyy Bingiltä, montako hakupistettä sinulta puuttuu tänään, tekee vain tarvittavat haut, pysähtyy itse kun ne on tehty ja näyttää, paljonko pisteesi ovat arvoltaan. Kun se on pois käytöstä, skripti ei tee lainkaan verkkopyyntöjä ja käyttää alla olevaa käsin annettua lukua.',
             manualFallbackTip: 'Rewards-edistymistäsi ei saatu luettua, joten ratkaisee avainsanavälilehden käsin annettu luku.',
@@ -692,6 +714,8 @@
             streakTip: 'Mỗi dòng là một chuỗi bảy bước riêng: sáu ngày đầu trả ít, ngày thứ bảy trả phần lớn nhất. Dấu ✓ nghĩa là hôm nay đã được tính; các dòng còn lại mở nơi thực hiện.',
             extraOffersNote: 'Thêm hoạt động trong Rewards',
             extraOffersTip: 'Bảng điều khiển Rewards và ứng dụng Bing thường có thêm những hoạt động cho nhiều điểm hơn các mục này. Chúng không cố định: có cái là tìm kiếm, có cái không (xếp hình, câu hỏi, khảo sát).',
+            xboxNote: 'Thêm điểm trên Xbox',
+            xboxTip: 'Xbox có các nhiệm vụ ngày, tuần và tháng riêng, cho điểm ngoài những mục này. Chúng không hiện ở đây lẫn trong bảng điều khiển Rewards: điểm được cộng từ ứng dụng hoặc máy chơi game, nên phải xem ở đó.',
             autoLabel: 'Dùng tiến độ Rewards của tôi',
             autoTip: 'Khi bật, tập lệnh hỏi Bing xem hôm nay bạn còn thiếu bao nhiêu điểm tìm kiếm, chỉ chạy những lượt tìm cần thiết, tự dừng khi xong, và cho biết điểm của bạn đáng giá bao nhiêu. Khi tắt, nó không thực hiện bất kỳ yêu cầu mạng nào và dùng con số đặt tay ở dưới.',
             manualFallbackTip: 'Không đọc được tiến độ Rewards của bạn, nên con số đặt tay ở thẻ từ khóa là con số quyết định.',
@@ -741,6 +765,8 @@
             streakTip: '每一行都是一个独立的七步连续记录：前六天给得少，第七天一次给足。✓ 表示今天这一份已经算上了，其余会打开完成任务的地方。',
             extraOffersNote: 'Rewards 里还有更多活动',
             extraOffersTip: 'Rewards 面板和 Bing 应用里通常还有额外活动，给的分比这些多。它们并不固定：有的是搜索，有的不是（拼图、问答、问卷）。',
+            xboxNote: 'Xbox 里还能拿更多分',
+            xboxTip: 'Xbox 有自己的每日、每周和每月任务，给的分和这些是分开的。这里和 Rewards 面板都看不到：它们从应用或主机上入账，只能到那边看。',
             autoLabel: '使用我的 Rewards 进度',
             autoTip: '开启后，脚本会向 Bing 查询你今天还差多少搜索积分，只执行必要的搜索，完成后自动停止，并显示你的积分值多少钱。关闭后，脚本不会发起任何网络请求，改用下面手动设置的次数。',
             manualFallbackTip: '没能读到你的 Rewards 进度，因此以关键词标签页中手动设置的次数为准。',
@@ -790,6 +816,8 @@
             streakTip: 'كل سطر سلسلة مستقلة من سبع خطوات: الأيام الستة الأولى تمنح القليل، واليوم السابع يمنح الجائزة الكبرى. وعلامة ✓ تعني أن نصيب اليوم محسوب بالفعل؛ أما البقية فتفتح المكان الذي تُنجَز فيه.',
             extraOffersNote: 'أنشطة أخرى في Rewards',
             extraOffersTip: 'عادةً ما توجد في لوحة Rewards وفي تطبيق Bing أنشطة إضافية تمنح نقاطًا أكثر من هذه. وهي ليست الأنشطة نفسها دائمًا: بعضها عمليات بحث وبعضها لا (ألغاز وأسئلة واستطلاعات).',
+            xboxNote: 'نقاط أكثر في Xbox',
+            xboxTip: 'لدى Xbox مهامها اليومية والأسبوعية والشهرية الخاصة، وهي تمنح نقاطًا إضافية غير هذه. لا تظهر هنا ولا في لوحة Rewards: تُضاف من التطبيق أو من الجهاز، ولذلك يجب مراجعتها هناك.',
             autoLabel: 'استخدام تقدّمي في Rewards',
             autoTip: 'عند تشغيل هذا يسأل البرنامج النصي Bing عن عدد نقاط البحث الناقصة اليوم، وينفّذ عمليات البحث اللازمة فقط، ويتوقّف من تلقاء نفسه عند إتمامها، ويعرض قيمة نقاطك. وعند إيقافه لا يُجري أي طلب شبكة ويستخدم العدد اليدوي أدناه.',
             manualFallbackTip: 'لم يتسنَّ قراءة تقدّمك في Rewards، لذا فالعدد اليدوي في علامة تبويب الكلمات المفتاحية هو المعتبر.',
@@ -839,6 +867,8 @@
             streakTip: 'हर पंक्ति सात चरणों की अलग शृंखला है: पहले छह दिन थोड़े अंक देते हैं और सातवाँ दिन बड़ा बोनस। ✓ का मतलब है कि आज का हिस्सा पहले ही गिना जा चुका है; बाकी पंक्तियाँ वह जगह खोलती हैं जहाँ यह किया जाता है।',
             extraOffersNote: 'Rewards में और गतिविधियाँ',
             extraOffersTip: 'Rewards के पैनल और Bing ऐप में आम तौर पर अतिरिक्त गतिविधियाँ होती हैं जो इनसे ज़्यादा अंक देती हैं। वे हमेशा एक जैसी नहीं होतीं: कुछ खोजें होती हैं और कुछ नहीं (पहेलियाँ, सवाल, सर्वेक्षण)।',
+            xboxNote: 'Xbox पर और अंक',
+            xboxTip: 'Xbox की अपनी दैनिक, साप्ताहिक और मासिक गतिविधियाँ हैं, जो इनके अलावा अंक देती हैं। वे न यहाँ दिखती हैं और न Rewards के पैनल में: वे ऐप या कंसोल से जुड़ती हैं, इसलिए उन्हें वहीं देखना पड़ता है।',
             autoLabel: 'मेरी Rewards प्रगति इस्तेमाल करें',
             autoTip: 'यह चालू होने पर स्क्रिप्ट Bing से पूछती है कि आज आपके कितने खोज-अंक बाकी हैं, सिर्फ़ ज़रूरी खोजें करती है, पूरा होने पर खुद रुक जाती है, और बताती है कि आपके अंकों का मूल्य कितना है। बंद होने पर यह कोई नेटवर्क अनुरोध नहीं करती और नीचे दी गई मैनुअल संख्या का उपयोग करती है।',
             manualFallbackTip: 'आपकी Rewards प्रगति पढ़ी नहीं जा सकी, इसलिए कीवर्ड टैब में दी गई मैनुअल संख्या ही मान्य है।',
@@ -888,6 +918,8 @@
             streakTip: 'Setiap baris adalah runtunan tujuh langkah tersendiri: enam hari pertama memberi sedikit dan hari ketujuh memberi hadiah besarnya. Tanda ✓ berarti bagian hari ini sudah dihitung; sisanya membuka tempat mengerjakannya.',
             extraOffersNote: 'Aktivitas lain di Rewards',
             extraOffersTip: 'Di dasbor Rewards dan aplikasi Bing biasanya ada aktivitas tambahan yang memberi lebih banyak poin daripada ini. Tidak selalu sama: sebagian berupa penelusuran dan sebagian bukan (teka-teki, pertanyaan, jajak pendapat).',
+            xboxNote: 'Lebih banyak poin di Xbox',
+            xboxTip: 'Xbox punya tugas harian, mingguan, dan bulanannya sendiri, yang memberi poin di luar yang ini. Semuanya tidak muncul di sini maupun di dasbor Rewards: poinnya masuk dari aplikasi atau konsol, jadi harus dilihat di sana.',
             autoLabel: 'Gunakan progres Rewards saya',
             autoTip: 'Bila ini aktif, skrip menanyakan ke Bing berapa poin penelusuran yang masih Anda kurang hari ini, menjalankan hanya penelusuran yang perlu, berhenti sendiri setelah selesai, dan menampilkan nilai poin Anda. Bila nonaktif, skrip tidak membuat permintaan jaringan apa pun dan memakai angka manual di bawah.',
             manualFallbackTip: 'Progres Rewards Anda tidak dapat dibaca, jadi angka manual di tab kata kunci yang berlaku.',
@@ -937,6 +969,8 @@
             streakTip: 'Ogni riga è una serie a sé di sette passi: i primi sei giorni rendono poco e il settimo dà il premio grosso. Il ✓ è ciò che oggi conta già; il resto apre il punto in cui si fa.',
             extraOffersNote: 'Altre attività in Rewards',
             extraOffersTip: 'Nel pannello Rewards e nell’app Bing di solito ci sono attività extra che danno più punti di queste. Non sono sempre le stesse: alcune sono ricerche e altre no (rompicapi, domande, sondaggi).',
+            xboxNote: 'Più punti su Xbox',
+            xboxTip: 'Xbox ha le sue attività giornaliere, settimanali e mensili, che danno punti oltre a queste. Non compaiono né qui né nel pannello Rewards: vengono accreditate dall’app o dalla console, quindi è lì che bisogna guardare.',
             autoLabel: 'Usa i miei progressi Rewards',
             autoTip: 'Con questa opzione attiva lo script chiede a Bing quanti punti ricerca ti mancano oggi, esegue solo le ricerche necessarie, si ferma da sé quando sono finite e mostra quanto valgono i tuoi punti. Disattivata non fa nessuna richiesta di rete e usa il numero manuale qui sotto.',
             manualFallbackTip: 'Non è stato possibile leggere i tuoi progressi Rewards, quindi vale il numero manuale nella scheda delle parole chiave.',
@@ -986,6 +1020,8 @@
             streakTip: 'Elke regel is een eigen reeks van zeven stappen: de eerste zes dagen leveren weinig op en de zevende de grote bonus. Een ✓ telt vandaag al mee; de rest opent de plek waar je het doet.',
             extraOffersNote: 'Meer activiteiten in Rewards',
             extraOffersTip: 'In het Rewards-dashboard en de Bing-app staan meestal extra activiteiten die meer punten opleveren dan deze. Ze zijn niet altijd hetzelfde: sommige zijn zoekopdrachten en andere niet (puzzels, vragen, peilingen).',
+            xboxNote: 'Meer punten op Xbox',
+            xboxTip: 'Xbox heeft eigen dagelijkse, wekelijkse en maandelijkse opdrachten, die punten opleveren naast deze. Ze staan niet hier en ook niet in het Rewards-dashboard: ze worden vanuit de app of de console bijgeschreven, dus daar moet je kijken.',
             autoLabel: 'Mijn Rewards-voortgang gebruiken',
             autoTip: 'Staat dit aan, dan vraagt het script bij Bing op hoeveel zoekpunten je vandaag nog mist, voert alleen de nodige zoekopdrachten uit, stopt zelf zodra ze klaar zijn en laat zien wat je punten waard zijn. Staat het uit, dan doet het geen enkel netwerkverzoek en gebruikt het het handmatige aantal hieronder.',
             manualFallbackTip: 'Je Rewards-voortgang kon niet worden gelezen, dus geldt het handmatige aantal op het tabblad met trefwoorden.',
@@ -1035,6 +1071,8 @@
             streakTip: 'Varje rad är en egen svit på sju steg: de sex första dagarna ger lite och den sjunde ger den stora bonusen. Ett ✓ räknas redan i dag; de övriga öppnar där uppgiften görs.',
             extraOffersNote: 'Fler aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelen och i Bing-appen finns oftast extra aktiviteter som ger mer poäng än de här. De är inte alltid desamma: vissa är sökningar och andra inte (pussel, frågor, enkäter).',
+            xboxNote: 'Fler poäng på Xbox',
+            xboxTip: 'Xbox har egna dagliga, veckovisa och månatliga uppdrag som ger poäng utöver de här. De syns varken här eller i Rewards-panelen: de krediteras från appen eller konsolen, så det är där man får titta.',
             autoLabel: 'Använd mina Rewards-framsteg',
             autoTip: 'När detta är på frågar skriptet Bing hur många sökpoäng du saknar i dag, gör bara de sökningar som behövs, stannar av sig själv när de är klara och visar vad dina poäng är värda. När det är av gör det inga nätverksanrop och använder det manuella antalet nedan.',
             manualFallbackTip: 'Dina Rewards-framsteg kunde inte läsas, så det manuella antalet på fliken för nyckelord är det som gäller.',
@@ -1084,6 +1122,8 @@
             streakTip: 'Hver linje er en selvstændig stime på syv trin: de første seks dage giver lidt, og den syvende giver den store bonus. Et ✓ tæller allerede med i dag; resten åbner der, hvor opgaven løses.',
             extraOffersNote: 'Flere aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelet og i Bing-appen er der som regel ekstra aktiviteter, der giver flere point end disse. De er ikke altid de samme: nogle er søgninger, andre ikke (puslespil, spørgsmål, afstemninger).',
+            xboxNote: 'Flere point på Xbox',
+            xboxTip: 'Xbox har sine egne daglige, ugentlige og månedlige opgaver, der giver point ud over disse. De vises hverken her eller i Rewards-panelet: de krediteres fra appen eller konsollen, så det er dér, man skal kigge.',
             autoLabel: 'Brug mine Rewards-fremskridt',
             autoTip: 'Når dette er slået til, spørger scriptet Bing om, hvor mange søgepoint du mangler i dag, udfører kun de nødvendige søgninger, stopper af sig selv, når de er klaret, og viser, hvad dine point er værd. Er det slået fra, foretager det ingen netværksanmodninger og bruger det manuelle antal nedenfor.',
             manualFallbackTip: 'Dine Rewards-fremskridt kunne ikke læses, så det manuelle antal på fanen med nøgleord er det, der gælder.',
@@ -1133,6 +1173,8 @@
             streakTip: 'Hver linje er en egen rekke på sju trinn: de seks første dagene gir lite, og den sjuende gir den store bonusen. En ✓ teller allerede i dag; resten åpner der oppgaven gjøres.',
             extraOffersNote: 'Flere aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelet og i Bing-appen finnes det som regel ekstra aktiviteter som gir flere poeng enn disse. De er ikke alltid de samme: noen er søk og andre ikke (puslespill, spørsmål, spørreundersøkelser).',
+            xboxNote: 'Flere poeng på Xbox',
+            xboxTip: 'Xbox har sine egne daglige, ukentlige og månedlige oppgaver som gir poeng i tillegg til disse. De vises verken her eller i Rewards-panelet: de godskrives fra appen eller konsollen, så det er der man må se etter.',
             autoLabel: 'Bruk fremgangen min i Rewards',
             autoTip: 'Når dette er slått på, spør skriptet Bing om hvor mange søkepoeng du mangler i dag, utfører bare de nødvendige søkene, stopper av seg selv når de er ferdige, og viser hva poengene dine er verdt. Er det slått av, gjør det ingen nettverksforespørsler og bruker det manuelle antallet nedenfor.',
             manualFallbackTip: 'Fremgangen din i Rewards kunne ikke leses, så det manuelle antallet i fanen for nøkkelord er det som gjelder.',
@@ -1182,6 +1224,8 @@
             streakTip: '每一行都是獨立的七步連續記錄：前六天給得少，第七天一次給足。✓ 表示今天這一份已經算進去了，其餘會開啟完成任務的地方。',
             extraOffersNote: 'Rewards 裡還有更多活動',
             extraOffersTip: 'Rewards 面板和 Bing 應用程式裡通常還有額外活動，給的分比這些多。它們並不固定：有的是搜尋，有的不是（拼圖、問答、問卷）。',
+            xboxNote: 'Xbox 裡還能拿更多分',
+            xboxTip: 'Xbox 有自己的每日、每週和每月任務，給的分和這些是分開的。這裡和 Rewards 面板都看不到：它們從應用程式或主機上入帳，只能到那邊看。',
             autoLabel: '使用我的 Rewards 進度',
             autoTip: '開啟後，腳本會向 Bing 查詢你今天還差多少搜尋點數，只執行必要的搜尋，完成後自動停止，並顯示你的點數值多少錢。關閉後，腳本不會發出任何網路請求，改用下面手動設定的次數。',
             manualFallbackTip: '沒能讀到你的 Rewards 進度，因此以關鍵字標籤頁中手動設定的次數為準。',
@@ -1312,7 +1356,11 @@
         text: '#e0e0e0',
         gray: '#8892a0',
         green: '#4caf50',
-        red: '#e74c3c'
+        red: '#e74c3c',
+        // Solo para la escalera que está a punto de cerrarse. Ni verde (que aquí
+        // significa «ya hecho») ni rojo (que significa «algo va mal»): esto no
+        // es un problema, es un día caro.
+        gold: '#ffb900'
     };
 
     // =============================================
@@ -1453,6 +1501,16 @@
     // las actividades.
     const REWARDS_MORE = 'https://rewards.bing.com/earn#moreactivities';
     const REWARDS_DAILYSET = 'https://rewards.bing.com/dashboard?section=dailyset';
+
+    // Xbox va aparte y sin locale: `microsoft.com/rewards/xbox` redirige aquí
+    // con un 301, y esta página se sirve ya traducida al mercado del usuario
+    // (verificado el 2026-08-26: desde mx devuelve es-MX sin pedirlo). Es el
+    // ÚNICO enlace del panel que apunta a algo que el script no puede leer: las
+    // tareas de Xbox no salen ni en el flyout ni en el panel de Rewards —se
+    // comprobó con controles positivos del propio sitio el 2026-08-26—, así que
+    // se acreditan desde la app o la consola y no hay número que enseñar. Por
+    // eso es un enlace con aviso y no una fila de tarea con estado.
+    const XBOX_REWARDS = 'https://www.xbox.com/rewards';
 
     const API_TIMEOUT = 8000;
 
@@ -3186,18 +3244,21 @@
             }
 
             /**
-             * Nota de cierre de lo que se hace en Bing: en el panel de Rewards
-             * hay más actividades, cambian a diario y valen más puntos. Va como
-             * enlace y no como fila de tarea porque no es una tarea con estado:
-             * ni se marca ni se cuenta, solo dice dónde mirar.
+             * Una nota: un enlace a algo que no es una tarea con estado —ni se
+             * marca ni se cuenta, solo dice dónde mirar—, por eso va en gris y
+             * en negrita y no como fila de `taskLine`.
+             *
+             * @param {string} url
+             * @param {string} text
+             * @param {string} tip
              */
-            function appendExtraNote() {
+            function noteLine(url, text, tip) {
                 const note = document.createElement('a');
-                note.href = REWARDS_MORE;
+                note.href = url;
                 note.target = '_blank';
                 note.rel = 'noopener noreferrer';
-                note.textContent = `+ ${t.extraOffersNote}`;
-                note.title = t.extraOffersTip;
+                note.textContent = `+ ${text}`;
+                note.title = tip;
                 Object.assign(note.style, {
                     display: 'block', color: colors.gray, textDecoration: 'none',
                     // Del mismo tamaño que las filas —lo hereda del bloque— y en
@@ -3209,6 +3270,11 @@
                 note.onmouseenter = () => { note.style.color = colors.text; };
                 note.onmouseleave = () => { note.style.color = colors.gray; };
                 tasksBox.appendChild(note);
+            }
+
+            /** Cierra el grupo de lo que se hace en Bing. */
+            function appendExtraNote() {
+                noteLine(REWARDS_MORE, t.extraOffersNote, t.extraOffersTip);
             }
 
             let dsetShown = false;
@@ -3225,7 +3291,33 @@
                     // El conjunto diario va a su sección del panel de Rewards,
                     // que es donde de verdad se hacen sus actividades.
                     const url = p.key === 'dset' ? REWARDS_DAILYSET : p.url;
-                    tasksBox.appendChild(taskLine(`${lead}${p.label}`, p.done, url));
+
+                    // La escalera a punto de cerrarse, en dorado y con 🎁. No es
+                    // un capricho de color: el séptimo paso es donde está el
+                    // dinero. Verificado el 2026-08-26 en dos cuentas, los siete
+                    // socios pagan 1203 puntos por semana y 670 de ellos —el
+                    // 56%— están en los séptimos pasos (bing 3·6+100, dset
+                    // 30·6+100, edge 5,10,20,30,40,80+120, sapphire 60+50, y
+                    // ntp, outlook y visualsearch 5·6+100). Saltarse ese día
+                    // cuesta más que los seis anteriores juntos.
+                    //
+                    // El `- 1` es a propósito, y es una cobertura: no sabemos si
+                    // `currentStep` cuenta pasos COMPLETADOS o nombra el paso EN
+                    // CURSO, porque las dos lecturas encajan con todo lo visto.
+                    // Bajo una el día bueno es `step === total`, bajo la otra
+                    // `total - 1`; con `>=` se enciende bajo las dos, como pronto
+                    // un día antes y nunca tarde. Y encenderse un día antes no
+                    // miente, porque esta línea no afirma nada por escrito: el
+                    // `6/7 ✱100` que ya pinta dice por sí solo cuánto falta. Esa
+                    // es también la razón de que no haya cadena nueva aquí —un
+                    // «hoy cierras» habría obligado a acertar la semántica para
+                    // no mentir en 22 idiomas—.
+                    const closing = !p.done && p.total > 1 && p.step >= p.total - 1;
+                    const row = taskLine(`${closing ? '🎁 ' : ''}${lead}${p.label}`, p.done, url);
+                    // Después de `taskLine`, que fija el color por el ✓/→. El
+                    // hover solo toca el subrayado, así que el dorado aguanta.
+                    if (closing) row.style.color = colors.gold;
+                    tasksBox.appendChild(row);
                     if (p.key === 'dset') { dsetShown = true; appendDailySetLinks(); }
                 });
                 if (!noted) appendExtraNote();
@@ -3238,6 +3330,12 @@
                     !ds.pending.length, REWARDS_DAILYSET, t.dailySetTip));
                 appendDailySetLinks();
             }
+
+            // Xbox va al final del todo y fuera de cualquier grupo: es lo único
+            // de la lista que el script no puede leer ni marcar. Su aviso existe
+            // sobre todo para contestar la pregunta que provoca su ausencia
+            // —«¿y los puntos de Xbox?»—, no para mandar a ninguna parte.
+            noteLine(XBOX_REWARDS, t.xboxNote, t.xboxTip);
         }
 
         // --- Valor de los puntos ---
