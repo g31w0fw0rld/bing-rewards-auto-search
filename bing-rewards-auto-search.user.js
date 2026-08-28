@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.7
+// @version      1.3.8
 // @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Waits out late crediting and links the other daily tasks. Queries from your own keywords, rotating search types (70% web plus images, videos, shopping, news), 3-10s delays with 10-25s reading pauses, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @author       g31w0fw0rld
 // @license      MIT
@@ -15,7 +15,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.7';
+    const SCRIPT_VERSION = '1.3.8';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -131,6 +131,9 @@
             extraOffersTip: 'En el panel de Rewards y en la app de Bing suele haber actividades extra que dan más puntos que estas. No son siempre las mismas: unas son búsquedas y otras no (puzles, preguntas, encuestas).',
             xboxNote: 'Más puntos en Xbox',
             xboxTip: 'Xbox tiene sus propias tareas diarias, semanales y mensuales, que dan puntos aparte de estas. No aparecen ni aquí ni en el panel de Rewards: se acreditan desde la app o la consola, así que hay que mirarlas allí.',
+            outlookNote: 'Misiones en Outlook',
+            outlookTip: 'Outlook en el navegador tiene misiones de puntos que solo se ven ahí. No aparecen ni aquí ni en el panel de Rewards, así que hay que abrirlo para verlas y completarlas.',
+            streakOffTip: 'Esta racha no está disponible en tu cuenta: Microsoft las ofrece solo a determinados miembros y en determinados mercados. Desde aquí no se puede avanzar.',
             autoLabel: 'Usar mi progreso de Rewards',
             autoTip: 'Con esto activado el script le pregunta a Bing cuántos puntos de búsqueda te faltan hoy, ejecuta solo las búsquedas necesarias, se detiene solo al completarlas y muestra cuánto valen tus puntos. Desactivado no hace ninguna petición de red y usa el número manual de abajo.',
             manualFallbackTip: 'No se pudo leer tu progreso de Rewards, así que manda el número manual de la pestaña de palabras clave.',
@@ -201,6 +204,9 @@
             extraOffersTip: 'The Rewards dashboard and the Bing app usually carry extra activities worth more points than these. They are not always the same: some are searches and some are not (puzzles, questions, polls).',
             xboxNote: 'More points on Xbox',
             xboxTip: 'Xbox has its own daily, weekly and monthly tasks, worth points on top of these. They show up neither here nor in the Rewards dashboard: they credit from the app or the console, so that is where you have to look.',
+            outlookNote: 'Missions in Outlook',
+            outlookTip: 'Outlook in the browser has point missions that can only be seen there. They show up neither here nor in the Rewards dashboard, so you have to open it to see them and complete them.',
+            streakOffTip: 'This streak is not available on your account: Microsoft offers them only to select members and in select markets. There is no way to advance it from here.',
             autoLabel: 'Use my Rewards progress',
             autoTip: 'With this on, the script asks Bing how many search points you still need today, runs only the searches required, stops on its own once they are done, and shows what your points are worth. With it off it makes no network request and uses the manual number below.',
             manualFallbackTip: 'Your Rewards progress could not be read, so the manual number in the keywords tab is what counts.',
@@ -257,6 +263,9 @@
             extraOffersTip: 'Im Rewards-Dashboard und in der Bing-App gibt es meist zusätzliche Aktivitäten, die mehr Punkte bringen als diese. Sie sind nicht immer dieselben: Manche sind Suchen, andere nicht (Puzzles, Quizfragen, Umfragen).',
             xboxNote: 'Mehr Punkte auf Xbox',
             xboxTip: 'Xbox hat eigene tägliche, wöchentliche und monatliche Aufgaben, die zusätzlich zu diesen Punkte bringen. Sie erscheinen weder hier noch im Rewards-Dashboard: Sie werden über die App oder die Konsole gutgeschrieben, dort muss man also nachsehen.',
+            outlookNote: 'Missionen in Outlook',
+            outlookTip: 'Outlook im Browser hat Punkte-Missionen, die man nur dort sieht. Sie erscheinen weder hier noch im Rewards-Dashboard, man muss es also öffnen, um sie zu sehen und zu erledigen.',
+            streakOffTip: 'Diese Serie ist für dein Konto nicht verfügbar: Microsoft bietet sie nur bestimmten Mitgliedern und in bestimmten Märkten an. Von hier aus lässt sie sich nicht voranbringen.',
             autoLabel: 'Meinen Rewards-Fortschritt verwenden',
             autoTip: 'Ist das aktiv, fragt das Skript bei Bing nach, wie viele Suchpunkte dir heute noch fehlen, führt nur die nötigen Suchen aus, hört von selbst auf, wenn sie erledigt sind, und zeigt, was deine Punkte wert sind. Ist es aus, stellt es keine Netzwerkanfrage und nutzt die manuelle Zahl darunter.',
             manualFallbackTip: 'Dein Rewards-Fortschritt ließ sich nicht lesen, also zählt die manuelle Zahl im Reiter für Schlüsselwörter.',
@@ -308,6 +317,9 @@
             extraOffersTip: 'Le tableau de bord Rewards et l’application Bing proposent en général des activités supplémentaires qui rapportent plus que celles-ci. Elles ne sont pas toujours les mêmes : certaines sont des recherches, d’autres non (puzzles, questions, sondages).',
             xboxNote: 'Plus de points sur Xbox',
             xboxTip: 'Xbox a ses propres tâches quotidiennes, hebdomadaires et mensuelles, qui rapportent des points en plus de celles-ci. Elles n’apparaissent ni ici ni dans le tableau de bord Rewards : elles sont créditées depuis l’application ou la console, c’est donc là qu’il faut regarder.',
+            outlookNote: 'Missions dans Outlook',
+            outlookTip: 'Outlook dans le navigateur a des missions à points que l’on ne voit que là. Elles n’apparaissent ni ici ni dans le tableau de bord Rewards, il faut donc l’ouvrir pour les voir et les terminer.',
+            streakOffTip: 'Cette série n’est pas disponible sur votre compte : Microsoft ne les propose qu’à certains membres et sur certains marchés. Impossible de la faire avancer d’ici.',
             autoLabel: 'Utiliser ma progression Rewards',
             autoTip: 'Avec cette option activée, le script demande à Bing combien de points de recherche vous manquent aujourd’hui, effectue uniquement les recherches nécessaires, s’arrête de lui-même une fois terminé et affiche ce que valent vos points. Désactivée, il ne fait aucune requête réseau et utilise le nombre manuel ci-dessous.',
             manualFallbackTip: 'Votre progression Rewards n’a pas pu être lue : c’est donc le nombre manuel de l’onglet des mots-clés qui compte.',
@@ -359,6 +371,9 @@
             extraOffersTip: 'No painel do Rewards e na aplicação Bing costuma haver atividades extra que dão mais pontos do que estas. Nem sempre são as mesmas: umas são pesquisas e outras não (puzzles, perguntas, sondagens).',
             xboxNote: 'Mais pontos na Xbox',
             xboxTip: 'A Xbox tem as suas próprias tarefas diárias, semanais e mensais, que dão pontos além destas. Não aparecem aqui nem no painel do Rewards: são creditadas a partir da aplicação ou da consola, por isso é lá que há que ver.',
+            outlookNote: 'Missões no Outlook',
+            outlookTip: 'O Outlook no navegador tem missões de pontos que só se veem ali. Não aparecem aqui nem no painel do Rewards, por isso há que abri-lo para as ver e completar.',
+            streakOffTip: 'Esta sequência não está disponível na sua conta: a Microsoft só as oferece a determinados membros e em determinados mercados. A partir daqui não é possível avançá-la.',
             autoLabel: 'Usar o meu progresso do Rewards',
             autoTip: 'Com isto ativado o script pergunta ao Bing quantos pontos de pesquisa lhe faltam hoje, faz apenas as pesquisas necessárias, para sozinho quando terminam e mostra quanto valem os seus pontos. Desativado não faz qualquer pedido de rede e usa o número manual abaixo.',
             manualFallbackTip: 'Não foi possível ler o seu progresso do Rewards, por isso vale o número manual do separador de palavras-chave.',
@@ -410,6 +425,9 @@
             extraOffersTip: 'На панели Rewards и в приложении Bing обычно есть дополнительные задания, которые дают больше баллов, чем эти. Они не всегда одинаковые: часть — поиски, часть — нет (головоломки, викторины, опросы).',
             xboxNote: 'Больше баллов в Xbox',
             xboxTip: 'У Xbox есть свои ежедневные, еженедельные и ежемесячные задания, которые дают баллы сверх этих. Их нет ни здесь, ни на панели Rewards: они начисляются из приложения или с консоли, там их и надо смотреть.',
+            outlookNote: 'Задания в Outlook',
+            outlookTip: 'В Outlook в браузере есть задания на баллы, которые видны только там. Их нет ни здесь, ни на панели Rewards, поэтому его нужно открыть, чтобы увидеть и выполнить их.',
+            streakOffTip: 'Эта серия недоступна в вашей учётной записи: Microsoft предлагает их только отдельным участникам и на отдельных рынках. Отсюда её не продвинуть.',
             autoLabel: 'Использовать мой прогресс Rewards',
             autoTip: 'Когда включено, скрипт спрашивает у Bing, сколько поисковых баллов вам осталось получить сегодня, выполняет только нужные запросы, сам останавливается по завершении и показывает, сколько стоят ваши баллы. Когда выключено, он не делает ни одного сетевого запроса и берёт число, заданное вручную ниже.',
             manualFallbackTip: 'Прочитать ваш прогресс Rewards не удалось, поэтому решает число, заданное вручную на вкладке ключевых слов.',
@@ -461,6 +479,9 @@
             extraOffersTip: 'Rewards panelinde ve Bing uygulamasında genellikle bunlardan daha çok puan veren ek etkinlikler bulunur. Hep aynı olmazlar: bazıları aramadır, bazıları değil (yapbozlar, sorular, anketler).',
             xboxNote: 'Xbox’ta daha fazla puan',
             xboxTip: 'Xbox’un kendi günlük, haftalık ve aylık görevleri var; bunlara ek puan verirler. Ne burada ne de Rewards panelinde görünürler: uygulamadan ya da konsoldan işlenirler, dolayısıyla oradan bakmak gerekir.',
+            outlookNote: 'Outlook’ta görevler',
+            outlookTip: 'Tarayıcıdaki Outlook’ta yalnızca orada görünen puan görevleri var. Ne burada ne de Rewards panelinde çıkarlar; görmek ve tamamlamak için Outlook’u açmak gerekir.',
+            streakOffTip: 'Bu seri hesabınızda kullanılamıyor: Microsoft bunları yalnızca belirli üyelere ve belirli pazarlarda sunuyor. Buradan ilerletilemez.',
             autoLabel: 'Rewards ilerlememi kullan',
             autoTip: 'Bu açıkken betik Bing’e bugün kaç arama puanınızın eksik olduğunu sorar, yalnızca gereken aramaları yapar, bitince kendiliğinden durur ve puanlarınızın ne değerde olduğunu gösterir. Kapalıyken hiçbir ağ isteği yapmaz ve aşağıdaki elle girilen sayıyı kullanır.',
             manualFallbackTip: 'Rewards ilerlemeniz okunamadı, bu yüzden anahtar kelimeler sekmesindeki elle girilen sayı geçerli.',
@@ -512,6 +533,9 @@
             extraOffersTip: 'Rewards のダッシュボードや Bing アプリには、これらより点数の高い追加アクティビティがあるのが普通です。毎回同じとは限らず、検索のものもあれば、そうでないもの（パズル、クイズ、アンケート）もあります。',
             xboxNote: 'Xbox でさらにポイント',
             xboxTip: 'Xbox には独自の日次・週次・月次のタスクがあり、これらとは別にポイントがもらえます。ここにも Rewards のダッシュボードにも出てきません。アプリか本体から加算されるので、確認はそちらで行います。',
+            outlookNote: 'Outlook のミッション',
+            outlookTip: 'ブラウザーの Outlook には、そこでしか見られないポイントミッションがあります。ここにも Rewards のダッシュボードにも出てこないので、確認と達成は Outlook を開いて行います。',
+            streakOffTip: 'このストリークはあなたのアカウントでは利用できません。Microsoft は一部のメンバーと一部の市場にのみ提供しています。ここからは進められません。',
             autoLabel: 'Rewards の進捗を使う',
             autoTip: 'オンにすると、今日あと何ポイント足りないかを Bing に問い合わせ、必要な回数だけ検索し、終われば自動で停止して、ポイントの価値を表示します。オフにするとネットワーク要求は一切行わず、下の手動の回数を使います。',
             manualFallbackTip: 'Rewards の進捗を読めなかったので、キーワードのタブにある手動の回数が有効になります。',
@@ -563,6 +587,9 @@
             extraOffersTip: 'Rewards 대시보드와 Bing 앱에는 보통 이보다 점수가 높은 추가 활동이 있습니다. 매번 같지도 않아서 검색인 것도 있고 아닌 것도 있습니다(퍼즐, 퀴즈, 설문).',
             xboxNote: 'Xbox에서 더 많은 포인트',
             xboxTip: 'Xbox에는 자체 일간·주간·월간 과제가 있어 이와 별도로 포인트를 줍니다. 여기에도 Rewards 대시보드에도 나오지 않습니다. 앱이나 콘솔에서 적립되므로 확인은 그쪽에서 해야 합니다.',
+            outlookNote: 'Outlook의 미션',
+            outlookTip: '브라우저의 Outlook에는 그곳에서만 볼 수 있는 포인트 미션이 있습니다. 여기에도 Rewards 대시보드에도 나오지 않으므로 Outlook을 열어서 확인하고 완료해야 합니다.',
+            streakOffTip: '이 연속 기록은 계정에서 사용할 수 없습니다. Microsoft는 일부 회원과 일부 시장에만 제공합니다. 여기서는 진행할 수 없습니다.',
             autoLabel: '내 Rewards 진행 상황 사용',
             autoTip: '켜 두면 스크립트가 오늘 검색 포인트가 얼마나 남았는지 Bing에 물어보고, 필요한 만큼만 검색하고, 끝나면 스스로 멈추며, 포인트의 가치를 보여줍니다. 끄면 네트워크 요청을 전혀 하지 않고 아래의 수동 횟수를 씁니다.',
             manualFallbackTip: 'Rewards 진행 상황을 읽지 못했으므로 키워드 탭의 수동 횟수가 기준이 됩니다.',
@@ -614,6 +641,9 @@
             extraOffersTip: 'W panelu Rewards i w aplikacji Bing zwykle są dodatkowe aktywności dające więcej punktów niż te. Nie zawsze są takie same: jedne to wyszukiwania, inne nie (układanki, pytania, ankiety).',
             xboxNote: 'Więcej punktów na Xbox',
             xboxTip: 'Xbox ma własne zadania dzienne, tygodniowe i miesięczne, dające punkty poza tymi. Nie widać ich ani tutaj, ani w panelu Rewards: naliczają się z aplikacji lub konsoli, więc tam trzeba zaglądać.',
+            outlookNote: 'Misje w Outlooku',
+            outlookTip: 'Outlook w przeglądarce ma misje punktowe, które widać tylko tam. Nie ma ich ani tutaj, ani w panelu Rewards, więc trzeba go otworzyć, żeby je zobaczyć i wykonać.',
+            streakOffTip: 'Ta seria nie jest dostępna na twoim koncie: Microsoft oferuje je tylko wybranym użytkownikom i na wybranych rynkach. Stąd nie da się jej rozwinąć.',
             autoLabel: 'Używaj mojego postępu Rewards',
             autoTip: 'Gdy to jest włączone, skrypt pyta Bing, ile punktów za wyszukiwania brakuje ci dzisiaj, wykonuje tylko potrzebne wyszukiwania, sam się zatrzymuje po ich ukończeniu i pokazuje, ile warte są twoje punkty. Gdy jest wyłączone, nie wykonuje żadnego żądania sieciowego i używa ręcznej liczby poniżej.',
             manualFallbackTip: 'Nie udało się odczytać twojego postępu Rewards, więc liczy się ręczna liczba z zakładki słów kluczowych.',
@@ -665,6 +695,9 @@
             extraOffersTip: 'Rewards-koontinäytöllä ja Bing-sovelluksessa on yleensä lisätehtäviä, joista saa enemmän pisteitä kuin näistä. Ne eivät ole aina samoja: osa on hakuja, osa ei (palapelit, kysymykset, kyselyt).',
             xboxNote: 'Lisää pisteitä Xboxissa',
             xboxTip: 'Xboxilla on omat päivittäiset, viikoittaiset ja kuukausittaiset tehtävänsä, joista saa pisteitä näiden lisäksi. Ne eivät näy täällä eivätkä Rewards-koontinäytöllä: ne kirjautuvat sovelluksesta tai konsolista, joten sieltä ne pitää katsoa.',
+            outlookNote: 'Outlookin tehtävät',
+            outlookTip: 'Selaimen Outlookissa on pistetehtäviä, jotka näkyvät vain siellä. Ne eivät näy täällä eivätkä Rewards-koontinäytöllä, joten se pitää avata, jotta ne näkee ja voi tehdä.',
+            streakOffTip: 'Tämä putki ei ole käytettävissä tililläsi: Microsoft tarjoaa niitä vain tietyille jäsenille ja tietyillä markkinoilla. Täältä sitä ei voi edistää.',
             autoLabel: 'Käytä Rewards-edistymistäni',
             autoTip: 'Kun tämä on käytössä, skripti kysyy Bingiltä, montako hakupistettä sinulta puuttuu tänään, tekee vain tarvittavat haut, pysähtyy itse kun ne on tehty ja näyttää, paljonko pisteesi ovat arvoltaan. Kun se on pois käytöstä, skripti ei tee lainkaan verkkopyyntöjä ja käyttää alla olevaa käsin annettua lukua.',
             manualFallbackTip: 'Rewards-edistymistäsi ei saatu luettua, joten ratkaisee avainsanavälilehden käsin annettu luku.',
@@ -716,6 +749,9 @@
             extraOffersTip: 'Bảng điều khiển Rewards và ứng dụng Bing thường có thêm những hoạt động cho nhiều điểm hơn các mục này. Chúng không cố định: có cái là tìm kiếm, có cái không (xếp hình, câu hỏi, khảo sát).',
             xboxNote: 'Thêm điểm trên Xbox',
             xboxTip: 'Xbox có các nhiệm vụ ngày, tuần và tháng riêng, cho điểm ngoài những mục này. Chúng không hiện ở đây lẫn trong bảng điều khiển Rewards: điểm được cộng từ ứng dụng hoặc máy chơi game, nên phải xem ở đó.',
+            outlookNote: 'Nhiệm vụ trong Outlook',
+            outlookTip: 'Outlook trên trình duyệt có các nhiệm vụ tính điểm chỉ thấy được ở đó. Chúng không hiện ở đây lẫn trong bảng điều khiển Rewards, nên phải mở Outlook để xem và hoàn thành.',
+            streakOffTip: 'Chuỗi này không khả dụng với tài khoản của bạn: Microsoft chỉ cung cấp cho một số thành viên và ở một số thị trường. Không thể tiến hành từ đây.',
             autoLabel: 'Dùng tiến độ Rewards của tôi',
             autoTip: 'Khi bật, tập lệnh hỏi Bing xem hôm nay bạn còn thiếu bao nhiêu điểm tìm kiếm, chỉ chạy những lượt tìm cần thiết, tự dừng khi xong, và cho biết điểm của bạn đáng giá bao nhiêu. Khi tắt, nó không thực hiện bất kỳ yêu cầu mạng nào và dùng con số đặt tay ở dưới.',
             manualFallbackTip: 'Không đọc được tiến độ Rewards của bạn, nên con số đặt tay ở thẻ từ khóa là con số quyết định.',
@@ -767,6 +803,9 @@
             extraOffersTip: 'Rewards 面板和 Bing 应用里通常还有额外活动，给的分比这些多。它们并不固定：有的是搜索，有的不是（拼图、问答、问卷）。',
             xboxNote: 'Xbox 里还能拿更多分',
             xboxTip: 'Xbox 有自己的每日、每周和每月任务，给的分和这些是分开的。这里和 Rewards 面板都看不到：它们从应用或主机上入账，只能到那边看。',
+            outlookNote: 'Outlook 里的任务',
+            outlookTip: '浏览器里的 Outlook 有只能在那里看到的积分任务。这里和 Rewards 面板都看不到，只能打开 Outlook 去看和完成。',
+            streakOffTip: '这个连续记录在你的账户上不可用：微软只向部分会员、在部分市场提供。从这里无法推进。',
             autoLabel: '使用我的 Rewards 进度',
             autoTip: '开启后，脚本会向 Bing 查询你今天还差多少搜索积分，只执行必要的搜索，完成后自动停止，并显示你的积分值多少钱。关闭后，脚本不会发起任何网络请求，改用下面手动设置的次数。',
             manualFallbackTip: '没能读到你的 Rewards 进度，因此以关键词标签页中手动设置的次数为准。',
@@ -818,6 +857,9 @@
             extraOffersTip: 'عادةً ما توجد في لوحة Rewards وفي تطبيق Bing أنشطة إضافية تمنح نقاطًا أكثر من هذه. وهي ليست الأنشطة نفسها دائمًا: بعضها عمليات بحث وبعضها لا (ألغاز وأسئلة واستطلاعات).',
             xboxNote: 'نقاط أكثر في Xbox',
             xboxTip: 'لدى Xbox مهامها اليومية والأسبوعية والشهرية الخاصة، وهي تمنح نقاطًا إضافية غير هذه. لا تظهر هنا ولا في لوحة Rewards: تُضاف من التطبيق أو من الجهاز، ولذلك يجب مراجعتها هناك.',
+            outlookNote: 'مهام في Outlook',
+            outlookTip: 'لدى Outlook في المتصفح مهام نقاط لا تظهر إلا هناك. لا تظهر هنا ولا في لوحة Rewards، لذلك يجب فتحه لرؤيتها وإكمالها.',
+            streakOffTip: 'هذه السلسلة غير متاحة في حسابك: تقدّمها Microsoft لأعضاء محدّدين وفي أسواق محدّدة فقط. ولا يمكن التقدّم فيها من هنا.',
             autoLabel: 'استخدام تقدّمي في Rewards',
             autoTip: 'عند تشغيل هذا يسأل البرنامج النصي Bing عن عدد نقاط البحث الناقصة اليوم، وينفّذ عمليات البحث اللازمة فقط، ويتوقّف من تلقاء نفسه عند إتمامها، ويعرض قيمة نقاطك. وعند إيقافه لا يُجري أي طلب شبكة ويستخدم العدد اليدوي أدناه.',
             manualFallbackTip: 'لم يتسنَّ قراءة تقدّمك في Rewards، لذا فالعدد اليدوي في علامة تبويب الكلمات المفتاحية هو المعتبر.',
@@ -869,6 +911,9 @@
             extraOffersTip: 'Rewards के पैनल और Bing ऐप में आम तौर पर अतिरिक्त गतिविधियाँ होती हैं जो इनसे ज़्यादा अंक देती हैं। वे हमेशा एक जैसी नहीं होतीं: कुछ खोजें होती हैं और कुछ नहीं (पहेलियाँ, सवाल, सर्वेक्षण)।',
             xboxNote: 'Xbox पर और अंक',
             xboxTip: 'Xbox की अपनी दैनिक, साप्ताहिक और मासिक गतिविधियाँ हैं, जो इनके अलावा अंक देती हैं। वे न यहाँ दिखती हैं और न Rewards के पैनल में: वे ऐप या कंसोल से जुड़ती हैं, इसलिए उन्हें वहीं देखना पड़ता है।',
+            outlookNote: 'Outlook में मिशन',
+            outlookTip: 'ब्राउज़र के Outlook में अंक-गतिविधियाँ हैं जो सिर्फ़ वहीं दिखती हैं। वे न यहाँ दिखती हैं और न Rewards के पैनल में, इसलिए उन्हें देखने और पूरा करने के लिए Outlook खोलना पड़ता है।',
+            streakOffTip: 'यह शृंखला आपके खाते में उपलब्ध नहीं है: Microsoft इन्हें सिर्फ़ कुछ सदस्यों को और कुछ बाज़ारों में देता है। यहाँ से इसे आगे नहीं बढ़ाया जा सकता।',
             autoLabel: 'मेरी Rewards प्रगति इस्तेमाल करें',
             autoTip: 'यह चालू होने पर स्क्रिप्ट Bing से पूछती है कि आज आपके कितने खोज-अंक बाकी हैं, सिर्फ़ ज़रूरी खोजें करती है, पूरा होने पर खुद रुक जाती है, और बताती है कि आपके अंकों का मूल्य कितना है। बंद होने पर यह कोई नेटवर्क अनुरोध नहीं करती और नीचे दी गई मैनुअल संख्या का उपयोग करती है।',
             manualFallbackTip: 'आपकी Rewards प्रगति पढ़ी नहीं जा सकी, इसलिए कीवर्ड टैब में दी गई मैनुअल संख्या ही मान्य है।',
@@ -920,6 +965,9 @@
             extraOffersTip: 'Di dasbor Rewards dan aplikasi Bing biasanya ada aktivitas tambahan yang memberi lebih banyak poin daripada ini. Tidak selalu sama: sebagian berupa penelusuran dan sebagian bukan (teka-teki, pertanyaan, jajak pendapat).',
             xboxNote: 'Lebih banyak poin di Xbox',
             xboxTip: 'Xbox punya tugas harian, mingguan, dan bulanannya sendiri, yang memberi poin di luar yang ini. Semuanya tidak muncul di sini maupun di dasbor Rewards: poinnya masuk dari aplikasi atau konsol, jadi harus dilihat di sana.',
+            outlookNote: 'Misi di Outlook',
+            outlookTip: 'Outlook di peramban punya misi poin yang hanya terlihat di sana. Semuanya tidak muncul di sini maupun di dasbor Rewards, jadi harus dibuka untuk dilihat dan diselesaikan.',
+            streakOffTip: 'Runtunan ini tidak tersedia di akun Anda: Microsoft hanya menawarkannya kepada anggota tertentu dan di pasar tertentu. Dari sini tidak bisa dilanjutkan.',
             autoLabel: 'Gunakan progres Rewards saya',
             autoTip: 'Bila ini aktif, skrip menanyakan ke Bing berapa poin penelusuran yang masih Anda kurang hari ini, menjalankan hanya penelusuran yang perlu, berhenti sendiri setelah selesai, dan menampilkan nilai poin Anda. Bila nonaktif, skrip tidak membuat permintaan jaringan apa pun dan memakai angka manual di bawah.',
             manualFallbackTip: 'Progres Rewards Anda tidak dapat dibaca, jadi angka manual di tab kata kunci yang berlaku.',
@@ -971,6 +1019,9 @@
             extraOffersTip: 'Nel pannello Rewards e nell’app Bing di solito ci sono attività extra che danno più punti di queste. Non sono sempre le stesse: alcune sono ricerche e altre no (rompicapi, domande, sondaggi).',
             xboxNote: 'Più punti su Xbox',
             xboxTip: 'Xbox ha le sue attività giornaliere, settimanali e mensili, che danno punti oltre a queste. Non compaiono né qui né nel pannello Rewards: vengono accreditate dall’app o dalla console, quindi è lì che bisogna guardare.',
+            outlookNote: 'Missioni in Outlook',
+            outlookTip: 'Outlook nel browser ha missioni a punti che si vedono solo lì. Non compaiono né qui né nel pannello Rewards, quindi bisogna aprirlo per vederle e completarle.',
+            streakOffTip: 'Questa serie non è disponibile sul tuo account: Microsoft le offre solo ad alcuni membri e in alcuni mercati. Da qui non si può portare avanti.',
             autoLabel: 'Usa i miei progressi Rewards',
             autoTip: 'Con questa opzione attiva lo script chiede a Bing quanti punti ricerca ti mancano oggi, esegue solo le ricerche necessarie, si ferma da sé quando sono finite e mostra quanto valgono i tuoi punti. Disattivata non fa nessuna richiesta di rete e usa il numero manuale qui sotto.',
             manualFallbackTip: 'Non è stato possibile leggere i tuoi progressi Rewards, quindi vale il numero manuale nella scheda delle parole chiave.',
@@ -1022,6 +1073,9 @@
             extraOffersTip: 'In het Rewards-dashboard en de Bing-app staan meestal extra activiteiten die meer punten opleveren dan deze. Ze zijn niet altijd hetzelfde: sommige zijn zoekopdrachten en andere niet (puzzels, vragen, peilingen).',
             xboxNote: 'Meer punten op Xbox',
             xboxTip: 'Xbox heeft eigen dagelijkse, wekelijkse en maandelijkse opdrachten, die punten opleveren naast deze. Ze staan niet hier en ook niet in het Rewards-dashboard: ze worden vanuit de app of de console bijgeschreven, dus daar moet je kijken.',
+            outlookNote: 'Missies in Outlook',
+            outlookTip: 'Outlook in de browser heeft puntenmissies die je alleen daar ziet. Ze staan niet hier en ook niet in het Rewards-dashboard, dus je moet het openen om ze te zien en te doen.',
+            streakOffTip: 'Deze reeks is niet beschikbaar op je account: Microsoft biedt ze alleen aan bepaalde leden en in bepaalde markten aan. Vanaf hier valt er niets aan te doen.',
             autoLabel: 'Mijn Rewards-voortgang gebruiken',
             autoTip: 'Staat dit aan, dan vraagt het script bij Bing op hoeveel zoekpunten je vandaag nog mist, voert alleen de nodige zoekopdrachten uit, stopt zelf zodra ze klaar zijn en laat zien wat je punten waard zijn. Staat het uit, dan doet het geen enkel netwerkverzoek en gebruikt het het handmatige aantal hieronder.',
             manualFallbackTip: 'Je Rewards-voortgang kon niet worden gelezen, dus geldt het handmatige aantal op het tabblad met trefwoorden.',
@@ -1073,6 +1127,9 @@
             extraOffersTip: 'I Rewards-panelen och i Bing-appen finns oftast extra aktiviteter som ger mer poäng än de här. De är inte alltid desamma: vissa är sökningar och andra inte (pussel, frågor, enkäter).',
             xboxNote: 'Fler poäng på Xbox',
             xboxTip: 'Xbox har egna dagliga, veckovisa och månatliga uppdrag som ger poäng utöver de här. De syns varken här eller i Rewards-panelen: de krediteras från appen eller konsolen, så det är där man får titta.',
+            outlookNote: 'Uppdrag i Outlook',
+            outlookTip: 'Outlook i webbläsaren har poänguppdrag som bara syns där. De syns varken här eller i Rewards-panelen, så man får öppna det för att se och göra dem.',
+            streakOffTip: 'Den här sviten är inte tillgänglig på ditt konto: Microsoft erbjuder dem bara till vissa medlemmar och på vissa marknader. Härifrån går den inte att föra vidare.',
             autoLabel: 'Använd mina Rewards-framsteg',
             autoTip: 'När detta är på frågar skriptet Bing hur många sökpoäng du saknar i dag, gör bara de sökningar som behövs, stannar av sig själv när de är klara och visar vad dina poäng är värda. När det är av gör det inga nätverksanrop och använder det manuella antalet nedan.',
             manualFallbackTip: 'Dina Rewards-framsteg kunde inte läsas, så det manuella antalet på fliken för nyckelord är det som gäller.',
@@ -1124,6 +1181,9 @@
             extraOffersTip: 'I Rewards-panelet og i Bing-appen er der som regel ekstra aktiviteter, der giver flere point end disse. De er ikke altid de samme: nogle er søgninger, andre ikke (puslespil, spørgsmål, afstemninger).',
             xboxNote: 'Flere point på Xbox',
             xboxTip: 'Xbox har sine egne daglige, ugentlige og månedlige opgaver, der giver point ud over disse. De vises hverken her eller i Rewards-panelet: de krediteres fra appen eller konsollen, så det er dér, man skal kigge.',
+            outlookNote: 'Missioner i Outlook',
+            outlookTip: 'Outlook i browseren har pointmissioner, der kun kan ses dér. De vises hverken her eller i Rewards-panelet, så man skal åbne det for at se og løse dem.',
+            streakOffTip: 'Denne stime er ikke tilgængelig på din konto: Microsoft tilbyder dem kun til udvalgte medlemmer og på udvalgte markeder. Herfra kan den ikke føres videre.',
             autoLabel: 'Brug mine Rewards-fremskridt',
             autoTip: 'Når dette er slået til, spørger scriptet Bing om, hvor mange søgepoint du mangler i dag, udfører kun de nødvendige søgninger, stopper af sig selv, når de er klaret, og viser, hvad dine point er værd. Er det slået fra, foretager det ingen netværksanmodninger og bruger det manuelle antal nedenfor.',
             manualFallbackTip: 'Dine Rewards-fremskridt kunne ikke læses, så det manuelle antal på fanen med nøgleord er det, der gælder.',
@@ -1175,6 +1235,9 @@
             extraOffersTip: 'I Rewards-panelet og i Bing-appen finnes det som regel ekstra aktiviteter som gir flere poeng enn disse. De er ikke alltid de samme: noen er søk og andre ikke (puslespill, spørsmål, spørreundersøkelser).',
             xboxNote: 'Flere poeng på Xbox',
             xboxTip: 'Xbox har sine egne daglige, ukentlige og månedlige oppgaver som gir poeng i tillegg til disse. De vises verken her eller i Rewards-panelet: de godskrives fra appen eller konsollen, så det er der man må se etter.',
+            outlookNote: 'Oppdrag i Outlook',
+            outlookTip: 'Outlook i nettleseren har poengoppdrag som bare vises der. De vises verken her eller i Rewards-panelet, så man må åpne det for å se og gjøre dem.',
+            streakOffTip: 'Denne rekken er ikke tilgjengelig på kontoen din: Microsoft tilbyr dem bare til utvalgte medlemmer og i utvalgte markeder. Herfra kan den ikke føres videre.',
             autoLabel: 'Bruk fremgangen min i Rewards',
             autoTip: 'Når dette er slått på, spør skriptet Bing om hvor mange søkepoeng du mangler i dag, utfører bare de nødvendige søkene, stopper av seg selv når de er ferdige, og viser hva poengene dine er verdt. Er det slått av, gjør det ingen nettverksforespørsler og bruker det manuelle antallet nedenfor.',
             manualFallbackTip: 'Fremgangen din i Rewards kunne ikke leses, så det manuelle antallet i fanen for nøkkelord er det som gjelder.',
@@ -1226,6 +1289,9 @@
             extraOffersTip: 'Rewards 面板和 Bing 應用程式裡通常還有額外活動，給的分比這些多。它們並不固定：有的是搜尋，有的不是（拼圖、問答、問卷）。',
             xboxNote: 'Xbox 裡還能拿更多分',
             xboxTip: 'Xbox 有自己的每日、每週和每月任務，給的分和這些是分開的。這裡和 Rewards 面板都看不到：它們從應用程式或主機上入帳，只能到那邊看。',
+            outlookNote: 'Outlook 裡的任務',
+            outlookTip: '瀏覽器裡的 Outlook 有只能在那裡看到的積分任務。這裡和 Rewards 面板都看不到，只能打開 Outlook 去看和完成。',
+            streakOffTip: '這個連續記錄在你的帳戶上無法使用：微軟只向部分會員、在部分市場提供。從這裡無法推進。',
             autoLabel: '使用我的 Rewards 進度',
             autoTip: '開啟後，腳本會向 Bing 查詢你今天還差多少搜尋點數，只執行必要的搜尋，完成後自動停止，並顯示你的點數值多少錢。關閉後，腳本不會發出任何網路請求，改用下面手動設定的次數。',
             manualFallbackTip: '沒能讀到你的 Rewards 進度，因此以關鍵字標籤頁中手動設定的次數為準。',
@@ -1512,6 +1578,20 @@
     // eso es un enlace con aviso y no una fila de tarea con estado.
     const XBOX_REWARDS = 'https://www.xbox.com/rewards';
 
+    // Outlook web, la bandeja. NO es `partner_outlook_destinationUrl`, y la
+    // diferencia importa: ese enlace lleva a la página de la RACHA de Outlook,
+    // que Microsoft describe como «Available on Android mobile devices only»
+    // para «select Microsoft Rewards members in the United States». Las misiones
+    // que Outlook enseña en el navegador de escritorio —«Explorar en Outlook»,
+    // tarjetas de 10 puntos— son OTRA promoción: se ven en es-MX y en
+    // escritorio, o sea justo donde esa página dice que no hay nada. Mandar ahí
+    // al usuario sería contradecir lo que tiene delante.
+    //
+    // Tampoco vale quitarle el idioma a la URL como se hizo con Xbox
+    // (`microsoft.com/rewards/xbox` redirige y se sirve traducida):
+    // `microsoft.com/rewards/outlook-rewards` responde 404 sin el segmento.
+    const OUTLOOK_REWARDS = 'https://outlook.live.com/mail/0/';
+
     const API_TIMEOUT = 8000;
 
     /** Los atributos del flyout son TEXTO, incluso los numéricos ("60", "3"). */
@@ -1780,6 +1860,15 @@
                     total: num(a[`partner_${k}_totalSteps`]),
                     url: a[`partner_${k}_destinationUrl`] || '',
                     priority: num(a[`partner_${k}_cardPriority`]),
+                    // `streakEnabled` es el ÚNICO campo que dice si la racha se
+                    // puede avanzar. `isEnabled` NO sirve y es una trampa: el
+                    // 2026-08-28 llegó `False` en `bing` —la escalera MÁS
+                    // avanzada de la cuenta, 3/7— y `undefined` en cuatro de los
+                    // siete socios; marcar por él habría tachado justo la que
+                    // funciona. Ausente se toma por ACTIVA: no se esconde un
+                    // socio porque falte un campo, que es lo que ya pasa con
+                    // `claimingPending` (solo existe en `bing`).
+                    enabled: String(a[`partner_${k}_streakEnabled`] || '').toLowerCase() !== 'false',
                     // El último de la lista de pagos: lo que da llegar al final
                     // de la escalera, que es lo que hace que valga la pena
                     // seguirla y lo único que el panel no decía.
@@ -1789,13 +1878,20 @@
                     })()
                 };
             })
-            // Orden propio, y NO el `cardPriority` de Bing: primero lo que se
-            // hace en Bing mismo —buscar, el conjunto diario y el registro de la
-            // app—, después Edge, y al final el resto, que son menos conocidos y
-            // se manejan desde la propia app o desde el panel de Rewards. Los
-            // que no estén en la lista van detrás y entre ellos sí manda el
-            // orden de Bing.
-            .sort((x, y) => (partnerRank(x.key) - partnerRank(y.key)) || (x.priority - y.priority));
+            // Orden propio, y NO el `cardPriority` de Bing. Manda primero lo
+            // que se PUEDE hacer: las rachas que no están habilitadas para esta
+            // cuenta se van todas al final, sea cual sea el socio. Antes el
+            // corte era por socio fijo, y eso mezclaba `edge` —accionable, solo
+            // que sin empezar— con `ntp`, `outlook` y `visualsearch`, que no se
+            // pueden avanzar desde aquí; se veían las cuatro igual, en 1/7.
+            //
+            // Dentro de las habilitadas sigue el orden de siempre: primero lo
+            // que se hace en Bing mismo —buscar, el conjunto diario y el
+            // registro de la app—, después Edge, y lo que no esté en la lista
+            // detrás, donde entre ellos sí manda el orden de Bing.
+            .sort((x, y) => (Number(y.enabled) - Number(x.enabled))
+                || (partnerRank(x.key) - partnerRank(y.key))
+                || (x.priority - y.priority));
 
         // Los sellos van SIN etiqueta de Bing, al contrario que los socios. Sus
         // `title` y `description` también son claves de `localizedStrings`, pero
@@ -3272,20 +3368,50 @@
                 tasksBox.appendChild(note);
             }
 
-            /** Cierra el grupo de lo que se hace en Bing. */
+            /** Cierra la lista de socios con el enlace a las demás actividades. */
             function appendExtraNote() {
                 noteLine(REWARDS_MORE, t.extraOffersNote, t.extraOffersTip);
             }
 
+            /**
+             * Pasos COMPLETADOS de la escalera, que no es lo que trae Bing.
+             *
+             * `currentStep` NOMBRA EL PASO EN CURSO empezando en 1, no cuenta
+             * completados. Estuvo sin decidir desde el 2026-08-26 y lo zanjó la
+             * propia interfaz de Microsoft el 2026-08-28: la ficha «Racha de
+             * navegación en Edge» dibuja `+5` y SEIS CÍRCULOS VACÍOS con
+             * «Minutos: 0/30» mientras `partner_edge_currentStep` vale 1. Cero
+             * días hechos, `currentStep` en 1. Así que el panel llevaba toda la
+             * vida pintando un día de más en las siete escaleras.
+             *
+             * Contrastado paso a paso contra las tarjetas de «Racha» del
+             * dashboard, con los cuatro socios habilitados de una cuenta:
+             *
+             *   bing      ✔ ✔ ✓3  ○○○ ✱100 → 3 ganados, currentStep 3, hoy hecho
+             *   dset      ✔ ✓30   ○○○○✱100 → 2 ganados, currentStep 2, hoy hecho
+             *   sapphire  ✔ ✔ ✓10 ○○○ ✱50  → 3 ganados, currentStep 3, hoy hecho
+             *   edge      +5      ○○○○○✱120→ 0 ganados, currentStep 1, hoy NO
+             *
+             * La píldora OSCURA con ✓ es el día de hoy ya ganado; la CLARA con
+             * `+` es hoy pendiente. Y el 🔥 de cada tarjeta cuenta los ganados,
+             * así que confirma lo mismo por otra vía. De ahí sale la fórmula:
+             * `step` si hoy está hecho, `step - 1` si no.
+             *
+             * **Un caso donde las dos hipótesis coinciden no es evidencia.** El
+             * panel de Outlook enseñaba «CONJUNTO DIARIO 2/7» con `currentStep`
+             * 2, y estuvo a punto de hacer revertir esto por «desalinearnos de
+             * la interfaz de Microsoft»: con el día ya hecho, contar completados
+             * y nombrar el paso dan el MISMO número. Quien separa las dos
+             * lecturas es una escalera con hoy sin hacer, que es Edge.
+             */
+            function doneSteps(p) {
+                return Math.max(0, Math.min(p.total, p.done ? p.step : p.step - 1));
+            }
+
             let dsetShown = false;
             if (ci) {
-                // La nota cierra el grupo de lo que se hace en Bing, así que va
-                // justo antes del primer socio que ya no es de los fijos.
-                const rest = partnerRank('edge');
-                let noted = false;
                 ci.partners.forEach((p) => {
-                    if (!noted && partnerRank(p.key) >= rest) { appendExtraNote(); noted = true; }
-                    const steps = p.total ? `${fmt(p.step)}/${fmt(p.total)}` : '';
+                    const steps = p.total ? `${fmt(doneSteps(p))}/${fmt(p.total)}` : '';
                     const prize = p.prize ? `${steps ? ' ' : ''}✱${fmt(p.prize)}` : '';
                     const lead = (steps || prize) ? `${steps}${prize} · ` : '';
                     // El conjunto diario va a su sección del panel de Rewards,
@@ -3301,26 +3427,56 @@
                     // ntp, outlook y visualsearch 5·6+100). Saltarse ese día
                     // cuesta más que los seis anteriores juntos.
                     //
-                    // El `- 1` es a propósito, y es una cobertura: no sabemos si
-                    // `currentStep` cuenta pasos COMPLETADOS o nombra el paso EN
-                    // CURSO, porque las dos lecturas encajan con todo lo visto.
-                    // Bajo una el día bueno es `step === total`, bajo la otra
-                    // `total - 1`; con `>=` se enciende bajo las dos, como pronto
-                    // un día antes y nunca tarde. Y encenderse un día antes no
-                    // miente, porque esta línea no afirma nada por escrito: el
-                    // `6/7 ✱100` que ya pinta dice por sí solo cuánto falta. Esa
-                    // es también la razón de que no haya cadena nueva aquí —un
-                    // «hoy cierras» habría obligado a acertar la semántica para
-                    // no mentir en 22 idiomas—.
-                    const closing = !p.done && p.total > 1 && p.step >= p.total - 1;
-                    const row = taskLine(`${closing ? '🎁 ' : ''}${lead}${p.label}`, p.done, url);
+                    // El `- 1` que había aquí era una cobertura mientras no se
+                    // supiera si `currentStep` contaba completados o nombraba el
+                    // paso en curso: con `>=` se encendía bajo las dos lecturas.
+                    // Resuelto el 2026-08-28 (ver `doneSteps`), nombra el paso,
+                    // así que el día del premio es `step === total` y la
+                    // cobertura sobraba —encendía DOS días antes, no uno como
+                    // decía este comentario—.
+                    //
+                    // Una racha que no se puede avanzar no cierra nada, por muy
+                    // arriba que esté su `currentStep`: sin `p.enabled` el 🎁
+                    // saldría en escaleras que el usuario no puede tocar.
+                    const closing = p.enabled && !p.done && p.total > 1 && p.step >= p.total;
+                    const row = taskLine(`${closing ? '🎁 ' : ''}${lead}${p.label}`, p.done, url,
+                        p.enabled ? '' : t.streakOffTip);
                     // Después de `taskLine`, que fija el color por el ✓/→. El
-                    // hover solo toca el subrayado, así que el dorado aguanta.
+                    // hover solo toca el subrayado, así que el color aguanta.
                     if (closing) row.style.color = colors.gold;
+                    // Las que no se pueden avanzar desde esta cuenta van en gris,
+                    // el mismo tono de las notas: siguen a la vista —son puntos
+                    // que existen— pero dejan de leerse como tarea pendiente.
+                    //
+                    // El aviso es CADENA PROPIA y no el `toggleDescription` del
+                    // socio, aunque ese venga de Bing. Se probó con el de Bing y
+                    // el de `outlook` llega SIN TRADUCIR («Go to your mobile
+                    // device, log into Outlook.com on the mobile browser…»), así
+                    // que el panel en español enseñaba un aviso en inglés. Que un
+                    // texto venga del mercado no garantiza que venga en el idioma
+                    // del mercado, y las ramas poco transitadas son justo donde
+                    // falla —el mismo trato de las etiquetas NO vale aquí, porque
+                    // aquellas sí llegan traducidas—.
+                    //
+                    // Lo que dice es lo único afirmable de las tres y viene de
+                    // Microsoft: la página de la promoción de Outlook las
+                    // encuadra como «disponible para determinados miembros… en
+                    // determinados mercados». O sea «no disponible para ti», no
+                    // «no existe» — por eso la fila no desaparece.
+                    else if (!p.enabled) row.style.color = colors.gray;
                     tasksBox.appendChild(row);
                     if (p.key === 'dset') { dsetShown = true; appendDailySetLinks(); }
                 });
-                if (!noted) appendExtraNote();
+                // Al final de TODOS los socios, no a mitad de la lista. Antes
+                // partía el grupo por socio fijo, y con el orden nuevo —activas
+                // primero, inactivas al final— ese corte habría dejado «Más
+                // actividades en Rewards» justo delante de las rachas
+                // inhabilitadas, que no son «más actividades»: la nota es un
+                // enlace, y como enlace cierra bien la lista entera. Separar
+                // activas de inactivas con un rótulo propio habría costado una
+                // cadena nueva en 22 idiomas para decir lo que ya dicen el gris
+                // y el aviso de Bing.
+                appendExtraNote();
             }
             // Sin tarjeta de check-in —o con una que no traiga el conjunto
             // diario— este queda igualmente, que es la tarea con enlaces útiles.
@@ -3331,10 +3487,28 @@
                 appendDailySetLinks();
             }
 
-            // Xbox va al final del todo y fuera de cualquier grupo: es lo único
-            // de la lista que el script no puede leer ni marcar. Su aviso existe
-            // sobre todo para contestar la pregunta que provoca su ausencia
-            // —«¿y los puntos de Xbox?»—, no para mandar a ninguna parte.
+            // Outlook y Xbox van al final del todo y fuera de cualquier grupo:
+            // son lo único de la lista que el script no puede leer ni marcar. Su
+            // aviso existe sobre todo para contestar la pregunta que provoca su
+            // ausencia —«¿y los puntos de Xbox?»—, no para mandar a ninguna parte.
+            //
+            // Lo de Outlook se comprobó el 2026-08-28 y es firme: la tarjeta
+            // «Explorar en Outlook» EXISTE en el flyout: el control
+            // `ExploreOnOutlookEngagementCard` llega con `enabled: true`, está
+            // en el layout de esta superficie y su encabezado viene ya
+            // traducido en `localizedStrings`. Pero el
+            // servidor no le manda ofertas. Los títulos de las misiones dan cero
+            // apariciones en el JSON entero (con `partner_outlook_totalSteps` y
+            // `PCSearch` de control positivo), y con el flyout abierto no hay
+            // NINGUNA petición que las traiga: los recursos son el propio
+            // `getuserinfo`, el `ncheader`, un `reportActivity` de telemetría y
+            // el JS del widget. No hay nada que leer desde Bing.
+            //
+            // Y el aviso NO lleva cifra a propósito. Las misiones rotan: dos de
+            // 10 puntos dos días seguidos y tres de 10 al siguiente, así que
+            // cualquier número escrito aquí mentiría la mayoría de los días —y
+            // no se puede calcular, que es justo el hallazgo—.
+            noteLine(OUTLOOK_REWARDS, t.outlookNote, t.outlookTip);
             noteLine(XBOX_REWARDS, t.xboxNote, t.xboxTip);
         }
 
