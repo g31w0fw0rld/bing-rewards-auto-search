@@ -1,8 +1,9 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.8
+// @version      1.3.9
 // @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Waits out late crediting and links the other daily tasks. Queries from your own keywords, rotating search types (70% web plus images, videos, shopping, news), 3-10s delays with 10-25s reading pauses, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
+// @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAOVBMVEVHcEwQbr4Qbr4QcL8Qbr8Qbr4Qbb4QcL8QcL8Qbr0Qb78Qb78QbrwQb70Qbr4Qb70Qbr0QbrwQbr7qzZxUAAAAEnRSTlMAkN8gf8+/QBCAn4+gn6CP0JCpAaXzAAAAmElEQVQ4y92TyxaCMAxE02daFdD5/481iNV4EnTjillNyc0QcijRwcS3CJQp7ZTbGU8tza1f8VLxiLW/ciOe1wxbT/K4b7aLZQNcgNPwFQgGKKqLgWgAiX3Pqw8KaC49FD9fUQwQ5CO9gUl1IW82i3XWLRGYmBpXqDC96gKl7BFhVOsOQWmWlBj4sez89c/4F0E/iH6k63QHcX8J1w5Wo/0AAAAASUVORK5CYII=
 // @author       g31w0fw0rld
 // @license      MIT
 // @match        https://www.bing.com/*
@@ -15,7 +16,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.8';
+    const SCRIPT_VERSION = '1.3.9';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
