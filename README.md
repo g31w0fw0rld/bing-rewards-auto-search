@@ -1,6 +1,6 @@
 # Bing Rewards Auto Search
 
-Tampermonkey userscript that automates daily Bing searches to collect Microsoft Rewards points. / Userscript de Tampermonkey que automatiza búsquedas diarias en Bing para acumular puntos de Microsoft Rewards.
+Userscript that automates daily Bing searches to collect Microsoft Rewards points. / Userscript que automatiza búsquedas diarias en Bing para acumular puntos de Microsoft Rewards.
 
 > [!WARNING]
 > **USE AT YOUR OWN RISK / USO BAJO TU PROPIO RIESGO:** automating activity may violate the Microsoft Rewards terms and put your account at risk. / Automatizar la actividad puede infringir los términos de Microsoft Rewards y poner tu cuenta en riesgo.
@@ -65,7 +65,7 @@ Tampermonkey userscript that automates daily Bing searches to collect Microsoft 
 **Language:** whichever you are viewing Bing in, your browser's as a fallback, or whichever you pin in the info tab.
 
 **Install:**
-1. Install [Tampermonkey](https://www.tampermonkey.net/).
+1. Install a userscript manager: [Violentmonkey](https://violentmonkey.github.io/) (open source, Chrome/Edge/Firefox) or [Tampermonkey](https://www.tampermonkey.net/). On Chrome and Edge, also turn on **Allow user scripts** on the extension's own page in `chrome://extensions` — without it nothing runs.
 2. Open the installer: [bing-rewards-auto-search.user.js](https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js) (also on [GreasyFork](https://greasyfork.org/es-419/users/1590477-g31w) and [OpenUserJS](https://openuserjs.org/users/g31w0fw0rldgmail.com/scripts)).
 
 **Site:** `bing.com`
@@ -118,7 +118,7 @@ Tampermonkey userscript that automates daily Bing searches to collect Microsoft 
 **Idioma:** el que estés viendo en Bing, el del navegador como respaldo, o el que fijes en la pestaña de información.
 
 **Instalación:**
-1. Instala [Tampermonkey](https://www.tampermonkey.net/).
+1. Instala un gestor de userscripts: [Violentmonkey](https://violentmonkey.github.io/) (código abierto, Chrome/Edge/Firefox) o [Tampermonkey](https://www.tampermonkey.net/). En Chrome y Edge, activa además **Allow user scripts** en la página de la propia extensión en `chrome://extensions`; sin eso no se ejecuta nada.
 2. Abre el instalador: [bing-rewards-auto-search.user.js](https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js) (también en [GreasyFork](https://greasyfork.org/es-419/users/1590477-g31w) y [OpenUserJS](https://openuserjs.org/users/g31w0fw0rldgmail.com/scripts)).
 
 **Sitio:** `bing.com`
