@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.10
+// @version      1.3.11
 // @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Lists the day's other point offers, your streak bonus and protection, and the whole day's points, not just the search ones. Queries from your own keywords, rotating search types, randomised delays, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAOVBMVEVHcEwQbr4Qbr4QcL8Qbr8Qbr4Qbb4QcL8QcL8Qbr0Qb78Qb78QbrwQb70Qbr4Qb70Qbr0QbrwQbr7qzZxUAAAAEnRSTlMAkN8gf8+/QBCAn4+gn6CP0JCpAaXzAAAAmElEQVQ4y92TyxaCMAxE02daFdD5/481iNV4EnTjillNyc0QcijRwcS3CJQp7ZTbGU8tza1f8VLxiLW/ciOe1wxbT/K4b7aLZQNcgNPwFQgGKKqLgWgAiX3Pqw8KaC49FD9fUQwQ5CO9gUl1IW82i3XWLRGYmBpXqDC96gKl7BFhVOsOQWmWlBj4sez89c/4F0E/iH6k63QHcX8J1w5Wo/0AAAAASUVORK5CYII=
 // @author       g31w0fw0rld
@@ -16,7 +16,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.10';
+    const SCRIPT_VERSION = '1.3.11';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -130,7 +130,7 @@
             streakTip: 'Cada línea es una racha aparte de siete pasos: los seis primeros días pagan poco y el séptimo da el premio gordo. El ✓ es lo que ya cuenta hoy; lo demás abre donde se hace.',
             offersTip: 'Ofertas de puntos del día que no van en el conjunto diario: temas destacados, la oferta fija de cada día de la semana… Cada enlace abre en una pestaña nueva la que falta. Si hay búsquedas automáticas en marcha, se detienen al abrirla, para que no te saquen de la página antes de completarla.',
             protectionTip: 'Días de protección de racha que te quedan. Si un día no completas las actividades, Rewards gasta uno y tu racha no se rompe.',
-            todayPointsTip: 'Los puntos que llevas hoy de todas las fuentes, no solo de las búsquedas: conjunto diario, ofertas, rachas y bonificaciones. De lo que este panel sabe medir, hoy hay {n}; si tu total lo supera es porque has hecho actividades que desde aquí no se ven, como las de la app de Bing, Outlook o Xbox.',
+            todayPointsTip: 'Los puntos que llevas hoy de todas las fuentes, no solo de las búsquedas: conjunto diario, ofertas, rachas y bonificaciones. Entre búsquedas y conjunto diario hoy hay {n}, el mismo número que Rewards enseña como «Puntos de hoy»; si lo superas es porque has sumado ofertas, rachas o actividades de la app de Bing, Outlook o Xbox.',
             levelTip: 'Los puntos que llevas en el periodo con el que Rewards decide tu nivel, y los que te pide para mantenerlo. No es el mes natural: el periodo lo lleva Rewards por su cuenta y no dice cuándo lo cierra. Además de los puntos pide completar unas cuantas actividades, que no se cuentan aquí.',
             extraOffersNote: 'Más actividades en Rewards',
             extraOffersTip: 'En el panel de Rewards y en la app de Bing suele haber actividades extra que dan más puntos que estas. No son siempre las mismas: unas son búsquedas y otras no (puzles, preguntas, encuestas).',
@@ -170,7 +170,7 @@
             infoPrivacy: 'Privacidad:',
             infoPrivacyText: 'Tus palabras clave y el contador de búsquedas se guardan solo en el almacenamiento local del gestor de userscripts, en tu navegador. Con «Usar mi progreso de Rewards» activado, el script hace una petición GET a bing.com —el mismo endpoint que alimenta el panel de puntos de la cabecera de Bing— para leer tu progreso del día, tu saldo y el catálogo de canje; viaja con tu sesión de Bing y nada de eso sale hacia terceros ni hacia el autor del script. Desactiva esa casilla y el script no hace ninguna petición de red propia: solo navega a URLs de búsqueda de bing.com, igual que si las escribieras tú. De esa misma respuesta salen las tareas del día que aparecen en esa lista, y lo leído se guarda también en local para no volver a pedirlo en cada página de Bing.',
             infoHow: 'Cómo funciona:',
-            infoHowText: 'Le pregunta a Rewards cuántos puntos de búsqueda faltan hoy y ejecuta solo las necesarias, parando cuando Rewards marca el día como completo; si el contador no sube en varias búsquedas seguidas espera medio minuto, vuelve a mirar y sigue, porque casi siempre es que Rewards acredita con retraso. Genera queries combinando 1 a 3 palabras clave y rota entre búsquedas web (70%), imágenes, videos, shopping y noticias para simular navegación humana. Los delays son aleatorios entre 3-10s, con pausas ocasionales de 10-25s que imitan lectura de resultados. Cada URL incluye parámetros rotados (form, cvid, PC) que Bing identifica como tráfico legítimo. Detecta mobile/desktop automáticamente, el progreso persiste entre recargas de página y el contador se resetea cada día a medianoche.'
+            infoHowText: 'Le pregunta a Rewards cuántos puntos de búsqueda faltan hoy y ejecuta solo las necesarias, parando cuando Rewards marca el día como completo; si el contador no sube en varias búsquedas seguidas espera medio minuto, vuelve a mirar y sigue, porque casi siempre es que Rewards acredita con retraso. Genera queries combinando 1 a 3 palabras clave y rota entre búsquedas web (70%), imágenes, videos, shopping y noticias para simular navegación humana. Los delays son aleatorios entre 3-10s, con pausas ocasionales de 10-25s que imitan lectura de resultados. Cada URL incluye parámetros rotados (form, cvid, PC) que Bing identifica como tráfico legítimo. Detecta mobile/desktop automáticamente, el progreso persiste entre recargas de página y el contador se resetea cada día a medianoche. Al completar el día deja la pestaña en la portada de Bing, para que volver a ella no cuente como la primera búsqueda del día siguiente.'
         },
         en: {
             tabSearch: '🔍',
@@ -209,7 +209,7 @@
             streakTip: 'Each line is a separate seven-step streak: the first six days pay little and the seventh pays the big one. A ✓ is what already counts today; the rest open where you do it.',
             offersTip: 'Point offers of the day that are not part of the daily set: featured topics, the fixed offer for each weekday… Each link opens a pending one in a new tab. If automatic searches are running, they stop when you open it, so they do not navigate you away before you finish it.',
             protectionTip: 'Streak protection days you have left. If you miss a day’s activities, Rewards spends one and your streak does not break.',
-            todayPointsTip: 'The points you have earned today from every source, not just searches: the daily set, offers, streaks and bonuses. Of what this panel can measure, today there are {n}; if your total is higher it is because you have done activities it cannot see, such as those in the Bing app, Outlook or Xbox.',
+            todayPointsTip: 'The points you have earned today from every source, not just searches: the daily set, offers, streaks and bonuses. Searches plus the daily set come to {n} today, the same figure Rewards shows as “Points today”; going above it means you have added offers, streaks or activities from the Bing app, Outlook or Xbox.',
             levelTip: 'The points you have in the period Rewards uses to set your level, and how many it asks for to keep it. It is not the calendar month: Rewards runs that period on its own and does not say when it closes. On top of the points it also asks you to complete a few activities, which are not counted here.',
             extraOffersNote: 'More activities in Rewards',
             extraOffersTip: 'The Rewards dashboard and the Bing app usually carry extra activities worth more points than these. They are not always the same: some are searches and some are not (puzzles, questions, polls).',
@@ -249,7 +249,7 @@
             infoPrivacy: 'Privacy:',
             infoPrivacyText: 'Your keywords and the search counter are stored only in your userscript manager\'s local storage, in your browser. With "Use my Rewards progress" on, the script makes a GET request to bing.com — the same endpoint that feeds the points panel in the Bing header — to read your progress for the day, your balance and the redemption catalogue; it travels with your Bing session and none of it goes to third parties or to the script author. Turn that checkbox off and the script makes no network requests of its own: it only navigates to bing.com search URLs, exactly as if you typed them yourself. The tasks of the day shown in that list come from the same response, and what is read is also kept locally so it is not requested again on every Bing page.',
             infoHow: 'How it works:',
-            infoHowText: 'It asks Rewards how many search points are missing today and runs only what is needed, stopping when Rewards marks the day as complete; if the counter does not move across several searches in a row it waits half a minute, checks again and carries on, because almost always Rewards is simply crediting late. Generates queries by combining 1 to 3 keywords and rotates between web (70%), image, video, shopping, and news searches to simulate human browsing. Delays are randomized between 3-10s with occasional 10-25s "reading pauses". Each URL includes rotated parameters (form, cvid, PC) that Bing identifies as legitimate traffic. Mobile/desktop detection is automatic, progress persists across page reloads, and the counter resets daily at midnight.'
+            infoHowText: 'It asks Rewards how many search points are missing today and runs only what is needed, stopping when Rewards marks the day as complete; if the counter does not move across several searches in a row it waits half a minute, checks again and carries on, because almost always Rewards is simply crediting late. Generates queries by combining 1 to 3 keywords and rotates between web (70%), image, video, shopping, and news searches to simulate human browsing. Delays are randomized between 3-10s with occasional 10-25s "reading pauses". Each URL includes rotated parameters (form, cvid, PC) that Bing identifies as legitimate traffic. Mobile/desktop detection is automatic, progress persists across page reloads, and the counter resets daily at midnight. When the day is complete it leaves the tab on the Bing home page, so returning to it does not count as the next day\'s first search.'
         },
         de: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -274,7 +274,7 @@
             streakTip: 'Jede Zeile ist eine eigene Serie über sieben Schritte: Die ersten sechs Tage bringen wenig, der siebte den großen Bonus. Ein ✓ zählt heute schon; alles andere öffnet dort, wo es erledigt wird.',
             offersTip: 'Punkteangebote des Tages, die nicht zum Tagesset gehören: Themen-Specials, das feste Angebot je Wochentag … Jeder Link öffnet ein offenes Angebot in einem neuen Tab. Laufen gerade automatische Suchen, werden sie beim Öffnen angehalten, damit sie dich nicht von der Seite wegführen, bevor du fertig bist.',
             protectionTip: 'Verbleibende Tage Serienschutz. Wenn du an einem Tag die Aktivitäten nicht abschließt, verbraucht Rewards einen davon und deine Serie reißt nicht ab.',
-            todayPointsTip: 'Die Punkte, die du heute aus allen Quellen gesammelt hast, nicht nur aus Suchen: Tagesset, Angebote, Serien und Boni. Von dem, was dieses Fenster messen kann, gibt es heute {n}; liegt dein Gesamtwert darüber, hast du Aktivitäten erledigt, die es nicht sieht — etwa in der Bing-App, in Outlook oder auf Xbox.',
+            todayPointsTip: 'Die Punkte, die du heute aus allen Quellen gesammelt hast, nicht nur aus Suchen: Tagesset, Angebote, Serien und Boni. Suchen und Tagesset ergeben heute {n} — dieselbe Zahl, die Rewards als „Punkte heute“ anzeigt; liegt dein Wert darüber, sind Angebote, Serien oder Aktivitäten aus der Bing-App, aus Outlook oder von Xbox dazugekommen.',
             levelTip: 'Die Punkte, die du in dem Zeitraum hast, mit dem Rewards deine Stufe bestimmt, und wie viele es zum Halten verlangt. Es ist nicht der Kalendermonat: Rewards führt diesen Zeitraum selbst und sagt nicht, wann er endet. Zusätzlich zu den Punkten verlangt es einige abgeschlossene Aktivitäten, die hier nicht mitgezählt werden.',
             extraOffersNote: 'Mehr Aktivitäten in Rewards',
             extraOffersTip: 'Im Rewards-Dashboard und in der Bing-App gibt es meist zusätzliche Aktivitäten, die mehr Punkte bringen als diese. Sie sind nicht immer dieselben: Manche sind Suchen, andere nicht (Puzzles, Quizfragen, Umfragen).',
@@ -309,7 +309,7 @@
             infoAuthor: 'Autor:', infoGitHub: 'GitHub:', infoPrivacy: 'Datenschutz:',
             infoPrivacyText: 'Deine Schlüsselwörter und der Suchzähler werden nur im lokalen Speicher der Userscript-Verwaltung in deinem Browser abgelegt. Ist „Meinen Rewards-Fortschritt verwenden“ aktiv, stellt das Skript eine GET-Anfrage an bing.com — an denselben Endpunkt, der das Punkte-Panel in der Bing-Kopfzeile versorgt —, um deinen Tagesfortschritt, dein Guthaben und den Einlösekatalog zu lesen; sie läuft über deine Bing-Sitzung, und nichts davon geht an Dritte oder an den Autor des Skripts. Schalte das Kästchen aus, dann stellt das Skript keine eigenen Netzwerkanfragen: es navigiert nur zu Such-URLs von bing.com, genauso als hättest du sie selbst eingetippt. Aus derselben Antwort stammen die Tagesaufgaben in dieser Liste, und das Gelesene wird ebenfalls lokal gespeichert, damit es nicht auf jeder Bing-Seite erneut abgefragt wird.',
             infoHow: 'Funktionsweise:',
-            infoHowText: 'Es fragt bei Rewards nach, wie viele Suchpunkte heute noch fehlen, und führt nur die nötigen Suchen aus; es hört auf, sobald Rewards den Tag als abgeschlossen meldet. Steigt der Zähler über mehrere Suchen hinweg nicht, wartet es eine halbe Minute, sieht erneut nach und macht weiter, denn fast immer rechnet Rewards nur verspätet an. Es bildet Suchanfragen aus 1 bis 3 Schlüsselwörtern und wechselt zwischen Websuche (70 %), Bildern, Videos, Shopping und Nachrichten, um menschliches Surfen nachzuahmen. Die Wartezeiten liegen zufällig zwischen 3 und 10 s, mit gelegentlichen Pausen von 10 bis 25 s, die das Lesen von Ergebnissen nachbilden. Jede URL enthält wechselnde Parameter (form, cvid, PC), die Bing als legitimen Verkehr einstuft. Mobil und Desktop werden automatisch erkannt, der Fortschritt übersteht das Neuladen der Seite und der Zähler wird täglich um Mitternacht zurückgesetzt.'
+            infoHowText: 'Es fragt bei Rewards nach, wie viele Suchpunkte heute noch fehlen, und führt nur die nötigen Suchen aus; es hört auf, sobald Rewards den Tag als abgeschlossen meldet. Steigt der Zähler über mehrere Suchen hinweg nicht, wartet es eine halbe Minute, sieht erneut nach und macht weiter, denn fast immer rechnet Rewards nur verspätet an. Es bildet Suchanfragen aus 1 bis 3 Schlüsselwörtern und wechselt zwischen Websuche (70 %), Bildern, Videos, Shopping und Nachrichten, um menschliches Surfen nachzuahmen. Die Wartezeiten liegen zufällig zwischen 3 und 10 s, mit gelegentlichen Pausen von 10 bis 25 s, die das Lesen von Ergebnissen nachbilden. Jede URL enthält wechselnde Parameter (form, cvid, PC), die Bing als legitimen Verkehr einstuft. Mobil und Desktop werden automatisch erkannt, der Fortschritt übersteht das Neuladen der Seite und der Zähler wird täglich um Mitternacht zurückgesetzt. Ist der Tag abgeschlossen, bleibt der Tab auf der Bing-Startseite, damit die Rückkehr dorthin nicht als erste Suche des nächsten Tages zählt.'
         },
         fr: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -334,7 +334,7 @@
             streakTip: 'Chaque ligne est une série distincte de sept étapes : les six premiers jours rapportent peu et le septième donne le gros lot. Un ✓ compte déjà aujourd’hui ; le reste ouvre là où cela se fait.',
             offersTip: 'Les offres de points du jour qui ne font pas partie de l’ensemble quotidien : thèmes à la une, l’offre fixe de chaque jour de la semaine… Chaque lien ouvre celle qui reste dans un nouvel onglet. Si des recherches automatiques sont en cours, elles s’arrêtent à l’ouverture.',
             protectionTip: 'Jours de protection de série qu’il vous reste. Si vous ne terminez pas les activités un jour, Rewards en consomme un et votre série n’est pas rompue.',
-            todayPointsTip: 'Les points accumulés aujourd’hui, toutes sources confondues, pas seulement les recherches : ensemble quotidien, offres, séries et bonus. Parmi ce que ce panneau sait mesurer, il y a {n} aujourd’hui ; si votre total dépasse ce chiffre, c’est que vous avez fait des activités qu’il ne voit pas, comme celles de l’application Bing, d’Outlook ou de Xbox.',
+            todayPointsTip: 'Les points accumulés aujourd’hui, toutes sources confondues, pas seulement les recherches : ensemble quotidien, offres, séries et bonus. Recherches et ensemble quotidien font {n} aujourd’hui, le chiffre que Rewards affiche comme « Points du jour » ; au-delà, ce sont des offres, des séries ou des activités de l’application Bing, d’Outlook ou de Xbox.',
             levelTip: 'Les points accumulés sur la période avec laquelle Rewards détermine votre niveau, et ceux qu’il demande pour le conserver. Ce n’est pas le mois civil : Rewards gère cette période lui-même et n’indique pas quand elle se termine. En plus des points, il demande aussi de réaliser quelques activités, qui ne sont pas comptées ici.',
             extraOffersNote: 'Plus d’activités dans Rewards',
             extraOffersTip: 'Le tableau de bord Rewards et l’application Bing proposent en général des activités supplémentaires qui rapportent plus que celles-ci. Elles ne sont pas toujours les mêmes : certaines sont des recherches, d’autres non (puzzles, questions, sondages).',
@@ -369,7 +369,7 @@
             infoAuthor: 'Auteur :', infoGitHub: 'GitHub :', infoPrivacy: 'Confidentialité :',
             infoPrivacyText: 'Vos mots-clés et le compteur de recherches sont conservés uniquement dans le stockage local du gestionnaire de userscripts, dans votre navigateur. Lorsque « Utiliser ma progression Rewards » est activé, le script envoie une requête GET à bing.com — le même point d’accès qui alimente le panneau de points de l’en-tête de Bing — pour lire votre progression du jour, votre solde et le catalogue d’échange ; elle passe par votre session Bing et rien de tout cela ne part vers des tiers ni vers l’auteur du script. Décochez cette case et le script n’effectue aucune requête réseau qui lui soit propre : il navigue seulement vers des URL de recherche de bing.com, exactement comme si vous les saisissiez vous-même. Les tâches du jour affichées dans cette liste proviennent de la même réponse, et ce qui est lu est également conservé en local pour ne pas le redemander sur chaque page de bing.com.',
             infoHow: 'Fonctionnement :',
-            infoHowText: 'Il demande à Rewards combien de points de recherche manquent aujourd’hui et n’effectue que les recherches nécessaires, en s’arrêtant lorsque Rewards déclare la journée terminée ; si le compteur ne bouge pas sur plusieurs recherches d’affilée, il attend une demi-minute, revérifie et poursuit, car il s’agit presque toujours d’un crédit tardif de Rewards. Il compose des requêtes en combinant 1 à 3 mots-clés et alterne entre recherche web (70 %), images, vidéos, shopping et actualités pour imiter une navigation humaine. Les délais sont aléatoires entre 3 et 10 s, avec des pauses occasionnelles de 10 à 25 s qui imitent la lecture des résultats. Chaque URL comporte des paramètres qui tournent (form, cvid, PC) et que Bing identifie comme du trafic légitime. Le mode mobile ou bureau est détecté automatiquement, la progression survit aux rechargements de page et le compteur se remet à zéro chaque jour à minuit.'
+            infoHowText: 'Il demande à Rewards combien de points de recherche manquent aujourd’hui et n’effectue que les recherches nécessaires, en s’arrêtant lorsque Rewards déclare la journée terminée ; si le compteur ne bouge pas sur plusieurs recherches d’affilée, il attend une demi-minute, revérifie et poursuit, car il s’agit presque toujours d’un crédit tardif de Rewards. Il compose des requêtes en combinant 1 à 3 mots-clés et alterne entre recherche web (70 %), images, vidéos, shopping et actualités pour imiter une navigation humaine. Les délais sont aléatoires entre 3 et 10 s, avec des pauses occasionnelles de 10 à 25 s qui imitent la lecture des résultats. Chaque URL comporte des paramètres qui tournent (form, cvid, PC) et que Bing identifie comme du trafic légitime. Le mode mobile ou bureau est détecté automatiquement, la progression survit aux rechargements de page et le compteur se remet à zéro chaque jour à minuit. Une fois la journée terminée, l’onglet reste sur la page d’accueil de Bing, pour qu’y revenir ne compte pas comme la première recherche du lendemain.'
         },
         pt: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -394,7 +394,7 @@
             streakTip: 'Cada linha é uma sequência à parte de sete passos: os seis primeiros dias pagam pouco e o sétimo dá o prémio grande. O ✓ é o que já conta hoje; o resto abre onde se faz.',
             offersTip: 'As ofertas de pontos do dia que não fazem parte do conjunto diário: temas em destaque, a oferta fixa de cada dia da semana… Cada ligação abre num separador novo a que falta. Se houver pesquisas automáticas a decorrer, param ao abri-la.',
             protectionTip: 'Dias de proteção de sequência que ainda tem. Se num dia não concluir as atividades, o Rewards gasta um e a sua sequência não se quebra.',
-            todayPointsTip: 'Os pontos que já ganhou hoje de todas as fontes, não só das pesquisas: conjunto diário, ofertas, sequências e bonificações. Do que este painel consegue medir, hoje há {n}; se o seu total for maior é porque fez atividades que daqui não se veem, como as da aplicação Bing, do Outlook ou da Xbox.',
+            todayPointsTip: 'Os pontos que já ganhou hoje de todas as fontes, não só das pesquisas: conjunto diário, ofertas, sequências e bonificações. Pesquisas mais conjunto diário dão {n} hoje, o mesmo número que o Rewards mostra como «Pontos de hoje»; se ultrapassar isso é porque somou ofertas, sequências ou atividades da aplicação Bing, do Outlook ou da Xbox.',
             levelTip: 'Os pontos que tem no período com que o Rewards define o seu nível, e os que pede para o manter. Não é o mês de calendário: o Rewards gere esse período por sua conta e não diz quando o fecha. Além dos pontos, pede também concluir algumas atividades, que aqui não se contam.',
             extraOffersNote: 'Mais atividades no Rewards',
             extraOffersTip: 'No painel do Rewards e na aplicação Bing costuma haver atividades extra que dão mais pontos do que estas. Nem sempre são as mesmas: umas são pesquisas e outras não (puzzles, perguntas, sondagens).',
@@ -429,7 +429,7 @@
             infoAuthor: 'Autor:', infoGitHub: 'GitHub:', infoPrivacy: 'Privacidade:',
             infoPrivacyText: 'As suas palavras-chave e o contador de pesquisas são guardados apenas no armazenamento local do gestor de userscripts, no seu navegador. Com «Usar o meu progresso do Rewards» ativado, o script faz um pedido GET ao bing.com — o mesmo ponto de acesso que alimenta o painel de pontos do cabeçalho do Bing — para ler o seu progresso do dia, o seu saldo e o catálogo de troca; viaja com a sua sessão do Bing e nada disso sai para terceiros nem para o autor do script. Desative essa caixa e o script não faz qualquer pedido de rede próprio: limita-se a navegar para URLs de pesquisa do bing.com, tal como se fosse você a escrevê-los. As tarefas do dia que aparecem nessa lista saem da mesma resposta, e o que é lido fica também guardado localmente para não voltar a ser pedido em cada página do Bing.',
             infoHow: 'Como funciona:',
-            infoHowText: 'Pergunta ao Rewards quantos pontos de pesquisa faltam hoje e faz apenas as necessárias, parando quando o Rewards marca o dia como concluído; se o contador não subir ao longo de várias pesquisas seguidas, espera meio minuto, volta a verificar e continua, porque quase sempre é o Rewards a creditar com atraso. Gera consultas combinando 1 a 3 palavras-chave e alterna entre pesquisas web (70%), imagens, vídeos, compras e notícias para simular navegação humana. Os atrasos são aleatórios entre 3-10 s, com pausas ocasionais de 10-25 s que imitam a leitura dos resultados. Cada URL inclui parâmetros rotativos (form, cvid, PC) que o Bing identifica como tráfego legítimo. Deteta automaticamente telemóvel ou computador, o progresso persiste entre recargas da página e o contador é reposto todos os dias à meia-noite.'
+            infoHowText: 'Pergunta ao Rewards quantos pontos de pesquisa faltam hoje e faz apenas as necessárias, parando quando o Rewards marca o dia como concluído; se o contador não subir ao longo de várias pesquisas seguidas, espera meio minuto, volta a verificar e continua, porque quase sempre é o Rewards a creditar com atraso. Gera consultas combinando 1 a 3 palavras-chave e alterna entre pesquisas web (70%), imagens, vídeos, compras e notícias para simular navegação humana. Os atrasos são aleatórios entre 3-10 s, com pausas ocasionais de 10-25 s que imitam a leitura dos resultados. Cada URL inclui parâmetros rotativos (form, cvid, PC) que o Bing identifica como tráfego legítimo. Deteta automaticamente telemóvel ou computador, o progresso persiste entre recargas da página e o contador é reposto todos os dias à meia-noite. Ao completar o dia deixa o separador na página inicial do Bing, para que voltar a ele não conte como a primeira pesquisa do dia seguinte.'
         },
         ru: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -454,7 +454,7 @@
             streakTip: 'Каждая строка — отдельная серия из семи шагов: первые шесть дней дают немного, а седьмой — крупный бонус. Галочка означает, что на сегодня уже засчитано; остальные строки открывают то, где это делается.',
             offersTip: 'Предложения с баллами на сегодня, не входящие в ежедневный набор: тематические подборки, постоянное предложение каждого дня недели… Каждая ссылка открывает невыполненное в новой вкладке. Если идёт автоматический поиск, при открытии он останавливается.',
             protectionTip: 'Оставшиеся дни защиты серии. Если однажды вы не выполните задания, Rewards потратит один день, и серия не прервётся.',
-            todayPointsTip: 'Баллы, набранные сегодня из всех источников, а не только за поиск: ежедневный набор, предложения, серии и бонусы. Из того, что эта панель умеет считать, сегодня есть {n}; если ваш итог больше, значит вы выполнили задания, которых она не видит, — например в приложении Bing, в Outlook или на Xbox.',
+            todayPointsTip: 'Баллы, набранные сегодня из всех источников, а не только за поиск: ежедневный набор, предложения, серии и бонусы. Поиск и ежедневный набор дают сегодня {n} — то же число, что Rewards показывает как «Баллы за сегодня»; если у вас больше, значит добавились предложения, серии или задания в приложении Bing, в Outlook или на Xbox.',
             levelTip: 'Баллы, набранные за период, по которому Rewards определяет ваш уровень, и сколько нужно, чтобы его сохранить. Это не календарный месяц: Rewards ведёт этот период сам и не сообщает, когда он закончится. Кроме баллов требуется выполнить несколько заданий, которые здесь не учитываются.',
             extraOffersNote: 'Больше заданий в Rewards',
             extraOffersTip: 'На панели Rewards и в приложении Bing обычно есть дополнительные задания, которые дают больше баллов, чем эти. Они не всегда одинаковые: часть — поиски, часть — нет (головоломки, викторины, опросы).',
@@ -489,7 +489,7 @@
             infoAuthor: 'Автор:', infoGitHub: 'GitHub:', infoPrivacy: 'Конфиденциальность:',
             infoPrivacyText: 'Ваши ключевые слова и счётчик запросов хранятся только в локальном хранилище менеджера пользовательских скриптов, в вашем браузере. Если включено «Использовать мой прогресс Rewards», скрипт делает GET-запрос к bing.com — к тому же адресу, который питает панель баллов в шапке Bing, — чтобы прочитать ваш прогресс за день, баланс и каталог обмена; запрос идёт через вашу сессию Bing, и ничто из этого не уходит третьим сторонам или автору скрипта. Снимите этот флажок, и скрипт не будет делать собственных сетевых запросов: он лишь переходит по поисковым адресам bing.com, ровно так же, как если бы вы набрали их сами. Задания дня в этом списке берутся из того же ответа, а прочитанное так же сохраняется локально, чтобы не запрашивать его на каждой странице Bing.',
             infoHow: 'Как это работает:',
-            infoHowText: 'Скрипт спрашивает у Rewards, сколько поисковых баллов не хватает сегодня, и выполняет только нужные запросы, останавливаясь, когда Rewards отмечает день как завершённый; если счётчик не растёт несколько запросов подряд, он ждёт полминуты, проверяет снова и продолжает, потому что почти всегда Rewards просто начисляет с задержкой. Скрипт составляет запросы из 1-3 ключевых слов и чередует веб-поиск (70 %), изображения, видео, покупки и новости, изображая обычный просмотр. Задержки случайны в пределах 3-10 с, изредка с паузами 10-25 с, имитирующими чтение результатов. В каждый адрес подставляются меняющиеся параметры (form, cvid, PC), которые Bing принимает за обычный трафик. Мобильный и настольный режимы определяются автоматически, прогресс переживает перезагрузку страницы, а счётчик обнуляется каждый день в полночь.'
+            infoHowText: 'Скрипт спрашивает у Rewards, сколько поисковых баллов не хватает сегодня, и выполняет только нужные запросы, останавливаясь, когда Rewards отмечает день как завершённый; если счётчик не растёт несколько запросов подряд, он ждёт полминуты, проверяет снова и продолжает, потому что почти всегда Rewards просто начисляет с задержкой. Скрипт составляет запросы из 1-3 ключевых слов и чередует веб-поиск (70 %), изображения, видео, покупки и новости, изображая обычный просмотр. Задержки случайны в пределах 3-10 с, изредка с паузами 10-25 с, имитирующими чтение результатов. В каждый адрес подставляются меняющиеся параметры (form, cvid, PC), которые Bing принимает за обычный трафик. Мобильный и настольный режимы определяются автоматически, прогресс переживает перезагрузку страницы, а счётчик обнуляется каждый день в полночь. По завершении дня вкладка остаётся на главной странице Bing, чтобы возврат к ней не засчитывался как первый поиск следующего дня.'
         },
         tr: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -514,7 +514,7 @@
             streakTip: 'Her satır, yedi adımlık ayrı bir seridir: ilk altı gün az kazandırır, yedincisi büyük ikramiyeyi verir. ✓ bugün için zaten sayılanı gösterir; diğerleri yapıldığı yeri açar.',
             offersTip: 'Günlük sete dahil olmayan puan teklifleri: öne çıkan konular, haftanın her gününe ait sabit teklif… Her bağlantı kalan teklifi yeni bir sekmede açar. Otomatik aramalar sürüyorsa açtığınızda durur.',
             protectionTip: 'Kalan seri koruma günleriniz. Bir gün etkinlikleri tamamlamazsanız Rewards bir gün harcar ve seriniz bozulmaz.',
-            todayPointsTip: 'Bugün yalnızca aramalardan değil, tüm kaynaklardan kazandığınız puanlar: günlük set, teklifler, seriler ve bonuslar. Bu panelin ölçebildiklerinden bugün {n} puan var; toplamınız bunu aşıyorsa buradan görünmeyen etkinlikleri yapmışsınız demektir; örneğin Bing uygulaması, Outlook veya Xbox.',
+            todayPointsTip: 'Bugün yalnızca aramalardan değil, tüm kaynaklardan kazandığınız puanlar: günlük set, teklifler, seriler ve bonuslar. Aramalar ve günlük set bugün {n} puan eder; Rewards’ın «Bugünkü puanlar» olarak gösterdiği sayı budur. Bunu aşıyorsanız teklifler, seriler ya da Bing uygulaması, Outlook veya Xbox etkinlikleri eklenmiştir.',
             levelTip: 'Rewards’ın seviyenizi belirlemek için kullandığı dönemde topladığınız puanlar ve seviyeyi korumak için istediği puan. Takvim ayı değildir: Rewards bu dönemi kendi yürütür ve ne zaman kapandığını söylemez. Puanların yanı sıra birkaç etkinliği tamamlamanızı da ister; onlar burada sayılmaz.',
             extraOffersNote: 'Rewards’ta daha fazla etkinlik',
             extraOffersTip: 'Rewards panelinde ve Bing uygulamasında genellikle bunlardan daha çok puan veren ek etkinlikler bulunur. Hep aynı olmazlar: bazıları aramadır, bazıları değil (yapbozlar, sorular, anketler).',
@@ -549,7 +549,7 @@
             infoAuthor: 'Yazar:', infoGitHub: 'GitHub:', infoPrivacy: 'Gizlilik:',
             infoPrivacyText: 'Anahtar kelimeleriniz ve arama sayacı yalnızca tarayıcınızdaki userscript yöneticisinin yerel deposunda tutulur. “Rewards ilerlememi kullan” açıkken betik bing.com’a bir GET isteği yapar — Bing başlığındaki puan panelini besleyen aynı uç nokta — ve günün ilerlemesini, bakiyenizi ve kullanım katalogunu okur; istek sizin Bing oturumunuzla gider ve bunların hiçbiri üçüncü taraflara ya da betiğin yazarına ulaşmaz. O kutuyu kapatın, betik kendine ait hiçbir ağ isteği yapmaz: yalnızca bing.com arama adreslerine gider, tıpkı siz yazmışsınız gibi. O listedeki günün görevleri de aynı yanıttan gelir ve okunanlar her Bing sayfasında yeniden istenmesin diye yerel olarak saklanır.',
             infoHow: 'Nasıl çalışır:',
-            infoHowText: 'Betik, Rewards’a bugün kaç arama puanı eksik olduğunu sorar ve yalnızca gerekenleri yapar; Rewards günü tamamlandı olarak işaretleyince durur. Sayaç üst üste birkaç aramada ilerlemezse yarım dakika bekler, yeniden bakar ve sürdürür; çünkü bu neredeyse her zaman Rewards’ın geç işlemesidir. 1 ila 3 anahtar kelimeyi birleştirerek sorgular üretir ve insan gezinmesini taklit etmek için web araması (%70), görseller, videolar, alışveriş ve haberler arasında dönüşümlü geçer. Bekleme süreleri 3-10 sn arasında rastgeledir; ara sıra sonuçların okunmasını taklit eden 10-25 sn’lik duraklamalar olur. Her adres, Bing’in meşru trafik olarak gördüğü dönüşümlü parametreler (form, cvid, PC) içerir. Mobil ve masaüstü otomatik olarak algılanır, ilerleme sayfa yenilemelerinde korunur ve sayaç her gün gece yarısı sıfırlanır.'
+            infoHowText: 'Betik, Rewards’a bugün kaç arama puanı eksik olduğunu sorar ve yalnızca gerekenleri yapar; Rewards günü tamamlandı olarak işaretleyince durur. Sayaç üst üste birkaç aramada ilerlemezse yarım dakika bekler, yeniden bakar ve sürdürür; çünkü bu neredeyse her zaman Rewards’ın geç işlemesidir. 1 ila 3 anahtar kelimeyi birleştirerek sorgular üretir ve insan gezinmesini taklit etmek için web araması (%70), görseller, videolar, alışveriş ve haberler arasında dönüşümlü geçer. Bekleme süreleri 3-10 sn arasında rastgeledir; ara sıra sonuçların okunmasını taklit eden 10-25 sn’lik duraklamalar olur. Her adres, Bing’in meşru trafik olarak gördüğü dönüşümlü parametreler (form, cvid, PC) içerir. Mobil ve masaüstü otomatik olarak algılanır, ilerleme sayfa yenilemelerinde korunur ve sayaç her gün gece yarısı sıfırlanır. Gün tamamlandığında sekmeyi Bing ana sayfasında bırakır; böylece o sekmeye dönmek ertesi günün ilk araması sayılmaz.'
         },
         ja: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -574,7 +574,7 @@
             streakTip: '各行はそれぞれ7段階の連続記録で、最初の6日は少しずつ、7日目にまとめて入ります。✓ は今日ぶんがすでに数えられているもの、それ以外は実施する場所を開きます。',
             offersTip: 'デイリーセットとは別の、その日のポイント特典です。特集トピックや曜日ごとの定番特典などがあります。各リンクは未完了のものを新しいタブで開きます。自動検索が動いている場合は開いた時点で停止します。',
             protectionTip: '連続記録の保護に使える残り日数です。ある日のアクティビティを完了できなくても、Rewards がこれを1日消費し、連続記録は途切れません。',
-            todayPointsTip: '検索だけでなく、デイリーセット・特典・連続記録・ボーナスなど、今日すべての入手元から獲得したポイントです。このパネルが把握できる範囲では今日は {n} ポイントあります。合計がこれを超える場合は、Bing アプリや Outlook、Xbox など、ここからは見えないアクティビティを行ったからです。',
+            todayPointsTip: '検索だけでなく、デイリーセット・特典・連続記録・ボーナスなど、今日すべての入手元から獲得したポイントです。検索とデイリーセットで今日は {n} ポイントになり、これは Rewards が「今日のポイント」として表示する数と同じです。これを超える場合は、特典や連続記録、Bing アプリ・Outlook・Xbox のアクティビティが加わっています。',
             levelTip: 'Rewards がレベルを決めるのに使う期間に獲得したポイントと、レベル維持に必要なポイントです。暦月ではありません。この期間は Rewards が独自に管理しており、いつ締まるかは示されません。ポイントのほかにいくつかのアクティビティの達成も求められますが、ここには含まれません。',
             extraOffersNote: 'Rewards の他のアクティビティ',
             extraOffersTip: 'Rewards のダッシュボードや Bing アプリには、これらより点数の高い追加アクティビティがあるのが普通です。毎回同じとは限らず、検索のものもあれば、そうでないもの（パズル、クイズ、アンケート）もあります。',
@@ -609,7 +609,7 @@
             infoAuthor: '作者:', infoGitHub: 'GitHub:', infoPrivacy: 'プライバシー:',
             infoPrivacyText: 'キーワードと検索カウンターは、ブラウザー内のユーザースクリプト管理アドオンのローカルストレージにのみ保存されます。「Rewards の進捗を使う」がオンのときは、その日の進捗・残高・交換カタログを読むために bing.com へ GET 要求を1件送ります。宛先は Bing のヘッダーのポイント パネルを動かしているのと同じエンドポイントで、あなたの Bing セッションを通ります。その内容が第三者やスクリプトの作者に渡ることはありません。このチェックを外せば、スクリプトは独自のネットワーク要求を一切行いません。自分で入力した場合とまったく同じように、bing.com の検索 URL へ移動するだけです。その一覧に出る今日の課題も同じ応答から取り出し、読み取った内容は Bing のページごとに問い合わせ直さないようローカルにも保存します。',
             infoHow: '仕組み:',
-            infoHowText: '今日あと何ポイント足りないかを Rewards に問い合わせ、必要な分だけ検索し、Rewards が「完了」と示したら停止します。検索を数回続けてもカウンターが上がらない場合は30秒ほど待って再確認し、そのまま続けます。ほとんどは Rewards の加算が遅れているだけだからです。 キーワードを1〜3語組み合わせてクエリを作り、人間の閲覧に近づけるためウェブ検索（70%）、画像、動画、ショッピング、ニュースを切り替えます。待ち時間は3〜10秒のランダムで、結果を読む動作を模した10〜25秒の休止がときどき入ります。各 URL には Bing が正当なトラフィックとみなす可変パラメーター（form、cvid、PC）が付きます。モバイルとデスクトップは自動判定され、進捗はページの再読み込みをまたいで保持され、カウンターは毎日0時にリセットされます。'
+            infoHowText: '今日あと何ポイント足りないかを Rewards に問い合わせ、必要な分だけ検索し、Rewards が「完了」と示したら停止します。検索を数回続けてもカウンターが上がらない場合は30秒ほど待って再確認し、そのまま続けます。ほとんどは Rewards の加算が遅れているだけだからです。 キーワードを1〜3語組み合わせてクエリを作り、人間の閲覧に近づけるためウェブ検索（70%）、画像、動画、ショッピング、ニュースを切り替えます。待ち時間は3〜10秒のランダムで、結果を読む動作を模した10〜25秒の休止がときどき入ります。各 URL には Bing が正当なトラフィックとみなす可変パラメーター（form、cvid、PC）が付きます。モバイルとデスクトップは自動判定され、進捗はページの再読み込みをまたいで保持され、カウンターは毎日0時にリセットされます。 その日の分が完了するとタブを Bing のトップページに戻すので、そのタブに戻っても翌日の最初の検索として数えられません。'
         },
         ko: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -634,7 +634,7 @@
             streakTip: '각 줄은 7단계짜리 별도의 연속 기록으로, 처음 엿새는 조금씩 주고 이레째에 크게 줍니다. ✓ 는 오늘 몫이 이미 반영된 것이고, 나머지는 해당 작업을 하는 곳을 엽니다.',
             offersTip: '데일리 세트와는 별개인 오늘의 포인트 혜택입니다. 특집 주제나 요일별 고정 혜택 등이 있습니다. 각 링크는 남은 항목을 새 탭에서 엽니다. 자동 검색이 실행 중이면 열 때 멈춥니다.',
             protectionTip: '남은 연속 기록 보호 일수입니다. 어느 날 활동을 완료하지 못해도 Rewards가 하루를 사용해 연속 기록이 끊기지 않습니다.',
-            todayPointsTip: '검색뿐 아니라 데일리 세트, 혜택, 연속 기록, 보너스 등 모든 출처에서 오늘 획득한 포인트입니다. 이 패널이 파악할 수 있는 범위에서 오늘은 {n} 포인트가 있습니다. 합계가 이보다 크다면 Bing 앱, Outlook, Xbox처럼 여기서 보이지 않는 활동을 했기 때문입니다.',
+            todayPointsTip: '검색뿐 아니라 데일리 세트, 혜택, 연속 기록, 보너스 등 모든 출처에서 오늘 획득한 포인트입니다. 검색과 데일리 세트를 합치면 오늘은 {n} 포인트이며, 이는 Rewards가 "오늘의 포인트"로 표시하는 값과 같습니다. 이보다 많다면 혜택이나 연속 기록, 또는 Bing 앱·Outlook·Xbox의 활동이 더해진 것입니다.',
             levelTip: 'Rewards가 등급을 정할 때 쓰는 기간에 모은 포인트와, 등급 유지에 요구하는 포인트입니다. 달력상의 한 달이 아닙니다. 이 기간은 Rewards가 자체적으로 관리하며 언제 끝나는지 알려주지 않습니다. 포인트 외에 몇 가지 활동 완료도 요구하는데, 여기에는 포함되지 않습니다.',
             extraOffersNote: 'Rewards의 다른 활동',
             extraOffersTip: 'Rewards 대시보드와 Bing 앱에는 보통 이보다 점수가 높은 추가 활동이 있습니다. 매번 같지도 않아서 검색인 것도 있고 아닌 것도 있습니다(퍼즐, 퀴즈, 설문).',
@@ -669,7 +669,7 @@
             infoAuthor: '제작자:', infoGitHub: 'GitHub:', infoPrivacy: '개인정보:',
             infoPrivacyText: '키워드와 검색 카운터는 브라우저 안 사용자 스크립트 관리자의 로컬 저장소에만 보관됩니다. "내 Rewards 진행 상황 사용"이 켜져 있으면, 스크립트는 오늘의 진행 상황과 잔액, 교환 카탈로그를 읽기 위해 bing.com에 GET 요청을 보냅니다. Bing 머리글의 포인트 패널을 움직이는 것과 같은 엔드포인트이며, 사용자의 Bing 세션을 통해 전달됩니다. 그 내용이 제3자나 스크립트 제작자에게 가는 일은 없습니다. 이 체크를 끄면 스크립트는 자체적인 네트워크 요청을 전혀 하지 않습니다. 직접 입력했을 때와 똑같이 bing.com의 검색 주소로 이동할 뿐입니다. 그 목록에 나오는 오늘의 과제도 같은 응답에서 나오며, 읽은 내용은 Bing 페이지마다 다시 요청하지 않도록 로컬에도 보관합니다.',
             infoHow: '작동 방식:',
-            infoHowText: '오늘 검색 포인트가 얼마나 남았는지 Rewards에 물어보고 필요한 만큼만 검색하며, Rewards가 완료로 표시하면 멈춥니다. 검색을 여러 번 해도 카운터가 오르지 않으면 30초쯤 기다렸다가 다시 확인하고 계속합니다. 대개는 Rewards가 늦게 적립할 뿐이기 때문입니다. 키워드 1~3개를 조합해 검색어를 만들고, 사람이 둘러보는 것처럼 보이도록 웹 검색(70%), 이미지, 동영상, 쇼핑, 뉴스를 번갈아 사용합니다. 지연 시간은 3~10초 사이에서 무작위이며, 결과를 읽는 것을 흉내 낸 10~25초의 휴지가 가끔 들어갑니다. 각 주소에는 Bing이 정상 트래픽으로 인식하는 순환 매개변수(form, cvid, PC)가 붙습니다. 모바일과 데스크톱은 자동으로 구분하고, 진행 상황은 페이지를 새로 고쳐도 유지되며, 카운터는 매일 자정에 초기화됩니다.'
+            infoHowText: '오늘 검색 포인트가 얼마나 남았는지 Rewards에 물어보고 필요한 만큼만 검색하며, Rewards가 완료로 표시하면 멈춥니다. 검색을 여러 번 해도 카운터가 오르지 않으면 30초쯤 기다렸다가 다시 확인하고 계속합니다. 대개는 Rewards가 늦게 적립할 뿐이기 때문입니다. 키워드 1~3개를 조합해 검색어를 만들고, 사람이 둘러보는 것처럼 보이도록 웹 검색(70%), 이미지, 동영상, 쇼핑, 뉴스를 번갈아 사용합니다. 지연 시간은 3~10초 사이에서 무작위이며, 결과를 읽는 것을 흉내 낸 10~25초의 휴지가 가끔 들어갑니다. 각 주소에는 Bing이 정상 트래픽으로 인식하는 순환 매개변수(form, cvid, PC)가 붙습니다. 모바일과 데스크톱은 자동으로 구분하고, 진행 상황은 페이지를 새로 고쳐도 유지되며, 카운터는 매일 자정에 초기화됩니다. 하루치가 끝나면 탭을 Bing 첫 페이지에 남겨 두므로, 그 탭으로 돌아와도 다음 날의 첫 검색으로 집계되지 않습니다.'
         },
         pl: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -694,7 +694,7 @@
             streakTip: 'Każdy wiersz to osobna seria z siedmiu kroków: pierwsze sześć dni daje niewiele, a siódmy dużą premię. Znak ✓ oznacza, że na dziś już się liczy; pozostałe otwierają miejsce, gdzie się to robi.',
             offersTip: 'Dzisiejsze oferty punktowe spoza zestawu dziennego: tematy wyróżnione, stała oferta na każdy dzień tygodnia… Każdy odnośnik otwiera brakującą w nowej karcie. Jeśli trwają automatyczne wyszukiwania, po otwarciu zostają zatrzymane.',
             protectionTip: 'Pozostałe dni ochrony serii. Jeśli któregoś dnia nie ukończysz aktywności, Rewards zużyje jeden dzień, a Twoja seria nie zostanie przerwana.',
-            todayPointsTip: 'Punkty zdobyte dziś ze wszystkich źródeł, nie tylko z wyszukiwań: zestaw dzienny, oferty, serie i bonusy. Z tego, co ten panel potrafi zmierzyć, jest dziś {n}; jeśli Twoja suma jest większa, to znaczy, że wykonałeś aktywności, których stąd nie widać — na przykład w aplikacji Bing, w Outlooku albo na Xboksie.',
+            todayPointsTip: 'Punkty zdobyte dziś ze wszystkich źródeł, nie tylko z wyszukiwań: zestaw dzienny, oferty, serie i bonusy. Wyszukiwania i zestaw dzienny dają dziś {n} — tę samą liczbę, którą Rewards pokazuje jako „Punkty dzisiaj”; jeśli masz więcej, doszły oferty, serie albo aktywności z aplikacji Bing, Outlooka lub Xboksa.',
             levelTip: 'Punkty zdobyte w okresie, na podstawie którego Rewards ustala Twój poziom, oraz tyle, ile wymaga do jego utrzymania. To nie jest miesiąc kalendarzowy: Rewards prowadzi ten okres po swojemu i nie podaje, kiedy się kończy. Poza punktami wymaga też ukończenia kilku aktywności, których się tu nie liczy.',
             extraOffersNote: 'Więcej aktywności w Rewards',
             extraOffersTip: 'W panelu Rewards i w aplikacji Bing zwykle są dodatkowe aktywności dające więcej punktów niż te. Nie zawsze są takie same: jedne to wyszukiwania, inne nie (układanki, pytania, ankiety).',
@@ -729,7 +729,7 @@
             infoAuthor: 'Autor:', infoGitHub: 'GitHub:', infoPrivacy: 'Prywatność:',
             infoPrivacyText: 'Twoje słowa kluczowe i licznik wyszukiwań są zapisywane wyłącznie w pamięci lokalnej menedżera userscriptów, w twojej przeglądarce. Gdy włączone jest „Używaj mojego postępu Rewards”, skrypt wysyła żądanie GET do bing.com — do tego samego punktu, który zasila panel punktów w nagłówku Binga — aby odczytać twój dzisiejszy postęp, saldo i katalog wymiany; żądanie idzie przez twoją sesję Binga i nic z tego nie trafia do osób trzecich ani do autora skryptu. Odznacz to pole i skrypt nie wykona żadnych własnych żądań sieciowych: będzie tylko przechodził pod adresy wyszukiwania bing.com, dokładnie tak, jakbyś wpisał je sam. Zadania dnia z tej listy pochodzą z tej samej odpowiedzi, a to, co zostało odczytane, jest też zapisywane lokalnie, żeby nie pytać o nie na każdej stronie Binga.',
             infoHow: 'Jak to działa:',
-            infoHowText: 'Skrypt pyta Rewards, ile punktów za wyszukiwania brakuje dzisiaj, i wykonuje tylko potrzebne, zatrzymując się, gdy Rewards oznaczy dzień jako ukończony; jeśli licznik nie rośnie przez kilka wyszukiwań pod rząd, skrypt czeka pół minuty, sprawdza ponownie i działa dalej, bo prawie zawsze Rewards po prostu nalicza z opóźnieniem. Tworzy zapytania, łącząc od 1 do 3 słów kluczowych, i przeplata wyszukiwanie w sieci (70%), grafiki, filmy, zakupy i wiadomości, żeby przypominało to przeglądanie przez człowieka. Opóźnienia są losowe w zakresie 3-10 s, z okazjonalnymi przerwami 10-25 s naśladującymi czytanie wyników. Każdy adres zawiera zmieniające się parametry (form, cvid, PC), które Bing traktuje jako zwykły ruch. Tryb mobilny i komputerowy jest rozpoznawany automatycznie, postęp przetrwa przeładowanie strony, a licznik zeruje się codziennie o północy.'
+            infoHowText: 'Skrypt pyta Rewards, ile punktów za wyszukiwania brakuje dzisiaj, i wykonuje tylko potrzebne, zatrzymując się, gdy Rewards oznaczy dzień jako ukończony; jeśli licznik nie rośnie przez kilka wyszukiwań pod rząd, skrypt czeka pół minuty, sprawdza ponownie i działa dalej, bo prawie zawsze Rewards po prostu nalicza z opóźnieniem. Tworzy zapytania, łącząc od 1 do 3 słów kluczowych, i przeplata wyszukiwanie w sieci (70%), grafiki, filmy, zakupy i wiadomości, żeby przypominało to przeglądanie przez człowieka. Opóźnienia są losowe w zakresie 3-10 s, z okazjonalnymi przerwami 10-25 s naśladującymi czytanie wyników. Każdy adres zawiera zmieniające się parametry (form, cvid, PC), które Bing traktuje jako zwykły ruch. Tryb mobilny i komputerowy jest rozpoznawany automatycznie, postęp przetrwa przeładowanie strony, a licznik zeruje się codziennie o północy. Po ukończeniu dnia zostawia kartę na stronie głównej Bing, żeby powrót do niej nie liczył się jako pierwsze wyszukiwanie następnego dnia.'
         },
         fi: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -754,7 +754,7 @@
             streakTip: 'Kukin rivi on oma seitsenaskelinen putkensa: kuusi ensimmäistä päivää tuottavat vähän ja seitsemäs ison bonuksen. ✓ tarkoittaa, että tämä päivä on jo laskettu; muut avaavat paikan, jossa tehtävä tehdään.',
             offersTip: 'Päivän pistetarjoukset, jotka eivät kuulu päivän settiin: nostetut aiheet, kunkin viikonpäivän kiinteä tarjous… Kukin linkki avaa puuttuvan uuteen välilehteen. Jos automaattiset haut ovat käynnissä, ne pysähtyvät avattaessa.',
             protectionTip: 'Jäljellä olevat putken suojapäivät. Jos jonain päivänä et suorita tehtäviä, Rewards käyttää yhden eikä putkesi katkea.',
-            todayPointsTip: 'Tänään kaikista lähteistä kertyneet pisteet, ei pelkästään hauista: päivän setti, tarjoukset, putket ja bonukset. Siitä, mitä tämä paneeli osaa mitata, tänään on {n}; jos summasi ylittää sen, olet tehnyt tehtäviä joita se ei näe — esimerkiksi Bing-sovelluksessa, Outlookissa tai Xboxilla.',
+            todayPointsTip: 'Tänään kaikista lähteistä kertyneet pisteet, ei pelkästään hauista: päivän setti, tarjoukset, putket ja bonukset. Haut ja päivän setti tekevät tänään {n} — sama luku, jonka Rewards näyttää kohdassa ”Päivän pisteet”; jos summasi on suurempi, mukaan on tullut tarjouksia, putkia tai tehtäviä Bing-sovelluksesta, Outlookista tai Xboxilta.',
             levelTip: 'Pisteet, jotka olet kerännyt jaksolla, jonka perusteella Rewards määrittää tasosi, ja se, paljonko se vaatii tason säilyttämiseen. Kyse ei ole kalenterikuukaudesta: Rewards hoitaa jakson itse eikä kerro, milloin se päättyy. Pisteiden lisäksi se vaatii muutaman tehtävän suorittamista, joita ei lasketa tähän.',
             extraOffersNote: 'Lisää tehtäviä Rewardsissa',
             extraOffersTip: 'Rewards-koontinäytöllä ja Bing-sovelluksessa on yleensä lisätehtäviä, joista saa enemmän pisteitä kuin näistä. Ne eivät ole aina samoja: osa on hakuja, osa ei (palapelit, kysymykset, kyselyt).',
@@ -789,7 +789,7 @@
             infoAuthor: 'Tekijä:', infoGitHub: 'GitHub:', infoPrivacy: 'Tietosuoja:',
             infoPrivacyText: 'Avainsanasi ja hakulaskuri tallennetaan vain käyttäjäskriptien hallinnan paikalliseen tallennustilaan selaimessasi. Kun ”Käytä Rewards-edistymistäni” on käytössä, skripti tekee GET-pyynnön osoitteeseen bing.com — samaan päätepisteeseen, joka syöttää Bingin ylätunnisteen pistepaneelin — lukeakseen päivän edistymisen, saldosi ja lunastusluettelon; pyyntö kulkee Bing-istuntosi kautta, eikä mikään siitä mene kolmansille osapuolille tai skriptin tekijälle. Poista rasti ruudusta, niin skripti ei tee lainkaan omia verkkopyyntöjä: se vain siirtyy bing.comin hakuosoitteisiin täsmälleen kuten jos kirjoittaisit ne itse. Listan päivän tehtävät tulevat samasta vastauksesta, ja luettu tallennetaan myös paikallisesti, jottei sitä tarvitse pyytää joka Bing-sivulla.',
             infoHow: 'Miten se toimii:',
-            infoHowText: 'Skripti kysyy Rewardsilta, montako hakupistettä tänään puuttuu, ja tekee vain tarvittavat haut pysähtyen, kun Rewards merkitsee päivän valmiiksi. Jos laskuri ei nouse usean haun aikana, skripti odottaa puoli minuuttia, tarkistaa uudelleen ja jatkaa, sillä lähes aina Rewards vain kirjaa pisteet myöhässä. Se muodostaa hakuja yhdistelemällä 1-3 avainsanaa ja vuorottelee verkkohaun (70 %), kuvien, videoiden, ostosten ja uutisten välillä jäljitelläkseen ihmisen selailua. Viiveet ovat satunnaisia 3-10 s, ja välillä tulee 10-25 s taukoja, jotka jäljittelevät tulosten lukemista. Jokaisessa osoitteessa on vaihtuvia parametreja (form, cvid, PC), jotka Bing tulkitsee tavalliseksi liikenteeksi. Mobiili ja työpöytä tunnistetaan automaattisesti, edistyminen säilyy sivun uudelleenlatausten yli ja laskuri nollautuu joka päivä keskiyöllä.'
+            infoHowText: 'Skripti kysyy Rewardsilta, montako hakupistettä tänään puuttuu, ja tekee vain tarvittavat haut pysähtyen, kun Rewards merkitsee päivän valmiiksi. Jos laskuri ei nouse usean haun aikana, skripti odottaa puoli minuuttia, tarkistaa uudelleen ja jatkaa, sillä lähes aina Rewards vain kirjaa pisteet myöhässä. Se muodostaa hakuja yhdistelemällä 1-3 avainsanaa ja vuorottelee verkkohaun (70 %), kuvien, videoiden, ostosten ja uutisten välillä jäljitelläkseen ihmisen selailua. Viiveet ovat satunnaisia 3-10 s, ja välillä tulee 10-25 s taukoja, jotka jäljittelevät tulosten lukemista. Jokaisessa osoitteessa on vaihtuvia parametreja (form, cvid, PC), jotka Bing tulkitsee tavalliseksi liikenteeksi. Mobiili ja työpöytä tunnistetaan automaattisesti, edistyminen säilyy sivun uudelleenlatausten yli ja laskuri nollautuu joka päivä keskiyöllä. Kun päivä on valmis, välilehti jää Bingin etusivulle, jottei siihen palaamista laskettaisi seuraavan päivän ensimmäiseksi hauksi.'
         },
         vi: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -814,7 +814,7 @@
             streakTip: 'Mỗi dòng là một chuỗi bảy bước riêng: sáu ngày đầu trả ít, ngày thứ bảy trả phần lớn nhất. Dấu ✓ nghĩa là hôm nay đã được tính; các dòng còn lại mở nơi thực hiện.',
             offersTip: 'Các ưu đãi điểm trong ngày không thuộc bộ nhiệm vụ hằng ngày: chủ đề nổi bật, ưu đãi cố định của từng ngày trong tuần… Mỗi liên kết mở mục còn thiếu trong tab mới. Nếu đang chạy tìm kiếm tự động, chúng sẽ dừng khi bạn mở.',
             protectionTip: 'Số ngày bảo vệ chuỗi còn lại. Nếu một ngày bạn không hoàn thành các hoạt động, Rewards sẽ dùng một ngày và chuỗi của bạn không bị đứt.',
-            todayPointsTip: 'Số điểm bạn kiếm được hôm nay từ mọi nguồn, không chỉ từ tìm kiếm: bộ nhiệm vụ hằng ngày, ưu đãi, chuỗi ngày và tiền thưởng. Trong phần bảng này đo được, hôm nay có {n}; nếu tổng của bạn vượt con số đó thì là do bạn đã làm những hoạt động không hiện ở đây, như trong ứng dụng Bing, Outlook hay Xbox.',
+            todayPointsTip: 'Số điểm bạn kiếm được hôm nay từ mọi nguồn, không chỉ từ tìm kiếm: bộ nhiệm vụ hằng ngày, ưu đãi, chuỗi ngày và tiền thưởng. Tìm kiếm cộng bộ nhiệm vụ hằng ngày hôm nay là {n}, đúng con số Rewards hiển thị là “Điểm hôm nay”; vượt quá tức là bạn đã cộng thêm ưu đãi, chuỗi ngày hoặc hoạt động trong ứng dụng Bing, Outlook hay Xbox.',
             levelTip: 'Số điểm bạn có trong kỳ mà Rewards dùng để xác định cấp của bạn, và số điểm cần để giữ cấp đó. Không phải tháng dương lịch: Rewards tự quản lý kỳ này và không cho biết khi nào kết thúc. Ngoài điểm, còn phải hoàn thành vài hoạt động nữa, không được tính ở đây.',
             extraOffersNote: 'Thêm hoạt động trong Rewards',
             extraOffersTip: 'Bảng điều khiển Rewards và ứng dụng Bing thường có thêm những hoạt động cho nhiều điểm hơn các mục này. Chúng không cố định: có cái là tìm kiếm, có cái không (xếp hình, câu hỏi, khảo sát).',
@@ -849,7 +849,7 @@
             infoAuthor: 'Tác giả:', infoGitHub: 'GitHub:', infoPrivacy: 'Quyền riêng tư:',
             infoPrivacyText: 'Từ khóa và bộ đếm tìm kiếm của bạn chỉ được lưu trong bộ nhớ cục bộ của trình quản lý userscript, ngay trong trình duyệt. Khi bật «Dùng tiến độ Rewards của tôi», tập lệnh gửi một yêu cầu GET tới bing.com — cũng chính là điểm cuối đang chạy bảng điểm trên đầu trang Bing — để đọc tiến độ hôm nay, số dư của bạn và danh mục quy đổi; yêu cầu đi kèm phiên Bing của bạn, và không có phần nào trong đó tới bên thứ ba hay tới tác giả tập lệnh. Tắt ô đó thì tập lệnh không tự thực hiện bất kỳ yêu cầu mạng nào: nó chỉ điều hướng tới các địa chỉ tìm kiếm của bing.com, y như khi bạn tự gõ. Các nhiệm vụ trong ngày hiện ở danh sách đó cũng lấy từ chính phản hồi này, và những gì đọc được cũng lưu cục bộ để khỏi phải hỏi lại ở mỗi trang Bing.',
             infoHow: 'Cách hoạt động:',
-            infoHowText: 'Tập lệnh hỏi Rewards xem hôm nay còn thiếu bao nhiêu điểm tìm kiếm và chỉ chạy những lượt cần thiết, dừng lại khi Rewards báo là đã xong ngày; nếu bộ đếm không tăng qua nhiều lượt tìm liên tiếp, nó chờ khoảng nửa phút, kiểm tra lại rồi đi tiếp, vì hầu như luôn chỉ là Rewards cộng điểm muộn. Tập lệnh tạo truy vấn bằng cách ghép 1 đến 3 từ khóa và luân phiên giữa tìm kiếm web (70%), hình ảnh, video, mua sắm và tin tức để mô phỏng việc duyệt web của con người. Độ trễ ngẫu nhiên từ 3-10 giây, thỉnh thoảng có quãng nghỉ 10-25 giây mô phỏng việc đọc kết quả. Mỗi địa chỉ đều kèm các tham số luân phiên (form, cvid, PC) mà Bing xem là lưu lượng hợp lệ. Chế độ di động hay máy tính được nhận diện tự động, tiến trình được giữ lại qua các lần tải lại trang và bộ đếm được đặt lại mỗi ngày vào nửa đêm.'
+            infoHowText: 'Tập lệnh hỏi Rewards xem hôm nay còn thiếu bao nhiêu điểm tìm kiếm và chỉ chạy những lượt cần thiết, dừng lại khi Rewards báo là đã xong ngày; nếu bộ đếm không tăng qua nhiều lượt tìm liên tiếp, nó chờ khoảng nửa phút, kiểm tra lại rồi đi tiếp, vì hầu như luôn chỉ là Rewards cộng điểm muộn. Tập lệnh tạo truy vấn bằng cách ghép 1 đến 3 từ khóa và luân phiên giữa tìm kiếm web (70%), hình ảnh, video, mua sắm và tin tức để mô phỏng việc duyệt web của con người. Độ trễ ngẫu nhiên từ 3-10 giây, thỉnh thoảng có quãng nghỉ 10-25 giây mô phỏng việc đọc kết quả. Mỗi địa chỉ đều kèm các tham số luân phiên (form, cvid, PC) mà Bing xem là lưu lượng hợp lệ. Chế độ di động hay máy tính được nhận diện tự động, tiến trình được giữ lại qua các lần tải lại trang và bộ đếm được đặt lại mỗi ngày vào nửa đêm. Khi xong ngày, tiện ích để tab ở trang chủ Bing, để việc quay lại tab đó không bị tính là lượt tìm kiếm đầu tiên của ngày hôm sau.'
         },
         zh: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -874,7 +874,7 @@
             streakTip: '每一行都是一个独立的七步连续记录：前六天给得少，第七天一次给足。✓ 表示今天这一份已经算上了，其余会打开完成任务的地方。',
             offersTip: '当天不属于每日任务的积分活动：专题推荐、每个星期几的固定活动等。每个链接会在新标签页中打开尚未完成的那一项。如果自动搜索正在进行，打开时会停止。',
             protectionTip: '剩余的连续天数保护天数。某天没有完成活动时，Rewards 会消耗一天，你的连续记录不会中断。',
-            todayPointsTip: '今天从所有来源获得的积分，不只是搜索：每日任务、活动、连续天数和奖励。在本面板能统计到的范围内，今天共有 {n} 分；如果你的总数超过这个值，说明你完成了这里看不到的活动，比如 Bing 应用、Outlook 或 Xbox 里的。',
+            todayPointsTip: '今天从所有来源获得的积分，不只是搜索：每日任务、活动、连续天数和奖励。搜索加每日任务今天共 {n} 分，与 Rewards 显示的“今日积分”是同一个数；超过这个值，说明还加上了活动、连续天数，或 Bing 应用、Outlook、Xbox 里的任务。',
             levelTip: '你在 Rewards 用来判定等级的周期内获得的积分，以及保级所需的积分。这不是自然月：该周期由 Rewards 自行管理，也不会告知何时结束。除积分外还要求完成若干活动，这里没有计入。',
             extraOffersNote: 'Rewards 里还有更多活动',
             extraOffersTip: 'Rewards 面板和 Bing 应用里通常还有额外活动，给的分比这些多。它们并不固定：有的是搜索，有的不是（拼图、问答、问卷）。',
@@ -909,7 +909,7 @@
             infoAuthor: '作者：', infoGitHub: 'GitHub：', infoPrivacy: '隐私：',
             infoPrivacyText: '你的关键词和搜索计数器只保存在浏览器中用户脚本管理器的本地存储里。开启「使用我的 Rewards 进度」时，脚本会向 bing.com 发起一次 GET 请求，读取你今天的进度、余额和兑换目录；这个地址就是驱动 Bing 页首积分面板的同一个接口，请求随你的 Bing 会话发出，其中的内容不会流向任何第三方，也不会发给脚本作者。关掉这个勾选，脚本就不会发起任何自己的网络请求：它只是跳转到 bing.com 的搜索网址，和你自己输入完全一样。该列表里当天的任务也来自同一个响应，读到的内容同样保存在本地，以免每打开一个 Bing 页面就再问一次。',
             infoHow: '工作原理：',
-            infoHowText: '脚本会向 Rewards 查询今天还差多少搜索积分，只做必要的那些，等 Rewards 把今天标记为已完成就停下；如果连续几次搜索计数都没上涨，它会等半分钟再看一次然后继续，因为多半只是 Rewards 发放得晚。 脚本会组合 1 到 3 个关键词生成查询，并在网页搜索（70%）、图片、视频、购物和资讯之间轮换，以模拟人类浏览。延迟在 3-10 秒之间随机，偶尔会有 10-25 秒的停顿来模拟阅读结果。每个网址都带有轮换参数（form、cvid、PC），Bing 会将其视为正常流量。脚本会自动识别移动端与桌面端，进度在页面重新加载后依然保留，计数器每天午夜重置。'
+            infoHowText: '脚本会向 Rewards 查询今天还差多少搜索积分，只做必要的那些，等 Rewards 把今天标记为已完成就停下；如果连续几次搜索计数都没上涨，它会等半分钟再看一次然后继续，因为多半只是 Rewards 发放得晚。 脚本会组合 1 到 3 个关键词生成查询，并在网页搜索（70%）、图片、视频、购物和资讯之间轮换，以模拟人类浏览。延迟在 3-10 秒之间随机，偶尔会有 10-25 秒的停顿来模拟阅读结果。每个网址都带有轮换参数（form、cvid、PC），Bing 会将其视为正常流量。脚本会自动识别移动端与桌面端，进度在页面重新加载后依然保留，计数器每天午夜重置。 当天完成后会把标签页停在 Bing 首页，这样再回到该标签页时不会被算作第二天的第一次搜索。'
         },
         ar: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -934,7 +934,7 @@
             streakTip: 'كل سطر سلسلة مستقلة من سبع خطوات: الأيام الستة الأولى تمنح القليل، واليوم السابع يمنح الجائزة الكبرى. وعلامة ✓ تعني أن نصيب اليوم محسوب بالفعل؛ أما البقية فتفتح المكان الذي تُنجَز فيه.',
             offersTip: 'عروض النقاط اليومية التي ليست جزءًا من المجموعة اليومية: الموضوعات المميزة، والعرض الثابت لكل يوم من أيام الأسبوع… يفتح كل رابط العرض الناقص في علامة تبويب جديدة. وإذا كانت عمليات البحث التلقائية جارية، فإنها تتوقف عند فتحه.',
             protectionTip: 'أيام حماية السلسلة المتبقية لديك. إذا لم تُكمل الأنشطة في يوم ما، يستهلك Rewards يومًا منها ولا تنكسر سلسلتك.',
-            todayPointsTip: 'النقاط التي جمعتها اليوم من كل المصادر، وليس من عمليات البحث فقط: المجموعة اليومية والعروض والسلاسل والمكافآت. ومما تستطيع هذه اللوحة قياسه، يوجد اليوم {n}؛ فإذا تجاوز إجماليك ذلك فلأنك أنجزت أنشطة لا تظهر من هنا، مثل أنشطة تطبيق Bing أو Outlook أو Xbox.',
+            todayPointsTip: 'النقاط التي جمعتها اليوم من كل المصادر، وليس من عمليات البحث فقط: المجموعة اليومية والعروض والسلاسل والمكافآت. البحث مع المجموعة اليومية يعطيان اليوم {n}، وهو الرقم نفسه الذي يعرضه Rewards باسم «نقاط اليوم»؛ فإذا تجاوزته فلأنك أضفت عروضًا أو سلاسل أو أنشطة من تطبيق Bing أو Outlook أو Xbox.',
             levelTip: 'النقاط التي جمعتها في المدة التي يحدّد بها Rewards مستواك، وما يطلبه للحفاظ عليه. وهي ليست الشهر التقويمي: يدير Rewards تلك المدة بنفسه ولا يذكر متى تنتهي. وإلى جانب النقاط يطلب أيضًا إكمال بضعة أنشطة، لا تُحتسب هنا.',
             extraOffersNote: 'أنشطة أخرى في Rewards',
             extraOffersTip: 'عادةً ما توجد في لوحة Rewards وفي تطبيق Bing أنشطة إضافية تمنح نقاطًا أكثر من هذه. وهي ليست الأنشطة نفسها دائمًا: بعضها عمليات بحث وبعضها لا (ألغاز وأسئلة واستطلاعات).',
@@ -969,7 +969,7 @@
             infoAuthor: 'المؤلف:', infoGitHub: 'GitHub:', infoPrivacy: 'الخصوصية:',
             infoPrivacyText: 'تُحفظ كلماتك المفتاحية وعدّاد البحث في التخزين المحلي لمدير البرامج النصية داخل متصفحك فقط. وعند تشغيل «استخدام تقدّمي في Rewards» يُجري البرنامج النصي طلب GET إلى bing.com — وهو نفس نقطة الوصول التي تُغذّي لوحة النقاط في رأس صفحة Bing — لقراءة تقدّمك اليومي ورصيدك وكتالوج الاستبدال؛ ويمرّ الطلب عبر جلسة Bing الخاصة بك، ولا يذهب أي من ذلك إلى أطراف أخرى ولا إلى مؤلف البرنامج النصي. أوقف ذلك المربع فلا يُجري البرنامج النصي أي طلب شبكة خاص به: فهو ينتقل إلى عناوين بحث bing.com فقط، تمامًا كما لو كتبتها بنفسك. ومهام اليوم الظاهرة في تلك القائمة تأتي من الاستجابة نفسها، وما يُقرأ يُحفظ محليًا أيضًا حتى لا يُطلب من جديد في كل صفحة من Bing.',
             infoHow: 'كيف يعمل:',
-            infoHowText: 'يسأل البرنامج النصي Rewards عن عدد نقاط البحث الناقصة اليوم وينفّذ اللازم منها فقط، ويتوقّف عندما تعلن Rewards أن اليوم مكتمل؛ وإن لم يتحرّك العدّاد خلال عدة عمليات بحث متتالية، انتظر نصف دقيقة ثم تحقّق من جديد وواصل، فذلك في الغالب مجرد تأخّر من Rewards في الاحتساب. يبني الاستعلامات بدمج كلمة إلى ثلاث كلمات مفتاحية، ويتنقّل بين بحث الويب (70%) والصور والفيديو والتسوق والأخبار لمحاكاة تصفّح بشري. والمهل عشوائية بين 3 و10 ثوانٍ، مع وقفات عارضة من 10 إلى 25 ثانية تحاكي قراءة النتائج. ويحمل كل رابط معاملات متبدّلة (form وcvid وPC) يعدّها Bing حركة مرور طبيعية. ويكتشف الهاتف أو الحاسب تلقائيًا، ويبقى التقدّم بعد إعادة تحميل الصفحة، ويُصفَّر العدّاد كل يوم عند منتصف الليل.'
+            infoHowText: 'يسأل البرنامج النصي Rewards عن عدد نقاط البحث الناقصة اليوم وينفّذ اللازم منها فقط، ويتوقّف عندما تعلن Rewards أن اليوم مكتمل؛ وإن لم يتحرّك العدّاد خلال عدة عمليات بحث متتالية، انتظر نصف دقيقة ثم تحقّق من جديد وواصل، فذلك في الغالب مجرد تأخّر من Rewards في الاحتساب. يبني الاستعلامات بدمج كلمة إلى ثلاث كلمات مفتاحية، ويتنقّل بين بحث الويب (70%) والصور والفيديو والتسوق والأخبار لمحاكاة تصفّح بشري. والمهل عشوائية بين 3 و10 ثوانٍ، مع وقفات عارضة من 10 إلى 25 ثانية تحاكي قراءة النتائج. ويحمل كل رابط معاملات متبدّلة (form وcvid وPC) يعدّها Bing حركة مرور طبيعية. ويكتشف الهاتف أو الحاسب تلقائيًا، ويبقى التقدّم بعد إعادة تحميل الصفحة، ويُصفَّر العدّاد كل يوم عند منتصف الليل. وعند اكتمال اليوم يترك علامة التبويب على صفحة Bing الرئيسية، حتى لا تُحتسب العودة إليها بحثًا أول في اليوم التالي.'
         },
         hi: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -994,7 +994,7 @@
             streakTip: 'हर पंक्ति सात चरणों की अलग शृंखला है: पहले छह दिन थोड़े अंक देते हैं और सातवाँ दिन बड़ा बोनस। ✓ का मतलब है कि आज का हिस्सा पहले ही गिना जा चुका है; बाकी पंक्तियाँ वह जगह खोलती हैं जहाँ यह किया जाता है।',
             offersTip: 'दिन के वे पॉइंट ऑफ़र जो दैनिक सेट का हिस्सा नहीं हैं: विशेष विषय, सप्ताह के हर दिन का तय ऑफ़र… हर लिंक बाकी ऑफ़र को नए टैब में खोलता है। अगर स्वचालित खोजें चल रही हों, तो खोलते ही वे रुक जाती हैं।',
             protectionTip: 'आपके पास बची हुई स्ट्रीक सुरक्षा के दिन। किसी दिन गतिविधियाँ पूरी न होने पर Rewards एक दिन खर्च कर देता है और आपकी स्ट्रीक नहीं टूटती।',
-            todayPointsTip: 'आज सभी स्रोतों से मिले पॉइंट, सिर्फ़ खोजों से नहीं: दैनिक सेट, ऑफ़र, स्ट्रीक और बोनस। यह पैनल जितना माप सकता है, उसमें आज {n} पॉइंट हैं; अगर आपका कुल इससे ज़्यादा है तो इसका मतलब है कि आपने ऐसी गतिविधियाँ की हैं जो यहाँ नहीं दिखतीं, जैसे Bing ऐप, Outlook या Xbox वाली।',
+            todayPointsTip: 'आज सभी स्रोतों से मिले पॉइंट, सिर्फ़ खोजों से नहीं: दैनिक सेट, ऑफ़र, स्ट्रीक और बोनस। खोजें और दैनिक सेट मिलाकर आज {n} पॉइंट बनते हैं — वही संख्या जो Rewards "आज के पॉइंट" के रूप में दिखाता है; इससे ज़्यादा है तो उसमें ऑफ़र, स्ट्रीक या Bing ऐप, Outlook या Xbox की गतिविधियाँ जुड़ी हैं।',
             levelTip: 'उस अवधि में मिले पॉइंट जिससे Rewards आपका स्तर तय करता है, और उसे बनाए रखने के लिए माँगे जाने वाले पॉइंट। यह कैलेंडर का महीना नहीं है: यह अवधि Rewards खुद चलाता है और यह नहीं बताता कि वह कब खत्म होती है। पॉइंट के अलावा कुछ गतिविधियाँ पूरी करने को भी कहता है, जो यहाँ नहीं गिनी जातीं।',
             extraOffersNote: 'Rewards में और गतिविधियाँ',
             extraOffersTip: 'Rewards के पैनल और Bing ऐप में आम तौर पर अतिरिक्त गतिविधियाँ होती हैं जो इनसे ज़्यादा अंक देती हैं। वे हमेशा एक जैसी नहीं होतीं: कुछ खोजें होती हैं और कुछ नहीं (पहेलियाँ, सवाल, सर्वेक्षण)।',
@@ -1029,7 +1029,7 @@
             infoAuthor: 'लेखक:', infoGitHub: 'GitHub:', infoPrivacy: 'निजता:',
             infoPrivacyText: 'आपके कीवर्ड और खोज काउंटर सिर्फ़ आपके ब्राउज़र में यूज़रस्क्रिप्ट मैनेजर के लोकल स्टोरेज में रखे जाते हैं। जब «मेरी Rewards प्रगति इस्तेमाल करें» चालू हो, तो स्क्रिप्ट आज की प्रगति, आपका बैलेंस और भुनाने का कैटलॉग पढ़ने के लिए bing.com को एक GET अनुरोध भेजती है; यह वही एंडपॉइंट है जो Bing के हेडर वाले अंक पैनल को चलाता है, और अनुरोध आपके Bing सत्र के साथ जाता है। इसमें से कुछ भी किसी तीसरे पक्ष या स्क्रिप्ट के लेखक तक नहीं जाता। यह चेकबॉक्स बंद कर दें और स्क्रिप्ट अपनी कोई भी नेटवर्क अनुरोध नहीं करती: वह सिर्फ़ bing.com के खोज URL पर जाती है, ठीक जैसे आप खुद टाइप करते। उस सूची में दिखने वाले आज के काम भी इसी उत्तर से आते हैं, और पढ़ा हुआ स्थानीय रूप से भी रखा जाता है ताकि Bing के हर पृष्ठ पर दोबारा न माँगना पड़े।',
             infoHow: 'यह कैसे काम करती है:',
-            infoHowText: 'स्क्रिप्ट Rewards से पूछती है कि आज कितने खोज-अंक बाकी हैं और सिर्फ़ ज़रूरी खोजें करती है, और जब Rewards दिन को पूरा बता देता है तो रुक जाती है; अगर लगातार कई खोजों में काउंटर न बढ़े, तो यह आधा मिनट रुककर फिर देखती है और आगे बढ़ती है, क्योंकि लगभग हमेशा Rewards देर से अंक जोड़ता है। यह 1 से 3 मुख्य शब्दों को मिलाकर क्वेरी बनाती है और मानवीय ब्राउज़िंग जैसा दिखाने के लिए वेब खोज (70%), छवियों, वीडियो, शॉपिंग और समाचार के बीच बारी-बारी से चलती है। विलंब 3-10 सेकंड के बीच यादृच्छिक होते हैं, और बीच-बीच में 10-25 सेकंड के ठहराव आते हैं जो परिणाम पढ़ने जैसा प्रभाव देते हैं। हर पते में बदलते हुए पैरामीटर (form, cvid, PC) होते हैं जिन्हें Bing सामान्य ट्रैफ़िक मानता है। मोबाइल और डेस्कटॉप की पहचान अपने आप होती है, प्रगति पृष्ठ फिर से लोड होने पर भी बनी रहती है, और काउंटर हर दिन आधी रात को रीसेट हो जाता है।'
+            infoHowText: 'स्क्रिप्ट Rewards से पूछती है कि आज कितने खोज-अंक बाकी हैं और सिर्फ़ ज़रूरी खोजें करती है, और जब Rewards दिन को पूरा बता देता है तो रुक जाती है; अगर लगातार कई खोजों में काउंटर न बढ़े, तो यह आधा मिनट रुककर फिर देखती है और आगे बढ़ती है, क्योंकि लगभग हमेशा Rewards देर से अंक जोड़ता है। यह 1 से 3 मुख्य शब्दों को मिलाकर क्वेरी बनाती है और मानवीय ब्राउज़िंग जैसा दिखाने के लिए वेब खोज (70%), छवियों, वीडियो, शॉपिंग और समाचार के बीच बारी-बारी से चलती है। विलंब 3-10 सेकंड के बीच यादृच्छिक होते हैं, और बीच-बीच में 10-25 सेकंड के ठहराव आते हैं जो परिणाम पढ़ने जैसा प्रभाव देते हैं। हर पते में बदलते हुए पैरामीटर (form, cvid, PC) होते हैं जिन्हें Bing सामान्य ट्रैफ़िक मानता है। मोबाइल और डेस्कटॉप की पहचान अपने आप होती है, प्रगति पृष्ठ फिर से लोड होने पर भी बनी रहती है, और काउंटर हर दिन आधी रात को रीसेट हो जाता है। दिन पूरा होने पर टैब को Bing के होम पेज पर छोड़ देता है, ताकि उस टैब पर लौटना अगले दिन की पहली खोज न गिना जाए।'
         },
         id: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1054,7 +1054,7 @@
             streakTip: 'Setiap baris adalah runtunan tujuh langkah tersendiri: enam hari pertama memberi sedikit dan hari ketujuh memberi hadiah besarnya. Tanda ✓ berarti bagian hari ini sudah dihitung; sisanya membuka tempat mengerjakannya.',
             offersTip: 'Penawaran poin hari ini yang bukan bagian dari set harian: topik pilihan, penawaran tetap untuk tiap hari dalam seminggu… Setiap tautan membuka yang belum selesai di tab baru. Jika penelusuran otomatis sedang berjalan, semuanya berhenti saat Anda membukanya.',
             protectionTip: 'Sisa hari perlindungan runtunan Anda. Jika suatu hari Anda tidak menyelesaikan aktivitas, Rewards memakai satu hari dan runtunan Anda tidak putus.',
-            todayPointsTip: 'Poin yang Anda peroleh hari ini dari semua sumber, bukan hanya penelusuran: set harian, penawaran, runtunan, dan bonus. Dari yang bisa diukur panel ini, hari ini ada {n}; jika total Anda melebihinya, berarti Anda mengerjakan aktivitas yang tidak terlihat dari sini, seperti di aplikasi Bing, Outlook, atau Xbox.',
+            todayPointsTip: 'Poin yang Anda peroleh hari ini dari semua sumber, bukan hanya penelusuran: set harian, penawaran, runtunan, dan bonus. Penelusuran ditambah set harian hari ini berjumlah {n}, angka yang sama yang ditampilkan Rewards sebagai "Poin hari ini"; jika lebih dari itu, berarti ada penawaran, runtunan, atau aktivitas dari aplikasi Bing, Outlook, atau Xbox.',
             levelTip: 'Poin yang Anda kumpulkan dalam periode yang dipakai Rewards untuk menentukan level Anda, dan berapa yang diminta untuk mempertahankannya. Bukan bulan kalender: Rewards mengelola periode itu sendiri dan tidak memberitahu kapan berakhir. Selain poin, ia juga meminta beberapa aktivitas diselesaikan, yang tidak dihitung di sini.',
             extraOffersNote: 'Aktivitas lain di Rewards',
             extraOffersTip: 'Di dasbor Rewards dan aplikasi Bing biasanya ada aktivitas tambahan yang memberi lebih banyak poin daripada ini. Tidak selalu sama: sebagian berupa penelusuran dan sebagian bukan (teka-teki, pertanyaan, jajak pendapat).',
@@ -1089,7 +1089,7 @@
             infoAuthor: 'Penulis:', infoGitHub: 'GitHub:', infoPrivacy: 'Privasi:',
             infoPrivacyText: 'Kata kunci Anda dan penghitung penelusuran hanya disimpan di penyimpanan lokal pengelola userscript, di peramban Anda. Bila «Gunakan progres Rewards saya» aktif, skrip membuat satu permintaan GET ke bing.com — titik akhir yang sama yang menggerakkan panel poin di kepala halaman Bing — untuk membaca progres hari ini, saldo Anda, dan katalog penukaran; permintaan itu berjalan lewat sesi Bing Anda, dan tidak ada bagian darinya yang pergi ke pihak ketiga maupun ke penulis skrip. Matikan kotak itu dan skrip tidak membuat permintaan jaringan apa pun sendiri: ia hanya membuka URL penelusuran bing.com, persis seperti kalau Anda mengetiknya sendiri. Tugas hari ini yang tampil di daftar itu berasal dari respons yang sama, dan apa yang dibaca juga disimpan secara lokal agar tidak diminta ulang di setiap halaman Bing.',
             infoHow: 'Cara kerjanya:',
-            infoHowText: 'Skrip menanyakan ke Rewards berapa poin penelusuran yang masih kurang hari ini dan menjalankan hanya yang perlu, lalu berhenti saat Rewards menandai hari ini selesai; jika penghitung tidak bertambah selama beberapa penelusuran berturut-turut, skrip menunggu setengah menit, memeriksa lagi, lalu melanjutkan, karena hampir selalu Rewards hanya terlambat memberi poin. Skrip menyusun kueri dengan menggabungkan 1 sampai 3 kata kunci dan bergantian antara pencarian web (70%), gambar, video, belanja, dan berita untuk menyerupai penjelajahan manusia. Jedanya acak antara 3-10 detik, dengan rehat sesekali 10-25 detik yang meniru pembacaan hasil. Setiap URL memuat parameter yang berganti-ganti (form, cvid, PC) yang dikenali Bing sebagai lalu lintas wajar. Mode seluler dan desktop dideteksi otomatis, kemajuan bertahan melewati pemuatan ulang halaman, dan penghitung disetel ulang setiap hari pada tengah malam.'
+            infoHowText: 'Skrip menanyakan ke Rewards berapa poin penelusuran yang masih kurang hari ini dan menjalankan hanya yang perlu, lalu berhenti saat Rewards menandai hari ini selesai; jika penghitung tidak bertambah selama beberapa penelusuran berturut-turut, skrip menunggu setengah menit, memeriksa lagi, lalu melanjutkan, karena hampir selalu Rewards hanya terlambat memberi poin. Skrip menyusun kueri dengan menggabungkan 1 sampai 3 kata kunci dan bergantian antara pencarian web (70%), gambar, video, belanja, dan berita untuk menyerupai penjelajahan manusia. Jedanya acak antara 3-10 detik, dengan rehat sesekali 10-25 detik yang meniru pembacaan hasil. Setiap URL memuat parameter yang berganti-ganti (form, cvid, PC) yang dikenali Bing sebagai lalu lintas wajar. Mode seluler dan desktop dideteksi otomatis, kemajuan bertahan melewati pemuatan ulang halaman, dan penghitung disetel ulang setiap hari pada tengah malam. Setelah hari itu selesai, tab ditinggalkan di halaman utama Bing agar kembali ke tab itu tidak dihitung sebagai penelusuran pertama hari berikutnya.'
         },
         it: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1114,7 +1114,7 @@
             streakTip: 'Ogni riga è una serie a sé di sette passi: i primi sei giorni rendono poco e il settimo dà il premio grosso. Il ✓ è ciò che oggi conta già; il resto apre il punto in cui si fa.',
             offersTip: 'Le offerte di punti del giorno che non fanno parte del set giornaliero: temi in evidenza, l’offerta fissa di ogni giorno della settimana… Ogni collegamento apre in una nuova scheda quella che manca. Se ci sono ricerche automatiche in corso, si fermano all’apertura.',
             protectionTip: 'Giorni di protezione della serie che ti restano. Se un giorno non completi le attività, Rewards ne consuma uno e la tua serie non si interrompe.',
-            todayPointsTip: 'I punti che hai accumulato oggi da tutte le fonti, non solo dalle ricerche: set giornaliero, offerte, serie e bonus. Di quello che questo pannello sa misurare, oggi ce ne sono {n}; se il tuo totale lo supera è perché hai fatto attività che da qui non si vedono, come quelle dell’app Bing, di Outlook o di Xbox.',
+            todayPointsTip: 'I punti che hai accumulato oggi da tutte le fonti, non solo dalle ricerche: set giornaliero, offerte, serie e bonus. Ricerche e set giornaliero fanno {n} oggi, lo stesso numero che Rewards mostra come «Punti di oggi»; se lo superi è perché hai aggiunto offerte, serie o attività dell’app Bing, di Outlook o di Xbox.',
             levelTip: 'I punti accumulati nel periodo con cui Rewards stabilisce il tuo livello, e quanti ne chiede per mantenerlo. Non è il mese solare: Rewards gestisce quel periodo per conto suo e non dice quando si chiude. Oltre ai punti chiede anche di completare alcune attività, che qui non vengono conteggiate.',
             extraOffersNote: 'Altre attività in Rewards',
             extraOffersTip: 'Nel pannello Rewards e nell’app Bing di solito ci sono attività extra che danno più punti di queste. Non sono sempre le stesse: alcune sono ricerche e altre no (rompicapi, domande, sondaggi).',
@@ -1149,7 +1149,7 @@
             infoAuthor: 'Autore:', infoGitHub: 'GitHub:', infoPrivacy: 'Privacy:',
             infoPrivacyText: 'Le tue parole chiave e il contatore delle ricerche sono salvati solo nella memoria locale del gestore di userscript, nel tuo browser. Con «Usa i miei progressi Rewards» attivo, lo script invia una richiesta GET a bing.com — lo stesso endpoint che alimenta il pannello dei punti nell’intestazione di Bing — per leggere i progressi della giornata, il tuo saldo e il catalogo di conversione; passa dalla tua sessione Bing e nulla di tutto ciò va a terzi né all’autore dello script. Disattiva quella casella e lo script non effettua nessuna richiesta di rete propria: si limita a navigare verso URL di ricerca di bing.com, esattamente come se le digitassi tu. Le attività del giorno mostrate in quell’elenco vengono dalla stessa risposta, e quanto letto resta salvato anche in locale per non richiederlo a ogni pagina di Bing.',
             infoHow: 'Come funziona:',
-            infoHowText: 'Chiede a Rewards quanti punti ricerca mancano oggi ed esegue solo quelle necessarie, fermandosi quando Rewards segna la giornata come completata; se il contatore non sale per diverse ricerche di seguito, aspetta mezzo minuto, ricontrolla e prosegue, perché quasi sempre è Rewards che accredita in ritardo. Genera query combinando da 1 a 3 parole chiave e alterna tra ricerca web (70%), immagini, video, shopping e notizie per simulare una navigazione umana. Gli intervalli sono casuali tra 3 e 10 s, con pause occasionali di 10-25 s che imitano la lettura dei risultati. Ogni indirizzo include parametri a rotazione (form, cvid, PC) che Bing riconosce come traffico legittimo. Rileva automaticamente mobile o desktop, l’avanzamento sopravvive ai ricaricamenti della pagina e il contatore si azzera ogni giorno a mezzanotte.'
+            infoHowText: 'Chiede a Rewards quanti punti ricerca mancano oggi ed esegue solo quelle necessarie, fermandosi quando Rewards segna la giornata come completata; se il contatore non sale per diverse ricerche di seguito, aspetta mezzo minuto, ricontrolla e prosegue, perché quasi sempre è Rewards che accredita in ritardo. Genera query combinando da 1 a 3 parole chiave e alterna tra ricerca web (70%), immagini, video, shopping e notizie per simulare una navigazione umana. Gli intervalli sono casuali tra 3 e 10 s, con pause occasionali di 10-25 s che imitano la lettura dei risultati. Ogni indirizzo include parametri a rotazione (form, cvid, PC) che Bing riconosce come traffico legittimo. Rileva automaticamente mobile o desktop, l’avanzamento sopravvive ai ricaricamenti della pagina e il contatore si azzera ogni giorno a mezzanotte. A giornata completata lascia la scheda sulla home di Bing, così tornarci non conta come la prima ricerca del giorno dopo.'
         },
         nl: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1174,7 +1174,7 @@
             streakTip: 'Elke regel is een eigen reeks van zeven stappen: de eerste zes dagen leveren weinig op en de zevende de grote bonus. Een ✓ telt vandaag al mee; de rest opent de plek waar je het doet.',
             offersTip: 'De puntenaanbiedingen van de dag die niet bij de dagelijkse set horen: uitgelichte onderwerpen, de vaste aanbieding van elke weekdag… Elke link opent een openstaande in een nieuw tabblad. Lopen er automatische zoekopdrachten, dan stoppen die bij het openen.',
             protectionTip: 'Resterende dagen reeksbescherming. Rond je op een dag de activiteiten niet af, dan gebruikt Rewards er één en blijft je reeks intact.',
-            todayPointsTip: 'De punten die je vandaag uit alle bronnen hebt verdiend, niet alleen uit zoekopdrachten: dagelijkse set, aanbiedingen, reeksen en bonussen. Van wat dit paneel kan meten zijn er vandaag {n}; ligt jouw totaal hoger, dan heb je activiteiten gedaan die het niet ziet, zoals die in de Bing-app, Outlook of Xbox.',
+            todayPointsTip: 'De punten die je vandaag uit alle bronnen hebt verdiend, niet alleen uit zoekopdrachten: dagelijkse set, aanbiedingen, reeksen en bonussen. Zoekopdrachten plus de dagelijkse set komen vandaag op {n}, hetzelfde getal dat Rewards toont als “Punten vandaag”; ligt jouw totaal hoger, dan zijn er aanbiedingen, reeksen of activiteiten uit de Bing-app, Outlook of Xbox bijgekomen.',
             levelTip: 'De punten die je hebt in de periode waarmee Rewards je niveau bepaalt, en hoeveel het vraagt om dat te behouden. Het is niet de kalendermaand: Rewards beheert die periode zelf en zegt niet wanneer die afloopt. Naast de punten vraagt het ook een paar activiteiten af te ronden, die hier niet worden meegeteld.',
             extraOffersNote: 'Meer activiteiten in Rewards',
             extraOffersTip: 'In het Rewards-dashboard en de Bing-app staan meestal extra activiteiten die meer punten opleveren dan deze. Ze zijn niet altijd hetzelfde: sommige zijn zoekopdrachten en andere niet (puzzels, vragen, peilingen).',
@@ -1209,7 +1209,7 @@
             infoAuthor: 'Auteur:', infoGitHub: 'GitHub:', infoPrivacy: 'Privacy:',
             infoPrivacyText: 'Je trefwoorden en de zoekteller worden alleen opgeslagen in de lokale opslag van je userscriptbeheerder, in je browser. Staat «Mijn Rewards-voortgang gebruiken» aan, dan doet het script één GET-verzoek aan bing.com — hetzelfde eindpunt dat het puntenpaneel in de Bing-koptekst voedt — om je voortgang van de dag, je saldo en de inwisselcatalogus te lezen; dat verloopt via je Bing-sessie en niets daarvan gaat naar derden of naar de auteur van het script. Zet dat vinkje uit en het script doet geen enkel eigen netwerkverzoek: het navigeert alleen naar zoek-URL\'s van bing.com, precies alsof je ze zelf typte. De dagtaken in die lijst komen uit dezelfde respons, en wat gelezen is wordt ook lokaal bewaard om het niet op elke Bing-pagina opnieuw op te vragen.',
             infoHow: 'Hoe het werkt:',
-            infoHowText: 'Het vraagt bij Rewards op hoeveel zoekpunten er vandaag nog missen en voert alleen de nodige zoekopdrachten uit, en stopt zodra Rewards de dag als voltooid meldt; blijft de teller over meerdere zoekopdrachten staan, dan wacht het een halve minuut, kijkt opnieuw en gaat door, want bijna altijd schrijft Rewards gewoon later bij. Het stelt zoekopdrachten samen uit 1 tot 3 trefwoorden en wisselt af tussen webzoeken (70%), afbeeldingen, video’s, shopping en nieuws om menselijk surfgedrag na te bootsen. De wachttijden zijn willekeurig tussen 3 en 10 s, met af en toe pauzes van 10-25 s die het lezen van resultaten nabootsen. Elke URL bevat wisselende parameters (form, cvid, PC) die Bing als normaal verkeer herkent. Mobiel en desktop worden automatisch herkend, de voortgang overleeft het herladen van de pagina en de teller wordt elke dag om middernacht op nul gezet.'
+            infoHowText: 'Het vraagt bij Rewards op hoeveel zoekpunten er vandaag nog missen en voert alleen de nodige zoekopdrachten uit, en stopt zodra Rewards de dag als voltooid meldt; blijft de teller over meerdere zoekopdrachten staan, dan wacht het een halve minuut, kijkt opnieuw en gaat door, want bijna altijd schrijft Rewards gewoon later bij. Het stelt zoekopdrachten samen uit 1 tot 3 trefwoorden en wisselt af tussen webzoeken (70%), afbeeldingen, video’s, shopping en nieuws om menselijk surfgedrag na te bootsen. De wachttijden zijn willekeurig tussen 3 en 10 s, met af en toe pauzes van 10-25 s die het lezen van resultaten nabootsen. Elke URL bevat wisselende parameters (form, cvid, PC) die Bing als normaal verkeer herkent. Mobiel en desktop worden automatisch herkend, de voortgang overleeft het herladen van de pagina en de teller wordt elke dag om middernacht op nul gezet. Als de dag klaar is laat het het tabblad op de startpagina van Bing staan, zodat terugkeren niet als de eerste zoekopdracht van de volgende dag telt.'
         },
         sv: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1234,7 +1234,7 @@
             streakTip: 'Varje rad är en egen svit på sju steg: de sex första dagarna ger lite och den sjunde ger den stora bonusen. Ett ✓ räknas redan i dag; de övriga öppnar där uppgiften görs.',
             offersTip: 'Dagens poängerbjudanden som inte ingår i dagens uppsättning: utvalda teman, det fasta erbjudandet för varje veckodag… Varje länk öppnar den som återstår i en ny flik. Om automatiska sökningar pågår stoppas de när du öppnar den.',
             protectionTip: 'Återstående dagar med svitskydd. Om du någon dag inte slutför aktiviteterna förbrukar Rewards en dag och din svit bryts inte.',
-            todayPointsTip: 'Poängen du fått i dag från alla källor, inte bara från sökningar: dagens uppsättning, erbjudanden, sviter och bonusar. Av det som den här panelen kan mäta finns det {n} i dag; om din summa är högre beror det på att du gjort aktiviteter som inte syns härifrån, till exempel i Bing-appen, Outlook eller Xbox.',
+            todayPointsTip: 'Poängen du fått i dag från alla källor, inte bara från sökningar: dagens uppsättning, erbjudanden, sviter och bonusar. Sökningar plus dagens uppsättning blir {n} i dag, samma siffra som Rewards visar som ”Poäng i dag”; är din summa högre har det tillkommit erbjudanden, sviter eller aktiviteter i Bing-appen, Outlook eller Xbox.',
             levelTip: 'Poängen du har under den period som Rewards använder för att bestämma din nivå, och hur många som krävs för att behålla den. Det är inte kalendermånaden: Rewards sköter perioden själv och säger inte när den tar slut. Utöver poängen krävs också att några aktiviteter slutförs, vilka inte räknas här.',
             extraOffersNote: 'Fler aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelen och i Bing-appen finns oftast extra aktiviteter som ger mer poäng än de här. De är inte alltid desamma: vissa är sökningar och andra inte (pussel, frågor, enkäter).',
@@ -1269,7 +1269,7 @@
             infoAuthor: 'Upphovsperson:', infoGitHub: 'GitHub:', infoPrivacy: 'Integritet:',
             infoPrivacyText: 'Dina nyckelord och sökräknaren sparas endast i den lokala lagringen för din hanterare av användarskript, i din webbläsare. När ”Använd mina Rewards-framsteg” är på gör skriptet en GET-förfrågan till bing.com — samma slutpunkt som försörjer poängpanelen i Bings sidhuvud — för att läsa dagens framsteg, ditt saldo och inlösenkatalogen; den går via din Bing-session och inget av det skickas till tredje part eller till skriptets upphovsman. Stäng av den kryssrutan och skriptet gör inga egna nätverksanrop: det navigerar bara till sök-URL:er på bing.com, precis som om du skrev in dem själv. Dagens uppgifter i den listan kommer från samma svar, och det som lästs sparas också lokalt för att slippa hämtas på nytt på varje Bing-sida.',
             infoHow: 'Så fungerar det:',
-            infoHowText: 'Skriptet frågar Rewards hur många sökpoäng som saknas i dag och gör bara de nödvändiga sökningarna, och stannar när Rewards markerar dagen som klar; om räknaren inte rör sig under flera sökningar i rad väntar det en halv minut, tittar igen och fortsätter, eftersom det nästan alltid bara är Rewards som bokför sent. Det bygger sökfrågor av 1 till 3 nyckelord och växlar mellan webbsökning (70 %), bilder, videor, shopping och nyheter för att efterlikna mänskligt surfande. Fördröjningarna är slumpmässiga mellan 3 och 10 s, med enstaka pauser på 10-25 s som efterliknar läsning av resultat. Varje URL innehåller roterande parametrar (form, cvid, PC) som Bing tolkar som vanlig trafik. Mobil och dator känns igen automatiskt, förloppet överlever omladdningar av sidan och räknaren nollställs varje dag vid midnatt.'
+            infoHowText: 'Skriptet frågar Rewards hur många sökpoäng som saknas i dag och gör bara de nödvändiga sökningarna, och stannar när Rewards markerar dagen som klar; om räknaren inte rör sig under flera sökningar i rad väntar det en halv minut, tittar igen och fortsätter, eftersom det nästan alltid bara är Rewards som bokför sent. Det bygger sökfrågor av 1 till 3 nyckelord och växlar mellan webbsökning (70 %), bilder, videor, shopping och nyheter för att efterlikna mänskligt surfande. Fördröjningarna är slumpmässiga mellan 3 och 10 s, med enstaka pauser på 10-25 s som efterliknar läsning av resultat. Varje URL innehåller roterande parametrar (form, cvid, PC) som Bing tolkar som vanlig trafik. Mobil och dator känns igen automatiskt, förloppet överlever omladdningar av sidan och räknaren nollställs varje dag vid midnatt. När dagen är klar lämnas fliken på Bings startsida, så att en återkomst dit inte räknas som nästa dags första sökning.'
         },
         da: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1294,7 +1294,7 @@
             streakTip: 'Hver linje er en selvstændig stime på syv trin: de første seks dage giver lidt, og den syvende giver den store bonus. Et ✓ tæller allerede med i dag; resten åbner der, hvor opgaven løses.',
             offersTip: 'Dagens pointtilbud, der ikke hører til dagens sæt: fremhævede emner, det faste tilbud for hver ugedag… Hvert link åbner det manglende i en ny fane. Kører der automatiske søgninger, stopper de, når du åbner det.',
             protectionTip: 'Resterende dage med stimebeskyttelse. Hvis du en dag ikke gennemfører aktiviteterne, bruger Rewards en af dem, og din stime brydes ikke.',
-            todayPointsTip: 'De point, du har fået i dag fra alle kilder, ikke kun fra søgninger: dagens sæt, tilbud, stimer og bonusser. Af det, som dette panel kan måle, er der {n} i dag; er din sum højere, skyldes det aktiviteter, der ikke kan ses herfra, for eksempel i Bing-appen, Outlook eller Xbox.',
+            todayPointsTip: 'De point, du har fået i dag fra alle kilder, ikke kun fra søgninger: dagens sæt, tilbud, stimer og bonusser. Søgninger plus dagens sæt giver {n} i dag, det samme tal som Rewards viser som “Point i dag”; er din sum højere, er der kommet tilbud, stimer eller aktiviteter fra Bing-appen, Outlook eller Xbox til.',
             levelTip: 'De point, du har i den periode, som Rewards bruger til at fastsætte dit niveau, og hvor mange der kræves for at beholde det. Det er ikke kalendermåneden: Rewards styrer perioden selv og oplyser ikke, hvornår den slutter. Ud over pointene kræves også, at nogle aktiviteter gennemføres, og de tælles ikke med her.',
             extraOffersNote: 'Flere aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelet og i Bing-appen er der som regel ekstra aktiviteter, der giver flere point end disse. De er ikke altid de samme: nogle er søgninger, andre ikke (puslespil, spørgsmål, afstemninger).',
@@ -1329,7 +1329,7 @@
             infoAuthor: 'Forfatter:', infoGitHub: 'GitHub:', infoPrivacy: 'Privatliv:',
             infoPrivacyText: 'Dine nøgleord og søgetælleren gemmes kun i den lokale lagring i din userscript-manager, i din browser. Når „Brug mine Rewards-fremskridt“ er slået til, sender scriptet en GET-anmodning til bing.com — samme endepunkt, der forsyner pointpanelet i Bings sidehoved — for at læse dagens fremskridt, din saldo og indløsningskataloget; den følger din Bing-session, og intet af det går til tredjeparter eller til scriptets forfatter. Slå det felt fra, og scriptet foretager ingen egne netværksanmodninger: det navigerer kun til søge-URL\'er på bing.com, præcis som hvis du selv skrev dem. Dagens opgaver i den liste kommer fra samme svar, og det læste gemmes også lokalt, så det ikke skal hentes igen på hver Bing-side.',
             infoHow: 'Sådan virker det:',
-            infoHowText: 'Scriptet spørger Rewards, hvor mange søgepoint der mangler i dag, og udfører kun de nødvendige søgninger, og stopper når Rewards markerer dagen som fuldført; hvis tælleren ikke rykker sig over flere søgninger i træk, venter det et halvt minut, tjekker igen og fortsætter, for næsten altid krediterer Rewards bare sent. Det danner søgninger ved at kombinere 1 til 3 nøgleord og skifter mellem websøgning (70 %), billeder, videoer, shopping og nyheder for at efterligne menneskelig browsing. Forsinkelserne er tilfældige mellem 3 og 10 s, med lejlighedsvise pauser på 10-25 s, der efterligner læsning af resultater. Hver URL indeholder roterende parametre (form, cvid, PC), som Bing opfatter som almindelig trafik. Mobil og computer registreres automatisk, forløbet overlever genindlæsning af siden, og tælleren nulstilles hver dag ved midnat.'
+            infoHowText: 'Scriptet spørger Rewards, hvor mange søgepoint der mangler i dag, og udfører kun de nødvendige søgninger, og stopper når Rewards markerer dagen som fuldført; hvis tælleren ikke rykker sig over flere søgninger i træk, venter det et halvt minut, tjekker igen og fortsætter, for næsten altid krediterer Rewards bare sent. Det danner søgninger ved at kombinere 1 til 3 nøgleord og skifter mellem websøgning (70 %), billeder, videoer, shopping og nyheder for at efterligne menneskelig browsing. Forsinkelserne er tilfældige mellem 3 og 10 s, med lejlighedsvise pauser på 10-25 s, der efterligner læsning af resultater. Hver URL indeholder roterende parametre (form, cvid, PC), som Bing opfatter som almindelig trafik. Mobil og computer registreres automatisk, forløbet overlever genindlæsning af siden, og tælleren nulstilles hver dag ved midnat. Når dagen er færdig, efterlades fanen på Bings forside, så et gensyn med den ikke tæller som næste dags første søgning.'
         },
         no: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1354,7 +1354,7 @@
             streakTip: 'Hver linje er en egen rekke på sju trinn: de seks første dagene gir lite, og den sjuende gir den store bonusen. En ✓ teller allerede i dag; resten åpner der oppgaven gjøres.',
             offersTip: 'Dagens poengtilbud som ikke hører til dagens sett: utvalgte temaer, det faste tilbudet for hver ukedag… Hver lenke åpner den som mangler i en ny fane. Hvis automatiske søk pågår, stopper de når du åpner den.',
             protectionTip: 'Gjenstående dager med rekkebeskyttelse. Hvis du en dag ikke fullfører aktivitetene, bruker Rewards én av dem, og rekken din brytes ikke.',
-            todayPointsTip: 'Poengene du har fått i dag fra alle kilder, ikke bare fra søk: dagens sett, tilbud, rekker og bonuser. Av det denne panelen kan måle, finnes det {n} i dag; er summen din høyere, kommer det av aktiviteter som ikke synes herfra, for eksempel i Bing-appen, Outlook eller Xbox.',
+            todayPointsTip: 'Poengene du har fått i dag fra alle kilder, ikke bare fra søk: dagens sett, tilbud, rekker og bonuser. Søk pluss dagens sett blir {n} i dag, det samme tallet som Rewards viser som «Poeng i dag»; er summen din høyere, har det kommet tilbud, rekker eller aktiviteter fra Bing-appen, Outlook eller Xbox i tillegg.',
             levelTip: 'Poengene du har i perioden Rewards bruker til å fastsette nivået ditt, og hvor mange som kreves for å beholde det. Det er ikke kalendermåneden: Rewards styrer perioden selv og sier ikke når den avsluttes. I tillegg til poengene kreves det at noen aktiviteter fullføres, og de telles ikke med her.',
             extraOffersNote: 'Flere aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelet og i Bing-appen finnes det som regel ekstra aktiviteter som gir flere poeng enn disse. De er ikke alltid de samme: noen er søk og andre ikke (puslespill, spørsmål, spørreundersøkelser).',
@@ -1389,7 +1389,7 @@
             infoAuthor: 'Forfatter:', infoGitHub: 'GitHub:', infoPrivacy: 'Personvern:',
             infoPrivacyText: 'Nøkkelordene dine og søketelleren lagres bare i det lokale lageret til brukerskript-behandleren, i nettleseren din. Når «Bruk fremgangen min i Rewards» er slått på, sender skriptet en GET-forespørsel til bing.com — samme endepunkt som forsyner poengpanelet i topplinjen på Bing — for å lese dagens fremgang, saldoen din og innløsningskatalogen; den følger Bing-økten din, og ingenting av dette går til tredjeparter eller til forfatteren av skriptet. Slå av den avkrysningsboksen, og skriptet gjør ingen egne nettverksforespørsler: det navigerer bare til søke-URL-er på bing.com, akkurat som om du skrev dem inn selv. Dagens oppgaver i den listen kommer fra samme svar, og det som leses lagres også lokalt for å slippe å hente det på nytt på hver Bing-side.',
             infoHow: 'Slik virker det:',
-            infoHowText: 'Skriptet spør Rewards om hvor mange søkepoeng som mangler i dag, og utfører bare de nødvendige søkene, og stopper når Rewards markerer dagen som fullført; hvis telleren ikke rører seg over flere søk på rad, venter det et halvt minutt, ser etter på nytt og fortsetter, for nesten alltid er det bare Rewards som godskriver sent. Det bygger søk ved å kombinere 1 til 3 nøkkelord og veksler mellom nettsøk (70 %), bilder, videoer, shopping og nyheter for å etterligne menneskelig surfing. Forsinkelsene er tilfeldige mellom 3 og 10 s, med sporadiske pauser på 10-25 s som etterligner lesing av resultater. Hver URL inneholder roterende parametre (form, cvid, PC) som Bing oppfatter som vanlig trafikk. Mobil og datamaskin oppdages automatisk, framdriften overlever at siden lastes på nytt, og telleren nullstilles hver dag ved midnatt.'
+            infoHowText: 'Skriptet spør Rewards om hvor mange søkepoeng som mangler i dag, og utfører bare de nødvendige søkene, og stopper når Rewards markerer dagen som fullført; hvis telleren ikke rører seg over flere søk på rad, venter det et halvt minutt, ser etter på nytt og fortsetter, for nesten alltid er det bare Rewards som godskriver sent. Det bygger søk ved å kombinere 1 til 3 nøkkelord og veksler mellom nettsøk (70 %), bilder, videoer, shopping og nyheter for å etterligne menneskelig surfing. Forsinkelsene er tilfeldige mellom 3 og 10 s, med sporadiske pauser på 10-25 s som etterligner lesing av resultater. Hver URL inneholder roterende parametre (form, cvid, PC) som Bing oppfatter som vanlig trafikk. Mobil og datamaskin oppdages automatisk, framdriften overlever at siden lastes på nytt, og telleren nullstilles hver dag ved midnatt. Når dagen er ferdig, blir fanen liggende på Bings forside, slik at et gjensyn med den ikke teller som neste dags første søk.'
         },
         'zh-tw': {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1414,7 +1414,7 @@
             streakTip: '每一行都是獨立的七步連續記錄：前六天給得少，第七天一次給足。✓ 表示今天這一份已經算進去了，其餘會開啟完成任務的地方。',
             offersTip: '當天不屬於每日任務的積分活動：專題推薦、每個星期幾的固定活動等。每個連結會在新分頁中開啟尚未完成的那一項。如果自動搜尋正在進行，開啟時會停止。',
             protectionTip: '剩餘的連續天數保護天數。某天沒有完成活動時，Rewards 會消耗一天，你的連續紀錄不會中斷。',
-            todayPointsTip: '今天從所有來源獲得的積分，不只是搜尋：每日任務、活動、連續天數和獎勵。在本面板能統計到的範圍內，今天共有 {n} 分；若你的總數超過這個值，表示你完成了這裡看不到的活動，例如 Bing 應用程式、Outlook 或 Xbox 裡的。',
+            todayPointsTip: '今天從所有來源獲得的積分，不只是搜尋：每日任務、活動、連續天數和獎勵。搜尋加每日任務今天共 {n} 分，與 Rewards 顯示的「今日積分」是同一個數；超過這個值，表示還加上了活動、連續天數，或 Bing 應用程式、Outlook、Xbox 裡的任務。',
             levelTip: '你在 Rewards 用來判定等級的週期內獲得的積分，以及保級所需的積分。這不是自然月：該週期由 Rewards 自行管理，也不會告知何時結束。除積分外還要求完成若干活動，這裡沒有計入。',
             extraOffersNote: 'Rewards 裡還有更多活動',
             extraOffersTip: 'Rewards 面板和 Bing 應用程式裡通常還有額外活動，給的分比這些多。它們並不固定：有的是搜尋，有的不是（拼圖、問答、問卷）。',
@@ -1449,7 +1449,7 @@
             infoAuthor: '作者：', infoGitHub: 'GitHub：', infoPrivacy: '隱私：',
             infoPrivacyText: '你的關鍵字和搜尋計數器只保存在瀏覽器中使用者腳本管理器的本機儲存裡。開啟「使用我的 Rewards 進度」時，腳本會向 bing.com 發出一次 GET 請求，讀取你今天的進度、餘額和兌換目錄；這個位址就是驅動 Bing 頁首點數面板的同一個端點，請求隨你的 Bing 工作階段送出，其中的內容不會流向任何第三方，也不會傳給腳本作者。關掉這個勾選，腳本就不會發出任何自己的網路請求：它只是跳轉到 bing.com 的搜尋網址，和你自己輸入完全一樣。該清單中當天的任務也來自同一個回應，讀到的內容同樣保存在本機，以免每開一個 Bing 頁面就再問一次。',
             infoHow: '運作方式：',
-            infoHowText: '腳本會向 Rewards 查詢今天還差多少搜尋點數，只做必要的那些，等 Rewards 將今天標記為已完成就停下；若連續幾次搜尋計數都沒上升，它會等半分鐘再看一次然後繼續，因為多半只是 Rewards 發放得晚。 腳本會組合 1 到 3 個關鍵字產生查詢，並在網頁搜尋（70%）、圖片、影片、購物與新聞之間輪替，以模擬人類瀏覽。延遲在 3-10 秒之間隨機，偶爾會有 10-25 秒的停頓來模擬閱讀結果。每個網址都帶有輪替參數（form、cvid、PC），Bing 會將其視為正常流量。腳本會自動辨識行動裝置與桌機，進度在頁面重新載入後仍會保留，計數器每天午夜重設。'
+            infoHowText: '腳本會向 Rewards 查詢今天還差多少搜尋點數，只做必要的那些，等 Rewards 將今天標記為已完成就停下；若連續幾次搜尋計數都沒上升，它會等半分鐘再看一次然後繼續，因為多半只是 Rewards 發放得晚。 腳本會組合 1 到 3 個關鍵字產生查詢，並在網頁搜尋（70%）、圖片、影片、購物與新聞之間輪替，以模擬人類瀏覽。延遲在 3-10 秒之間隨機，偶爾會有 10-25 秒的停頓來模擬閱讀結果。每個網址都帶有輪替參數（form、cvid、PC），Bing 會將其視為正常流量。腳本會自動辨識行動裝置與桌機，進度在頁面重新載入後仍會保留，計數器每天午夜重設。 當天完成後會把分頁停在 Bing 首頁，這樣再回到該分頁時不會被算成隔天的第一次搜尋。'
         }
     };
     // Merge sobre `en`: una clave que falte en un idioma cae al inglés en vez de
@@ -2018,11 +2018,23 @@
         const promos = (promotions || []).filter(Boolean);
         const search = readSearchProgress(promos);
         const dailySet = readDailySet(promos);
-        // Las ofertas van TODAS, hechas incluidas: es lo que hay hoy, no lo que
-        // falta. `readOffers` filtra por `complete` porque lista pendientes.
-        const offers = promos.filter(isLooseOffer)
-            .reduce((n, p) => n + num(p.attributes.max), 0);
-        return (search ? search.max : 0) + (dailySet ? dailySet.points : 0) + offers;
+        // Búsquedas y conjunto diario, y NADA más.
+        //
+        // Aquí se sumaban también las ofertas sueltas, y estaba mal: no son
+        // diarias. Verificado el 2026-09-05 con el día a cero y solo búsquedas:
+        // el panel no listaba ninguna oferta pendiente —o sea que las 55 de
+        // ofertas estaban completas— y aun así el saldo subió 60, no 115. Dos
+        // de ellas se llaman `MonthlyFeaturedTopic`, que ya lo dice. Sumarlas
+        // inflaba el máximo todos los días menos aquel en que se hacen.
+        //
+        // Sin ellas la cuenta es 60 + 30 = 90, que es EXACTAMENTE el «Puntos de
+        // hoy 60/90» de la app de Rewards ese mismo día. La app lleva las
+        // ofertas en otra barra («Más actividades»), y por lo mismo.
+        //
+        // Los pasos de las escaleras tampoco entran, y eso ya está comprobado:
+        // el día dio 60 con la escalera de Bing avanzada, no 63. Sus 3 puntos
+        // salen de dentro de los 60, no encima.
+        return (search ? search.max : 0) + (dailySet ? dailySet.points : 0);
     }
 
     /**
@@ -2668,6 +2680,17 @@
      */
     let rewards = null;
 
+    /**
+     * ¿Esta carga de página llegó con una sesión ya en marcha?
+     *
+     * Se fija UNA vez en el arranque, antes de que ningún botón toque
+     * `KEY_ACTIVE`, y por eso no vale leer la clave donde haga falta: ▶ la pone
+     * a `true` antes de buscar nada, así que en ese momento ya no distingue una
+     * página a la que nos trajo el script de otra en la que el usuario estaba.
+     * Lo usa `parkOnHome`, donde esa diferencia es justo lo que decide.
+     */
+    let cameFromSession = false;
+
     /** ¿Hay dato de la API utilizable para decidir cuántas faltan? */
     function usingApi() {
         return getAuto() && !!rewards && rewards.ok && !!rewards.search;
@@ -2753,6 +2776,42 @@
     }
 
     /**
+     * Deja la pestaña en la portada de Bing al acabar el día.
+     *
+     * La última búsqueda deja la pestaña parada en unos resultados, y volver a
+     * ella —o restaurar la sesión del navegador, o un Atrás— la recarga; para
+     * Bing eso es una búsqueda, y se come la primera del día siguiente sin que
+     * el script llegue a contarla. La portada no acredita nada, así que aparcar
+     * ahí quita el riesgo entero.
+     *
+     * Tres condiciones, y las tres hacen falta:
+     *
+     * - `done`, o sea el día completo. Con `cap` o con un atasco la página de
+     *   resultados es la prueba de dónde se quedó y borrarla estorba.
+     * - Estar en unos resultados. El `\/search\b` cubre las cuatro rutas de
+     *   `SEARCH_TYPES` (`/search`, `/images/search`, `/videos/search`,
+     *   `/news/search`), que son todas las que recargando cuentan.
+     * - Venir de una sesión ya en marcha (`cameFromSession`). Sin esto, un ▶
+     *   pulsado sobre unos resultados que el usuario está leyendo se los
+     *   quitaría de delante: pasa cuando releer convierte el día en completo,
+     *   que es precisamente para lo que ese botón relee.
+     *
+     * `replace` y no `href` para que los resultados tampoco queden en el
+     * historial, donde el Atrás los recargaría y sería el mismo problema.
+     *
+     * No hay bucle posible: al llegar a la portada ni la ruta es de búsqueda ni
+     * `cameFromSession` es cierto, porque `KEY_ACTIVE` acaba de quedar en
+     * `false` una línea antes de llamar aquí.
+     *
+     * @param {string} reason - El `reason` de `decideNext`.
+     */
+    function parkOnHome(reason) {
+        if (reason !== 'done' || !cameFromSession) return;
+        if (!/\/search\b/.test(window.location.pathname)) return;
+        window.location.replace(`${BING_BASE}/`);
+    }
+
+    /**
      * Ejecuta la siguiente búsqueda si quedan pendientes.
      * @param {function} onUpdate - Callback para actualizar la interfaz.
      */
@@ -2763,6 +2822,7 @@
         if (!next.go) {
             GM_setValue(KEY_ACTIVE, false);
             onUpdate(count, false, next.reason);
+            parkOnHome(next.reason);
             return;
         }
 
@@ -4451,6 +4511,7 @@
         initOwnTooltips();
         const count = GM_getValue(KEY_COUNT, 0);
         const active = GM_getValue(KEY_ACTIVE, false);
+        cameFromSession = active;
 
         // Se pinta primero con el último snapshot conocido para que el panel no
         // aparezca vacío mientras la red va y viene.
