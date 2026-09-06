@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.12
-// @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Lists the day's other point offers, your streak bonus and protection, and the whole day's points, not just the search ones. Queries from your own keywords, rotating search types, randomised delays, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
+// @version      1.3.14
+// @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Lists what else Rewards asks today, the points waiting to be claimed, your streak, and the day's points from every source. Queries from your own keywords, rotating search types, randomised delays, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAOVBMVEVHcEwQbr4Qbr4QcL8Qbr8Qbr4Qbb4QcL8QcL8Qbr0Qb78Qb78QbrwQb70Qbr4Qb70Qbr0QbrwQbr7qzZxUAAAAEnRSTlMAkN8gf8+/QBCAn4+gn6CP0JCpAaXzAAAAmElEQVQ4y92TyxaCMAxE02daFdD5/481iNV4EnTjillNyc0QcijRwcS3CJQp7ZTbGU8tza1f8VLxiLW/ciOe1wxbT/K4b7aLZQNcgNPwFQgGKKqLgWgAiX3Pqw8KaC49FD9fUQwQ5CO9gUl1IW82i3XWLRGYmBpXqDC96gKl7BFhVOsOQWmWlBj4sez89c/4F0E/iH6k63QHcX8J1w5Wo/0AAAAASUVORK5CYII=
 // @author       g31w0fw0rld
 // @license      MIT
@@ -16,7 +16,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.12';
+    const SCRIPT_VERSION = '1.3.14';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -128,7 +128,6 @@
             dailySet: 'Conjunto diario',
             streakDays: 'Racha: {n} días',
             streakTip: 'Cada línea es una racha aparte de siete pasos: los seis primeros días pagan poco y el séptimo da el premio gordo. El ✓ es lo que ya cuenta hoy; lo demás abre donde se hace.',
-            offersTip: 'Ofertas de puntos del día que no van en el conjunto diario: temas destacados, la oferta fija de cada día de la semana… Cada enlace abre en una pestaña nueva la que falta. Si hay búsquedas automáticas en marcha, se detienen al abrirla, para que no te saquen de la página antes de completarla.',
             protectionTip: 'Días de protección de racha que te quedan. Si un día no completas las actividades, Rewards gasta uno y tu racha no se rompe.',
             todayPointsTip: 'Los puntos que llevas hoy de todas las fuentes, no solo de las búsquedas: conjunto diario, ofertas, rachas y bonificaciones. Entre búsquedas y conjunto diario hoy hay {n}, el mismo número que Rewards enseña como «Puntos de hoy»; si lo superas es porque has sumado ofertas, rachas o actividades de la app de Bing, Outlook o Xbox.',
             claimableLine: '{n} pts por reclamar',
@@ -209,7 +208,6 @@
             dailySet: 'Daily set',
             streakDays: 'Streak: {n} days',
             streakTip: 'Each line is a separate seven-step streak: the first six days pay little and the seventh pays the big one. A ✓ is what already counts today; the rest open where you do it.',
-            offersTip: 'Point offers of the day that are not part of the daily set: featured topics, the fixed offer for each weekday… Each link opens a pending one in a new tab. If automatic searches are running, they stop when you open it, so they do not navigate you away before you finish it.',
             protectionTip: 'Streak protection days you have left. If you miss a day’s activities, Rewards spends one and your streak does not break.',
             todayPointsTip: 'The points you have earned today from every source, not just searches: the daily set, offers, streaks and bonuses. Searches plus the daily set come to {n} today, the same figure Rewards shows as “Points today”; going above it means you have added offers, streaks or activities from the Bing app, Outlook or Xbox.',
             claimableLine: '{n} pts to claim',
@@ -276,7 +274,6 @@
             dailySet: 'Tagesset',
             streakDays: 'Serie: {n} Tage',
             streakTip: 'Jede Zeile ist eine eigene Serie über sieben Schritte: Die ersten sechs Tage bringen wenig, der siebte den großen Bonus. Ein ✓ zählt heute schon; alles andere öffnet dort, wo es erledigt wird.',
-            offersTip: 'Punkteangebote des Tages, die nicht zum Tagesset gehören: Themen-Specials, das feste Angebot je Wochentag … Jeder Link öffnet ein offenes Angebot in einem neuen Tab. Laufen gerade automatische Suchen, werden sie beim Öffnen angehalten, damit sie dich nicht von der Seite wegführen, bevor du fertig bist.',
             protectionTip: 'Verbleibende Tage Serienschutz. Wenn du an einem Tag die Aktivitäten nicht abschließt, verbraucht Rewards einen davon und deine Serie reißt nicht ab.',
             todayPointsTip: 'Die Punkte, die du heute aus allen Quellen gesammelt hast, nicht nur aus Suchen: Tagesset, Angebote, Serien und Boni. Suchen und Tagesset ergeben heute {n} — dieselbe Zahl, die Rewards als „Punkte heute“ anzeigt; liegt dein Wert darüber, sind Angebote, Serien oder Aktivitäten aus der Bing-App, aus Outlook oder von Xbox dazugekommen.',
             claimableLine: '{n} Pkt. abzuholen',
@@ -338,7 +335,6 @@
             dailySet: 'Ensemble quotidien',
             streakDays: 'Série : {n} jours',
             streakTip: 'Chaque ligne est une série distincte de sept étapes : les six premiers jours rapportent peu et le septième donne le gros lot. Un ✓ compte déjà aujourd’hui ; le reste ouvre là où cela se fait.',
-            offersTip: 'Les offres de points du jour qui ne font pas partie de l’ensemble quotidien : thèmes à la une, l’offre fixe de chaque jour de la semaine… Chaque lien ouvre celle qui reste dans un nouvel onglet. Si des recherches automatiques sont en cours, elles s’arrêtent à l’ouverture.',
             protectionTip: 'Jours de protection de série qu’il vous reste. Si vous ne terminez pas les activités un jour, Rewards en consomme un et votre série n’est pas rompue.',
             todayPointsTip: 'Les points accumulés aujourd’hui, toutes sources confondues, pas seulement les recherches : ensemble quotidien, offres, séries et bonus. Recherches et ensemble quotidien font {n} aujourd’hui, le chiffre que Rewards affiche comme « Points du jour » ; au-delà, ce sont des offres, des séries ou des activités de l’application Bing, d’Outlook ou de Xbox.',
             claimableLine: '{n} pts à réclamer',
@@ -400,7 +396,6 @@
             dailySet: 'Conjunto diário',
             streakDays: 'Sequência: {n} dias',
             streakTip: 'Cada linha é uma sequência à parte de sete passos: os seis primeiros dias pagam pouco e o sétimo dá o prémio grande. O ✓ é o que já conta hoje; o resto abre onde se faz.',
-            offersTip: 'As ofertas de pontos do dia que não fazem parte do conjunto diário: temas em destaque, a oferta fixa de cada dia da semana… Cada ligação abre num separador novo a que falta. Se houver pesquisas automáticas a decorrer, param ao abri-la.',
             protectionTip: 'Dias de proteção de sequência que ainda tem. Se num dia não concluir as atividades, o Rewards gasta um e a sua sequência não se quebra.',
             todayPointsTip: 'Os pontos que já ganhou hoje de todas as fontes, não só das pesquisas: conjunto diário, ofertas, sequências e bonificações. Pesquisas mais conjunto diário dão {n} hoje, o mesmo número que o Rewards mostra como «Pontos de hoje»; se ultrapassar isso é porque somou ofertas, sequências ou atividades da aplicação Bing, do Outlook ou da Xbox.',
             claimableLine: '{n} pts por reclamar',
@@ -462,7 +457,6 @@
             dailySet: 'Ежедневный набор',
             streakDays: 'Серия дней подряд: {n}',
             streakTip: 'Каждая строка — отдельная серия из семи шагов: первые шесть дней дают немного, а седьмой — крупный бонус. Галочка означает, что на сегодня уже засчитано; остальные строки открывают то, где это делается.',
-            offersTip: 'Предложения с баллами на сегодня, не входящие в ежедневный набор: тематические подборки, постоянное предложение каждого дня недели… Каждая ссылка открывает невыполненное в новой вкладке. Если идёт автоматический поиск, при открытии он останавливается.',
             protectionTip: 'Оставшиеся дни защиты серии. Если однажды вы не выполните задания, Rewards потратит один день, и серия не прервётся.',
             todayPointsTip: 'Баллы, набранные сегодня из всех источников, а не только за поиск: ежедневный набор, предложения, серии и бонусы. Поиск и ежедневный набор дают сегодня {n} — то же число, что Rewards показывает как «Баллы за сегодня»; если у вас больше, значит добавились предложения, серии или задания в приложении Bing, в Outlook или на Xbox.',
             claimableLine: '{n} б. к получению',
@@ -524,7 +518,6 @@
             dailySet: 'Günlük set',
             streakDays: 'Seri: {n} gün',
             streakTip: 'Her satır, yedi adımlık ayrı bir seridir: ilk altı gün az kazandırır, yedincisi büyük ikramiyeyi verir. ✓ bugün için zaten sayılanı gösterir; diğerleri yapıldığı yeri açar.',
-            offersTip: 'Günlük sete dahil olmayan puan teklifleri: öne çıkan konular, haftanın her gününe ait sabit teklif… Her bağlantı kalan teklifi yeni bir sekmede açar. Otomatik aramalar sürüyorsa açtığınızda durur.',
             protectionTip: 'Kalan seri koruma günleriniz. Bir gün etkinlikleri tamamlamazsanız Rewards bir gün harcar ve seriniz bozulmaz.',
             todayPointsTip: 'Bugün yalnızca aramalardan değil, tüm kaynaklardan kazandığınız puanlar: günlük set, teklifler, seriler ve bonuslar. Aramalar ve günlük set bugün {n} puan eder; Rewards’ın «Bugünkü puanlar» olarak gösterdiği sayı budur. Bunu aşıyorsanız teklifler, seriler ya da Bing uygulaması, Outlook veya Xbox etkinlikleri eklenmiştir.',
             claimableLine: '{n} p talep edilecek',
@@ -586,7 +579,6 @@
             dailySet: 'デイリーセット',
             streakDays: '連続記録: {n}日',
             streakTip: '各行はそれぞれ7段階の連続記録で、最初の6日は少しずつ、7日目にまとめて入ります。✓ は今日ぶんがすでに数えられているもの、それ以外は実施する場所を開きます。',
-            offersTip: 'デイリーセットとは別の、その日のポイント特典です。特集トピックや曜日ごとの定番特典などがあります。各リンクは未完了のものを新しいタブで開きます。自動検索が動いている場合は開いた時点で停止します。',
             protectionTip: '連続記録の保護に使える残り日数です。ある日のアクティビティを完了できなくても、Rewards がこれを1日消費し、連続記録は途切れません。',
             todayPointsTip: '検索だけでなく、デイリーセット・特典・連続記録・ボーナスなど、今日すべての入手元から獲得したポイントです。検索とデイリーセットで今日は {n} ポイントになり、これは Rewards が「今日のポイント」として表示する数と同じです。これを超える場合は、特典や連続記録、Bing アプリ・Outlook・Xbox のアクティビティが加わっています。',
             claimableLine: '{n} pt 受け取り可能',
@@ -648,7 +640,6 @@
             dailySet: '데일리 세트',
             streakDays: '연속 기록: {n}일',
             streakTip: '각 줄은 7단계짜리 별도의 연속 기록으로, 처음 엿새는 조금씩 주고 이레째에 크게 줍니다. ✓ 는 오늘 몫이 이미 반영된 것이고, 나머지는 해당 작업을 하는 곳을 엽니다.',
-            offersTip: '데일리 세트와는 별개인 오늘의 포인트 혜택입니다. 특집 주제나 요일별 고정 혜택 등이 있습니다. 각 링크는 남은 항목을 새 탭에서 엽니다. 자동 검색이 실행 중이면 열 때 멈춥니다.',
             protectionTip: '남은 연속 기록 보호 일수입니다. 어느 날 활동을 완료하지 못해도 Rewards가 하루를 사용해 연속 기록이 끊기지 않습니다.',
             todayPointsTip: '검색뿐 아니라 데일리 세트, 혜택, 연속 기록, 보너스 등 모든 출처에서 오늘 획득한 포인트입니다. 검색과 데일리 세트를 합치면 오늘은 {n} 포인트이며, 이는 Rewards가 "오늘의 포인트"로 표시하는 값과 같습니다. 이보다 많다면 혜택이나 연속 기록, 또는 Bing 앱·Outlook·Xbox의 활동이 더해진 것입니다.',
             claimableLine: '{n} pt 받기 가능',
@@ -710,7 +701,6 @@
             dailySet: 'Zestaw dzienny',
             streakDays: 'Seria dni z rzędu: {n}',
             streakTip: 'Każdy wiersz to osobna seria z siedmiu kroków: pierwsze sześć dni daje niewiele, a siódmy dużą premię. Znak ✓ oznacza, że na dziś już się liczy; pozostałe otwierają miejsce, gdzie się to robi.',
-            offersTip: 'Dzisiejsze oferty punktowe spoza zestawu dziennego: tematy wyróżnione, stała oferta na każdy dzień tygodnia… Każdy odnośnik otwiera brakującą w nowej karcie. Jeśli trwają automatyczne wyszukiwania, po otwarciu zostają zatrzymane.',
             protectionTip: 'Pozostałe dni ochrony serii. Jeśli któregoś dnia nie ukończysz aktywności, Rewards zużyje jeden dzień, a Twoja seria nie zostanie przerwana.',
             todayPointsTip: 'Punkty zdobyte dziś ze wszystkich źródeł, nie tylko z wyszukiwań: zestaw dzienny, oferty, serie i bonusy. Wyszukiwania i zestaw dzienny dają dziś {n} — tę samą liczbę, którą Rewards pokazuje jako „Punkty dzisiaj”; jeśli masz więcej, doszły oferty, serie albo aktywności z aplikacji Bing, Outlooka lub Xboksa.',
             claimableLine: '{n} pkt do odebrania',
@@ -772,7 +762,6 @@
             dailySet: 'Päivän setti',
             streakDays: 'Putki: {n} päivää',
             streakTip: 'Kukin rivi on oma seitsenaskelinen putkensa: kuusi ensimmäistä päivää tuottavat vähän ja seitsemäs ison bonuksen. ✓ tarkoittaa, että tämä päivä on jo laskettu; muut avaavat paikan, jossa tehtävä tehdään.',
-            offersTip: 'Päivän pistetarjoukset, jotka eivät kuulu päivän settiin: nostetut aiheet, kunkin viikonpäivän kiinteä tarjous… Kukin linkki avaa puuttuvan uuteen välilehteen. Jos automaattiset haut ovat käynnissä, ne pysähtyvät avattaessa.',
             protectionTip: 'Jäljellä olevat putken suojapäivät. Jos jonain päivänä et suorita tehtäviä, Rewards käyttää yhden eikä putkesi katkea.',
             todayPointsTip: 'Tänään kaikista lähteistä kertyneet pisteet, ei pelkästään hauista: päivän setti, tarjoukset, putket ja bonukset. Haut ja päivän setti tekevät tänään {n} — sama luku, jonka Rewards näyttää kohdassa ”Päivän pisteet”; jos summasi on suurempi, mukaan on tullut tarjouksia, putkia tai tehtäviä Bing-sovelluksesta, Outlookista tai Xboxilta.',
             claimableLine: '{n} p lunastettavana',
@@ -834,7 +823,6 @@
             dailySet: 'Bộ nhiệm vụ hằng ngày',
             streakDays: 'Chuỗi: {n} ngày',
             streakTip: 'Mỗi dòng là một chuỗi bảy bước riêng: sáu ngày đầu trả ít, ngày thứ bảy trả phần lớn nhất. Dấu ✓ nghĩa là hôm nay đã được tính; các dòng còn lại mở nơi thực hiện.',
-            offersTip: 'Các ưu đãi điểm trong ngày không thuộc bộ nhiệm vụ hằng ngày: chủ đề nổi bật, ưu đãi cố định của từng ngày trong tuần… Mỗi liên kết mở mục còn thiếu trong tab mới. Nếu đang chạy tìm kiếm tự động, chúng sẽ dừng khi bạn mở.',
             protectionTip: 'Số ngày bảo vệ chuỗi còn lại. Nếu một ngày bạn không hoàn thành các hoạt động, Rewards sẽ dùng một ngày và chuỗi của bạn không bị đứt.',
             todayPointsTip: 'Số điểm bạn kiếm được hôm nay từ mọi nguồn, không chỉ từ tìm kiếm: bộ nhiệm vụ hằng ngày, ưu đãi, chuỗi ngày và tiền thưởng. Tìm kiếm cộng bộ nhiệm vụ hằng ngày hôm nay là {n}, đúng con số Rewards hiển thị là “Điểm hôm nay”; vượt quá tức là bạn đã cộng thêm ưu đãi, chuỗi ngày hoặc hoạt động trong ứng dụng Bing, Outlook hay Xbox.',
             claimableLine: '{n} điểm chờ nhận',
@@ -896,7 +884,6 @@
             dailySet: '每日任务',
             streakDays: '连续天数：{n} 天',
             streakTip: '每一行都是一个独立的七步连续记录：前六天给得少，第七天一次给足。✓ 表示今天这一份已经算上了，其余会打开完成任务的地方。',
-            offersTip: '当天不属于每日任务的积分活动：专题推荐、每个星期几的固定活动等。每个链接会在新标签页中打开尚未完成的那一项。如果自动搜索正在进行，打开时会停止。',
             protectionTip: '剩余的连续天数保护天数。某天没有完成活动时，Rewards 会消耗一天，你的连续记录不会中断。',
             todayPointsTip: '今天从所有来源获得的积分，不只是搜索：每日任务、活动、连续天数和奖励。搜索加每日任务今天共 {n} 分，与 Rewards 显示的“今日积分”是同一个数；超过这个值，说明还加上了活动、连续天数，或 Bing 应用、Outlook、Xbox 里的任务。',
             claimableLine: '{n} 分待领取',
@@ -958,7 +945,6 @@
             dailySet: 'المجموعة اليومية',
             streakDays: 'سلسلة الأيام المتتالية: {n}',
             streakTip: 'كل سطر سلسلة مستقلة من سبع خطوات: الأيام الستة الأولى تمنح القليل، واليوم السابع يمنح الجائزة الكبرى. وعلامة ✓ تعني أن نصيب اليوم محسوب بالفعل؛ أما البقية فتفتح المكان الذي تُنجَز فيه.',
-            offersTip: 'عروض النقاط اليومية التي ليست جزءًا من المجموعة اليومية: الموضوعات المميزة، والعرض الثابت لكل يوم من أيام الأسبوع… يفتح كل رابط العرض الناقص في علامة تبويب جديدة. وإذا كانت عمليات البحث التلقائية جارية، فإنها تتوقف عند فتحه.',
             protectionTip: 'أيام حماية السلسلة المتبقية لديك. إذا لم تُكمل الأنشطة في يوم ما، يستهلك Rewards يومًا منها ولا تنكسر سلسلتك.',
             todayPointsTip: 'النقاط التي جمعتها اليوم من كل المصادر، وليس من عمليات البحث فقط: المجموعة اليومية والعروض والسلاسل والمكافآت. البحث مع المجموعة اليومية يعطيان اليوم {n}، وهو الرقم نفسه الذي يعرضه Rewards باسم «نقاط اليوم»؛ فإذا تجاوزته فلأنك أضفت عروضًا أو سلاسل أو أنشطة من تطبيق Bing أو Outlook أو Xbox.',
             claimableLine: '{n} نقطة للمطالبة',
@@ -1020,7 +1006,6 @@
             dailySet: 'दैनिक सेट',
             streakDays: 'लगातार दिनों की शृंखला: {n}',
             streakTip: 'हर पंक्ति सात चरणों की अलग शृंखला है: पहले छह दिन थोड़े अंक देते हैं और सातवाँ दिन बड़ा बोनस। ✓ का मतलब है कि आज का हिस्सा पहले ही गिना जा चुका है; बाकी पंक्तियाँ वह जगह खोलती हैं जहाँ यह किया जाता है।',
-            offersTip: 'दिन के वे पॉइंट ऑफ़र जो दैनिक सेट का हिस्सा नहीं हैं: विशेष विषय, सप्ताह के हर दिन का तय ऑफ़र… हर लिंक बाकी ऑफ़र को नए टैब में खोलता है। अगर स्वचालित खोजें चल रही हों, तो खोलते ही वे रुक जाती हैं।',
             protectionTip: 'आपके पास बची हुई स्ट्रीक सुरक्षा के दिन। किसी दिन गतिविधियाँ पूरी न होने पर Rewards एक दिन खर्च कर देता है और आपकी स्ट्रीक नहीं टूटती।',
             todayPointsTip: 'आज सभी स्रोतों से मिले पॉइंट, सिर्फ़ खोजों से नहीं: दैनिक सेट, ऑफ़र, स्ट्रीक और बोनस। खोजें और दैनिक सेट मिलाकर आज {n} पॉइंट बनते हैं — वही संख्या जो Rewards "आज के पॉइंट" के रूप में दिखाता है; इससे ज़्यादा है तो उसमें ऑफ़र, स्ट्रीक या Bing ऐप, Outlook या Xbox की गतिविधियाँ जुड़ी हैं।',
             claimableLine: '{n} अंक क्लेम करने बाकी',
@@ -1082,7 +1067,6 @@
             dailySet: 'Set harian',
             streakDays: 'Runtunan: {n} hari',
             streakTip: 'Setiap baris adalah runtunan tujuh langkah tersendiri: enam hari pertama memberi sedikit dan hari ketujuh memberi hadiah besarnya. Tanda ✓ berarti bagian hari ini sudah dihitung; sisanya membuka tempat mengerjakannya.',
-            offersTip: 'Penawaran poin hari ini yang bukan bagian dari set harian: topik pilihan, penawaran tetap untuk tiap hari dalam seminggu… Setiap tautan membuka yang belum selesai di tab baru. Jika penelusuran otomatis sedang berjalan, semuanya berhenti saat Anda membukanya.',
             protectionTip: 'Sisa hari perlindungan runtunan Anda. Jika suatu hari Anda tidak menyelesaikan aktivitas, Rewards memakai satu hari dan runtunan Anda tidak putus.',
             todayPointsTip: 'Poin yang Anda peroleh hari ini dari semua sumber, bukan hanya penelusuran: set harian, penawaran, runtunan, dan bonus. Penelusuran ditambah set harian hari ini berjumlah {n}, angka yang sama yang ditampilkan Rewards sebagai "Poin hari ini"; jika lebih dari itu, berarti ada penawaran, runtunan, atau aktivitas dari aplikasi Bing, Outlook, atau Xbox.',
             claimableLine: '{n} poin untuk diklaim',
@@ -1144,7 +1128,6 @@
             dailySet: 'Set giornaliero',
             streakDays: 'Serie: {n} giorni',
             streakTip: 'Ogni riga è una serie a sé di sette passi: i primi sei giorni rendono poco e il settimo dà il premio grosso. Il ✓ è ciò che oggi conta già; il resto apre il punto in cui si fa.',
-            offersTip: 'Le offerte di punti del giorno che non fanno parte del set giornaliero: temi in evidenza, l’offerta fissa di ogni giorno della settimana… Ogni collegamento apre in una nuova scheda quella che manca. Se ci sono ricerche automatiche in corso, si fermano all’apertura.',
             protectionTip: 'Giorni di protezione della serie che ti restano. Se un giorno non completi le attività, Rewards ne consuma uno e la tua serie non si interrompe.',
             todayPointsTip: 'I punti che hai accumulato oggi da tutte le fonti, non solo dalle ricerche: set giornaliero, offerte, serie e bonus. Ricerche e set giornaliero fanno {n} oggi, lo stesso numero che Rewards mostra come «Punti di oggi»; se lo superi è perché hai aggiunto offerte, serie o attività dell’app Bing, di Outlook o di Xbox.',
             claimableLine: '{n} pt da riscuotere',
@@ -1206,7 +1189,6 @@
             dailySet: 'Dagelijkse set',
             streakDays: 'Reeks: {n} dagen',
             streakTip: 'Elke regel is een eigen reeks van zeven stappen: de eerste zes dagen leveren weinig op en de zevende de grote bonus. Een ✓ telt vandaag al mee; de rest opent de plek waar je het doet.',
-            offersTip: 'De puntenaanbiedingen van de dag die niet bij de dagelijkse set horen: uitgelichte onderwerpen, de vaste aanbieding van elke weekdag… Elke link opent een openstaande in een nieuw tabblad. Lopen er automatische zoekopdrachten, dan stoppen die bij het openen.',
             protectionTip: 'Resterende dagen reeksbescherming. Rond je op een dag de activiteiten niet af, dan gebruikt Rewards er één en blijft je reeks intact.',
             todayPointsTip: 'De punten die je vandaag uit alle bronnen hebt verdiend, niet alleen uit zoekopdrachten: dagelijkse set, aanbiedingen, reeksen en bonussen. Zoekopdrachten plus de dagelijkse set komen vandaag op {n}, hetzelfde getal dat Rewards toont als “Punten vandaag”; ligt jouw totaal hoger, dan zijn er aanbiedingen, reeksen of activiteiten uit de Bing-app, Outlook of Xbox bijgekomen.',
             claimableLine: '{n} ptn te claimen',
@@ -1268,7 +1250,6 @@
             dailySet: 'Dagens uppsättning',
             streakDays: 'Svit: {n} dagar',
             streakTip: 'Varje rad är en egen svit på sju steg: de sex första dagarna ger lite och den sjunde ger den stora bonusen. Ett ✓ räknas redan i dag; de övriga öppnar där uppgiften görs.',
-            offersTip: 'Dagens poängerbjudanden som inte ingår i dagens uppsättning: utvalda teman, det fasta erbjudandet för varje veckodag… Varje länk öppnar den som återstår i en ny flik. Om automatiska sökningar pågår stoppas de när du öppnar den.',
             protectionTip: 'Återstående dagar med svitskydd. Om du någon dag inte slutför aktiviteterna förbrukar Rewards en dag och din svit bryts inte.',
             todayPointsTip: 'Poängen du fått i dag från alla källor, inte bara från sökningar: dagens uppsättning, erbjudanden, sviter och bonusar. Sökningar plus dagens uppsättning blir {n} i dag, samma siffra som Rewards visar som ”Poäng i dag”; är din summa högre har det tillkommit erbjudanden, sviter eller aktiviteter i Bing-appen, Outlook eller Xbox.',
             claimableLine: '{n} p att hämta',
@@ -1330,7 +1311,6 @@
             dailySet: 'Dagens sæt',
             streakDays: 'Stime: {n} dage',
             streakTip: 'Hver linje er en selvstændig stime på syv trin: de første seks dage giver lidt, og den syvende giver den store bonus. Et ✓ tæller allerede med i dag; resten åbner der, hvor opgaven løses.',
-            offersTip: 'Dagens pointtilbud, der ikke hører til dagens sæt: fremhævede emner, det faste tilbud for hver ugedag… Hvert link åbner det manglende i en ny fane. Kører der automatiske søgninger, stopper de, når du åbner det.',
             protectionTip: 'Resterende dage med stimebeskyttelse. Hvis du en dag ikke gennemfører aktiviteterne, bruger Rewards en af dem, og din stime brydes ikke.',
             todayPointsTip: 'De point, du har fået i dag fra alle kilder, ikke kun fra søgninger: dagens sæt, tilbud, stimer og bonusser. Søgninger plus dagens sæt giver {n} i dag, det samme tal som Rewards viser som “Point i dag”; er din sum højere, er der kommet tilbud, stimer eller aktiviteter fra Bing-appen, Outlook eller Xbox til.',
             claimableLine: '{n} p at hente',
@@ -1392,7 +1372,6 @@
             dailySet: 'Dagens sett',
             streakDays: 'Rekke: {n} dager',
             streakTip: 'Hver linje er en egen rekke på sju trinn: de seks første dagene gir lite, og den sjuende gir den store bonusen. En ✓ teller allerede i dag; resten åpner der oppgaven gjøres.',
-            offersTip: 'Dagens poengtilbud som ikke hører til dagens sett: utvalgte temaer, det faste tilbudet for hver ukedag… Hver lenke åpner den som mangler i en ny fane. Hvis automatiske søk pågår, stopper de når du åpner den.',
             protectionTip: 'Gjenstående dager med rekkebeskyttelse. Hvis du en dag ikke fullfører aktivitetene, bruker Rewards én av dem, og rekken din brytes ikke.',
             todayPointsTip: 'Poengene du har fått i dag fra alle kilder, ikke bare fra søk: dagens sett, tilbud, rekker og bonuser. Søk pluss dagens sett blir {n} i dag, det samme tallet som Rewards viser som «Poeng i dag»; er summen din høyere, har det kommet tilbud, rekker eller aktiviteter fra Bing-appen, Outlook eller Xbox i tillegg.',
             claimableLine: '{n} p å hente',
@@ -1454,7 +1433,6 @@
             dailySet: '每日任務',
             streakDays: '連續天數：{n} 天',
             streakTip: '每一行都是獨立的七步連續記錄：前六天給得少，第七天一次給足。✓ 表示今天這一份已經算進去了，其餘會開啟完成任務的地方。',
-            offersTip: '當天不屬於每日任務的積分活動：專題推薦、每個星期幾的固定活動等。每個連結會在新分頁中開啟尚未完成的那一項。如果自動搜尋正在進行，開啟時會停止。',
             protectionTip: '剩餘的連續天數保護天數。某天沒有完成活動時，Rewards 會消耗一天，你的連續紀錄不會中斷。',
             todayPointsTip: '今天從所有來源獲得的積分，不只是搜尋：每日任務、活動、連續天數和獎勵。搜尋加每日任務今天共 {n} 分，與 Rewards 顯示的「今日積分」是同一個數；超過這個值，表示還加上了活動、連續天數，或 Bing 應用程式、Outlook、Xbox 裡的任務。',
             claimableLine: '{n} 分待領取',
@@ -1972,68 +1950,30 @@
         return String(text || '').replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
     }
 
-    /**
-     * Las ofertas sueltas del día: `urlreward` que NO son del conjunto diario.
-     *
-     * Son los «Bing Bonus Items» que el panel no listaba, y son puntos de
-     * verdad: el 2026-09-04, con dos volcados separados por minutos, los dos
-     * `WW_Bing_MonthlyFeaturedTopic_20260904_7` y `_8` pasaron de `0/10
-     * complete=False` a `10/10 complete=True` al abrirlos, y `todays_points`
-     * los recogió. Dos al día a 10 puntos, más la evergreen de 5, son ~25
-     * diarios que estaban ahí sin cobrar.
-     *
-     * Cinco condiciones, y ninguna sobra (verificadas contra dos cuentas):
-     *
-     *  - `daily_set_date` fuera: los `Global_DailySet_*` TAMBIÉN son
-     *    `urlreward`, así que sin esto se duplicaría el bloque del conjunto
-     *    diario —y con los días siguientes dentro, que la respuesta trae hoy,
-     *    mañana y pasado—.
-     *  - `max > 0` mata las tarjetas promocionales, que llegan con `0/0`
-     *    (`WW_flyout_wallpaper_free_Dec25`, la extensión del navegador, el
-     *    programa de referidos) y las de HVA con `-1/-1`. Es además lo único
-     *    que separaba a las dos cuentas: sus juegos de tareas eran idénticos y
-     *    lo que cambiaba era ese ruido comercial.
-     *  - `hidden` fuera: `ENStar_TodayInHistory_Info` viene con 0/20 y Bing no
-     *    la enseña en ninguna parte. Enlazarla sería mandar a una oferta
-     *    fantasma.
-     *  - Sin `destination` no hay nada que abrir.
-     *
-     * **NO se filtra por día de la semana, aunque el nombre lo invite.** Las
-     * `..._Evergreen_<Weekday>` llegan LAS CINCO en la misma respuesta y el
-     * 2026-09-04 —viernes— las cinco marcaban `complete=True`. Llegué a
-     * concluir que las otras cuatro eran `complete` heredado de sus días y a
-     * casar el nombre contra el día local; era falso. La página de
-     * `rewards.bing.com/earn#moreactivities` de ese mismo día enseña las CINCO
-     * como tarjetas vivas e independientes —«Cita del día», «¿Conoces la
-     * respuesta?», «¿Sabes la respuesta?», «Puzle de mitad de semana» y
-     * «Comienza el día con una cita», a 5 puntos cada una— y su contador de
-     * sección lo confirma por aritmética: 10+10 de los temas destacados, 5 de
-     * «Fija un objetivo» y 25 de las cinco evergreen son los 50 del «50/100».
-     *
-     * Con el filtro puesto, un día con varias pendientes el panel habría
-     * listado una y escondido hasta 20 puntos. Es la misma trampa que el
-     * `_27Days` con `activity_max` 7: **el nombre no es el dato**. Quien dice
-     * si una oferta cuenta hoy es su `complete`, que es per-oferta y ya está.
-     *
-     * @param {object[]} promotions
-     * @returns {{title:string,url:string,points:number}[]|null}
-     */
-    function isLooseOffer(p) {
-        const a = (p && p.attributes) || {};
-        return a.type === 'urlreward' && !isTrue(a.hidden) && !a.daily_set_date &&
-            !!a.destination && num(a.max) > 0;
-    }
-
-    function readOffers(promotions) {
-        const out = [];
-        for (const p of (promotions || []).filter(Boolean)) {
-            if (!isLooseOffer(p) || isTrue(p.attributes.complete)) continue;
-            const a = p.attributes;
-            // El título viene ya traducido por Bing al idioma del mercado.
-            out.push({ title: String(a.title || ''), url: String(a.destination), points: num(a.max) });
-        }
-        return out.length ? out : null;
-    }
+    // NO se listan las ofertas sueltas del día, y no es un olvido.
+    //
+    // 1.3.10 las listaba: los `urlreward` que no son del conjunto diario, cada
+    // una con lo que paga y un enlace. Se quitó en 1.3.14 porque **no
+    // funcionaban**: lo que salía en el panel no eran tareas que se pudieran
+    // hacer desde ahí. La prueba a la vista era una línea
+    // `✱2100 · Bono Estrella de Bing` — y 2100 es el
+    // `program_restructure_good_user_bonus_max`, o sea el bono mensual del
+    // programa, no una oferta del día. El resto tampoco pagaba al abrirlas.
+    //
+    // El filtro que las escogía era `type === 'urlreward'` + no oculta + sin
+    // `daily_set_date` + con `destination` + `max > 0`, y esas cinco
+    // condiciones NO bastan para separar una tarea diaria de un contador de
+    // programa: comparten forma en la respuesta. No se ha encontrado ningún
+    // campo que sí los separe, y sin él la lista miente más de lo que ayuda.
+    //
+    // Lo que queda en su lugar es la nota «+ Más actividades en Rewards», que
+    // dice que PUEDE haber más sin afirmar cuáles ni cuántas y manda a mirarlo
+    // donde de verdad se hacen. Es lo mismo que hacen las notas de Xbox y
+    // Outlook, y por lo mismo: prometer una cifra que no se puede sostener es
+    // peor que no prometer ninguna.
+    //
+    // `readDayMax` ya no las sumaba desde 1.3.11 —no son diarias—, así que
+    // aquí no queda nada suelto que dependa de ellas.
 
     /**
      * Los puntos que HAY hoy en lo que este panel sabe medir, hechos o no.
@@ -2604,7 +2544,6 @@
             // guardado por una versión anterior no los trae: llegan como
             // `undefined` y los guardas de `renderTasks` lo tratan igual que la
             // ausencia, así que se pintan a partir de la siguiente lectura.
-            offers: readOffers(info.promotions),
             streakBonus: readStreakBonus(info.promotions),
             protection: readProtection(info.promotions),
             todayPoints: readTodayPoints(info.promotions),
@@ -3879,13 +3818,12 @@
             const ok = getAuto() && rewards && rewards.ok;
             const ci = ok ? rewards.checkIn : null;
             const ds = (ok && rewards.dailySet && rewards.dailySet.total) ? rewards.dailySet : null;
-            const offers = (ok && rewards.offers && rewards.offers.length) ? rewards.offers : null;
             const bonus = ok ? rewards.streakBonus : null;
             const prot = ok ? rewards.protection : null;
             const today = ok ? num(rewards.todayPoints) : 0;
             const claim = ok ? rewards.claimable : null;
             const lvl = ok ? rewards.level : null;
-            if (!ci && !ds && !offers && !bonus && !prot && !today && !lvl && !claim) {
+            if (!ci && !ds && !bonus && !prot && !today && !lvl && !claim) {
                 tasksBox.style.display = 'none';
                 return;
             }
@@ -3999,41 +3937,6 @@
                     group.appendChild(taskLine(item.title, false, item.url));
                 });
                 tasksBox.appendChild(group);
-            }
-
-            /**
-             * Las ofertas sueltas del día, cada una con lo que paga. Van ENCIMA
-             * de la nota «Más actividades en Rewards», no colgando de ella.
-             *
-             * Se probó al revés —sangradas bajo la nota, como el conjunto diario
-             * cuelga de su socio— porque son literalmente esas actividades: las
-             * tres que lista el panel salen en
-             * `rewards.bing.com/earn#moreactivities`, verificado el 2026-09-04.
-             * Y ESO ES JUSTO POR LO QUE NO VALE. Colgadas, la nota deja de ser
-             * un sitio al que ir y se convierte en el rótulo de la lista: quien
-             * la lee da por hecho que abajo está todo, y ya no abre el enlace.
-             * Lo que hay al otro lado es medio centenar de puntos que el panel
-             * NO puede enseñar —el 2026-09-04, cinco tarjetas «solo en la
-             * aplicación Rewards» a 10 puntos, o sea 50 de los 100 de la
-             * sección— y, con ellas, la existencia misma de la app de Rewards,
-             * que es lo que el aviso quiere que descubra. Es el mismo papel que
-             * hace la nota de Xbox.
-             *
-             * Así que el orden importa y no es cosmético: primero lo que se
-             * puede hacer desde aquí, y al final el enlace a lo que no.
-             *
-             * Van con el mismo glifo de premio que los séptimos pasos de las
-             * escaleras, así que no necesitan rótulo: el título llega traducido
-             * por Bing y el resto lo dice el número. Y como apuntan a bing.com,
-             * `taskLine` ya detiene la sesión al abrirlas, que es justo lo que
-             * hace falta con un cuestionario que hay que contestar.
-             */
-            function appendOffers() {
-                if (!offers) return;
-                offers.forEach((o) => {
-                    tasksBox.appendChild(taskLine(
-                        `\u2731${fmt(o.points)} \u00B7 ${o.title}`, false, o.url, t.offersTip));
-                });
             }
 
             /**
@@ -4173,9 +4076,6 @@
                 // activas de inactivas con un rótulo propio habría costado una
                 // cadena nueva en 22 idiomas para decir lo que ya dicen el gris
                 // y el aviso de Bing.
-                // Las que sí se pueden hacer desde aquí, y la nota cerrando.
-                appendOffers();
-                appendExtraNote();
             }
             // Sin tarjeta de check-in —o con una que no traiga el conjunto
             // diario— este queda igualmente, que es la tarea con enlaces útiles.
@@ -4185,9 +4085,12 @@
                     !ds.pending.length, REWARDS_DAILYSET, t.dailySetTip));
                 appendDailySetLinks();
             }
-            // Sin socios no hubo `appendExtraNote`: aquí van las dos, en el
-            // mismo orden que arriba.
-            if (!ci && offers) { appendOffers(); appendExtraNote(); }
+            // La nota cierra la LISTA, así que va detrás de todo lo que sea
+            // lista —los socios, y en su defecto el conjunto diario— y no
+            // dentro de la rama de los socios, que es donde estaba cuando la
+            // acompañaban las ofertas sueltas. Sin lista no hay nada que
+            // cerrar: con solo líneas grises de contexto la nota sobraría.
+            if (ci || ds) appendExtraNote();
 
             // Outlook y Xbox van al final del todo y fuera de cualquier grupo:
             // son lo único de la lista que el script no puede leer ni marcar. Su
