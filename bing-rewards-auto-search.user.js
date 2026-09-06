@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.11
+// @version      1.3.12
 // @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Lists the day's other point offers, your streak bonus and protection, and the whole day's points, not just the search ones. Queries from your own keywords, rotating search types, randomised delays, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAOVBMVEVHcEwQbr4Qbr4QcL8Qbr8Qbr4Qbb4QcL8QcL8Qbr0Qb78Qb78QbrwQb70Qbr4Qb70Qbr0QbrwQbr7qzZxUAAAAEnRSTlMAkN8gf8+/QBCAn4+gn6CP0JCpAaXzAAAAmElEQVQ4y92TyxaCMAxE02daFdD5/481iNV4EnTjillNyc0QcijRwcS3CJQp7ZTbGU8tza1f8VLxiLW/ciOe1wxbT/K4b7aLZQNcgNPwFQgGKKqLgWgAiX3Pqw8KaC49FD9fUQwQ5CO9gUl1IW82i3XWLRGYmBpXqDC96gKl7BFhVOsOQWmWlBj4sez89c/4F0E/iH6k63QHcX8J1w5Wo/0AAAAASUVORK5CYII=
 // @author       g31w0fw0rld
@@ -16,7 +16,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.11';
+    const SCRIPT_VERSION = '1.3.12';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -131,6 +131,8 @@
             offersTip: 'Ofertas de puntos del día que no van en el conjunto diario: temas destacados, la oferta fija de cada día de la semana… Cada enlace abre en una pestaña nueva la que falta. Si hay búsquedas automáticas en marcha, se detienen al abrirla, para que no te saquen de la página antes de completarla.',
             protectionTip: 'Días de protección de racha que te quedan. Si un día no completas las actividades, Rewards gasta uno y tu racha no se rompe.',
             todayPointsTip: 'Los puntos que llevas hoy de todas las fuentes, no solo de las búsquedas: conjunto diario, ofertas, rachas y bonificaciones. Entre búsquedas y conjunto diario hoy hay {n}, el mismo número que Rewards enseña como «Puntos de hoy»; si lo superas es porque has sumado ofertas, rachas o actividades de la app de Bing, Outlook o Xbox.',
+            claimableLine: '{n} pts por reclamar',
+            claimableTip: 'Puntos que ya has ganado y que Rewards retiene hasta que los reclames. Mientras sigan aquí no cuentan ni en la cifra de arriba ni en tu saldo. Pulsa para ir a reclamarlos.',
             levelTip: 'Los puntos que llevas en el periodo con el que Rewards decide tu nivel, y los que te pide para mantenerlo. No es el mes natural: el periodo lo lleva Rewards por su cuenta y no dice cuándo lo cierra. Además de los puntos pide completar unas cuantas actividades, que no se cuentan aquí.',
             extraOffersNote: 'Más actividades en Rewards',
             extraOffersTip: 'En el panel de Rewards y en la app de Bing suele haber actividades extra que dan más puntos que estas. No son siempre las mismas: unas son búsquedas y otras no (puzles, preguntas, encuestas).',
@@ -210,6 +212,8 @@
             offersTip: 'Point offers of the day that are not part of the daily set: featured topics, the fixed offer for each weekday… Each link opens a pending one in a new tab. If automatic searches are running, they stop when you open it, so they do not navigate you away before you finish it.',
             protectionTip: 'Streak protection days you have left. If you miss a day’s activities, Rewards spends one and your streak does not break.',
             todayPointsTip: 'The points you have earned today from every source, not just searches: the daily set, offers, streaks and bonuses. Searches plus the daily set come to {n} today, the same figure Rewards shows as “Points today”; going above it means you have added offers, streaks or activities from the Bing app, Outlook or Xbox.',
+            claimableLine: '{n} pts to claim',
+            claimableTip: 'Points you have already earned that Rewards is holding until you claim them. While they sit here they count neither in the figure above nor in your balance. Click to go and claim them.',
             levelTip: 'The points you have in the period Rewards uses to set your level, and how many it asks for to keep it. It is not the calendar month: Rewards runs that period on its own and does not say when it closes. On top of the points it also asks you to complete a few activities, which are not counted here.',
             extraOffersNote: 'More activities in Rewards',
             extraOffersTip: 'The Rewards dashboard and the Bing app usually carry extra activities worth more points than these. They are not always the same: some are searches and some are not (puzzles, questions, polls).',
@@ -275,6 +279,8 @@
             offersTip: 'Punkteangebote des Tages, die nicht zum Tagesset gehören: Themen-Specials, das feste Angebot je Wochentag … Jeder Link öffnet ein offenes Angebot in einem neuen Tab. Laufen gerade automatische Suchen, werden sie beim Öffnen angehalten, damit sie dich nicht von der Seite wegführen, bevor du fertig bist.',
             protectionTip: 'Verbleibende Tage Serienschutz. Wenn du an einem Tag die Aktivitäten nicht abschließt, verbraucht Rewards einen davon und deine Serie reißt nicht ab.',
             todayPointsTip: 'Die Punkte, die du heute aus allen Quellen gesammelt hast, nicht nur aus Suchen: Tagesset, Angebote, Serien und Boni. Suchen und Tagesset ergeben heute {n} — dieselbe Zahl, die Rewards als „Punkte heute“ anzeigt; liegt dein Wert darüber, sind Angebote, Serien oder Aktivitäten aus der Bing-App, aus Outlook oder von Xbox dazugekommen.',
+            claimableLine: '{n} Pkt. abzuholen',
+            claimableTip: 'Punkte, die du bereits verdient hast und die Rewards zurückhält, bis du sie einlöst. Solange sie hier stehen, zählen sie weder in der Zahl darüber noch in deinem Guthaben. Zum Einlösen klicken.',
             levelTip: 'Die Punkte, die du in dem Zeitraum hast, mit dem Rewards deine Stufe bestimmt, und wie viele es zum Halten verlangt. Es ist nicht der Kalendermonat: Rewards führt diesen Zeitraum selbst und sagt nicht, wann er endet. Zusätzlich zu den Punkten verlangt es einige abgeschlossene Aktivitäten, die hier nicht mitgezählt werden.',
             extraOffersNote: 'Mehr Aktivitäten in Rewards',
             extraOffersTip: 'Im Rewards-Dashboard und in der Bing-App gibt es meist zusätzliche Aktivitäten, die mehr Punkte bringen als diese. Sie sind nicht immer dieselben: Manche sind Suchen, andere nicht (Puzzles, Quizfragen, Umfragen).',
@@ -335,6 +341,8 @@
             offersTip: 'Les offres de points du jour qui ne font pas partie de l’ensemble quotidien : thèmes à la une, l’offre fixe de chaque jour de la semaine… Chaque lien ouvre celle qui reste dans un nouvel onglet. Si des recherches automatiques sont en cours, elles s’arrêtent à l’ouverture.',
             protectionTip: 'Jours de protection de série qu’il vous reste. Si vous ne terminez pas les activités un jour, Rewards en consomme un et votre série n’est pas rompue.',
             todayPointsTip: 'Les points accumulés aujourd’hui, toutes sources confondues, pas seulement les recherches : ensemble quotidien, offres, séries et bonus. Recherches et ensemble quotidien font {n} aujourd’hui, le chiffre que Rewards affiche comme « Points du jour » ; au-delà, ce sont des offres, des séries ou des activités de l’application Bing, d’Outlook ou de Xbox.',
+            claimableLine: '{n} pts à réclamer',
+            claimableTip: 'Des points déjà gagnés que Rewards conserve jusqu’à ce que vous les réclamiez. Tant qu’ils restent ici, ils ne comptent ni dans le chiffre ci-dessus ni dans votre solde. Cliquez pour aller les réclamer.',
             levelTip: 'Les points accumulés sur la période avec laquelle Rewards détermine votre niveau, et ceux qu’il demande pour le conserver. Ce n’est pas le mois civil : Rewards gère cette période lui-même et n’indique pas quand elle se termine. En plus des points, il demande aussi de réaliser quelques activités, qui ne sont pas comptées ici.',
             extraOffersNote: 'Plus d’activités dans Rewards',
             extraOffersTip: 'Le tableau de bord Rewards et l’application Bing proposent en général des activités supplémentaires qui rapportent plus que celles-ci. Elles ne sont pas toujours les mêmes : certaines sont des recherches, d’autres non (puzzles, questions, sondages).',
@@ -395,6 +403,8 @@
             offersTip: 'As ofertas de pontos do dia que não fazem parte do conjunto diário: temas em destaque, a oferta fixa de cada dia da semana… Cada ligação abre num separador novo a que falta. Se houver pesquisas automáticas a decorrer, param ao abri-la.',
             protectionTip: 'Dias de proteção de sequência que ainda tem. Se num dia não concluir as atividades, o Rewards gasta um e a sua sequência não se quebra.',
             todayPointsTip: 'Os pontos que já ganhou hoje de todas as fontes, não só das pesquisas: conjunto diário, ofertas, sequências e bonificações. Pesquisas mais conjunto diário dão {n} hoje, o mesmo número que o Rewards mostra como «Pontos de hoje»; se ultrapassar isso é porque somou ofertas, sequências ou atividades da aplicação Bing, do Outlook ou da Xbox.',
+            claimableLine: '{n} pts por reclamar',
+            claimableTip: 'Pontos que já ganhou e que o Rewards retém até os reclamar. Enquanto ficarem aqui não contam nem no número acima nem no seu saldo. Clique para os ir reclamar.',
             levelTip: 'Os pontos que tem no período com que o Rewards define o seu nível, e os que pede para o manter. Não é o mês de calendário: o Rewards gere esse período por sua conta e não diz quando o fecha. Além dos pontos, pede também concluir algumas atividades, que aqui não se contam.',
             extraOffersNote: 'Mais atividades no Rewards',
             extraOffersTip: 'No painel do Rewards e na aplicação Bing costuma haver atividades extra que dão mais pontos do que estas. Nem sempre são as mesmas: umas são pesquisas e outras não (puzzles, perguntas, sondagens).',
@@ -455,6 +465,8 @@
             offersTip: 'Предложения с баллами на сегодня, не входящие в ежедневный набор: тематические подборки, постоянное предложение каждого дня недели… Каждая ссылка открывает невыполненное в новой вкладке. Если идёт автоматический поиск, при открытии он останавливается.',
             protectionTip: 'Оставшиеся дни защиты серии. Если однажды вы не выполните задания, Rewards потратит один день, и серия не прервётся.',
             todayPointsTip: 'Баллы, набранные сегодня из всех источников, а не только за поиск: ежедневный набор, предложения, серии и бонусы. Поиск и ежедневный набор дают сегодня {n} — то же число, что Rewards показывает как «Баллы за сегодня»; если у вас больше, значит добавились предложения, серии или задания в приложении Bing, в Outlook или на Xbox.',
+            claimableLine: '{n} б. к получению',
+            claimableTip: 'Баллы, которые вы уже заработали и которые Rewards удерживает, пока вы их не заберёте. Пока они здесь, они не входят ни в число выше, ни в ваш баланс. Нажмите, чтобы забрать их.',
             levelTip: 'Баллы, набранные за период, по которому Rewards определяет ваш уровень, и сколько нужно, чтобы его сохранить. Это не календарный месяц: Rewards ведёт этот период сам и не сообщает, когда он закончится. Кроме баллов требуется выполнить несколько заданий, которые здесь не учитываются.',
             extraOffersNote: 'Больше заданий в Rewards',
             extraOffersTip: 'На панели Rewards и в приложении Bing обычно есть дополнительные задания, которые дают больше баллов, чем эти. Они не всегда одинаковые: часть — поиски, часть — нет (головоломки, викторины, опросы).',
@@ -515,6 +527,8 @@
             offersTip: 'Günlük sete dahil olmayan puan teklifleri: öne çıkan konular, haftanın her gününe ait sabit teklif… Her bağlantı kalan teklifi yeni bir sekmede açar. Otomatik aramalar sürüyorsa açtığınızda durur.',
             protectionTip: 'Kalan seri koruma günleriniz. Bir gün etkinlikleri tamamlamazsanız Rewards bir gün harcar ve seriniz bozulmaz.',
             todayPointsTip: 'Bugün yalnızca aramalardan değil, tüm kaynaklardan kazandığınız puanlar: günlük set, teklifler, seriler ve bonuslar. Aramalar ve günlük set bugün {n} puan eder; Rewards’ın «Bugünkü puanlar» olarak gösterdiği sayı budur. Bunu aşıyorsanız teklifler, seriler ya da Bing uygulaması, Outlook veya Xbox etkinlikleri eklenmiştir.',
+            claimableLine: '{n} p talep edilecek',
+            claimableTip: 'Zaten kazandığınız ve Rewards’ın siz talep edene kadar tuttuğu puanlar. Burada durdukları sürece ne yukarıdaki sayıya ne de bakiyenize dahil olurlar. Talep etmek için tıklayın.',
             levelTip: 'Rewards’ın seviyenizi belirlemek için kullandığı dönemde topladığınız puanlar ve seviyeyi korumak için istediği puan. Takvim ayı değildir: Rewards bu dönemi kendi yürütür ve ne zaman kapandığını söylemez. Puanların yanı sıra birkaç etkinliği tamamlamanızı da ister; onlar burada sayılmaz.',
             extraOffersNote: 'Rewards’ta daha fazla etkinlik',
             extraOffersTip: 'Rewards panelinde ve Bing uygulamasında genellikle bunlardan daha çok puan veren ek etkinlikler bulunur. Hep aynı olmazlar: bazıları aramadır, bazıları değil (yapbozlar, sorular, anketler).',
@@ -575,6 +589,8 @@
             offersTip: 'デイリーセットとは別の、その日のポイント特典です。特集トピックや曜日ごとの定番特典などがあります。各リンクは未完了のものを新しいタブで開きます。自動検索が動いている場合は開いた時点で停止します。',
             protectionTip: '連続記録の保護に使える残り日数です。ある日のアクティビティを完了できなくても、Rewards がこれを1日消費し、連続記録は途切れません。',
             todayPointsTip: '検索だけでなく、デイリーセット・特典・連続記録・ボーナスなど、今日すべての入手元から獲得したポイントです。検索とデイリーセットで今日は {n} ポイントになり、これは Rewards が「今日のポイント」として表示する数と同じです。これを超える場合は、特典や連続記録、Bing アプリ・Outlook・Xbox のアクティビティが加わっています。',
+            claimableLine: '{n} pt 受け取り可能',
+            claimableTip: 'すでに獲得済みで、受け取るまで Rewards が保留しているポイントです。ここにある間は、上の数字にも残高にも含まれません。クリックすると受け取りに進みます。',
             levelTip: 'Rewards がレベルを決めるのに使う期間に獲得したポイントと、レベル維持に必要なポイントです。暦月ではありません。この期間は Rewards が独自に管理しており、いつ締まるかは示されません。ポイントのほかにいくつかのアクティビティの達成も求められますが、ここには含まれません。',
             extraOffersNote: 'Rewards の他のアクティビティ',
             extraOffersTip: 'Rewards のダッシュボードや Bing アプリには、これらより点数の高い追加アクティビティがあるのが普通です。毎回同じとは限らず、検索のものもあれば、そうでないもの（パズル、クイズ、アンケート）もあります。',
@@ -635,6 +651,8 @@
             offersTip: '데일리 세트와는 별개인 오늘의 포인트 혜택입니다. 특집 주제나 요일별 고정 혜택 등이 있습니다. 각 링크는 남은 항목을 새 탭에서 엽니다. 자동 검색이 실행 중이면 열 때 멈춥니다.',
             protectionTip: '남은 연속 기록 보호 일수입니다. 어느 날 활동을 완료하지 못해도 Rewards가 하루를 사용해 연속 기록이 끊기지 않습니다.',
             todayPointsTip: '검색뿐 아니라 데일리 세트, 혜택, 연속 기록, 보너스 등 모든 출처에서 오늘 획득한 포인트입니다. 검색과 데일리 세트를 합치면 오늘은 {n} 포인트이며, 이는 Rewards가 "오늘의 포인트"로 표시하는 값과 같습니다. 이보다 많다면 혜택이나 연속 기록, 또는 Bing 앱·Outlook·Xbox의 활동이 더해진 것입니다.',
+            claimableLine: '{n} pt 받기 가능',
+            claimableTip: '이미 획득했지만 받기 전까지 Rewards가 보관 중인 포인트입니다. 여기 남아 있는 동안에는 위의 수치에도 잔액에도 포함되지 않습니다. 클릭하면 받으러 갑니다.',
             levelTip: 'Rewards가 등급을 정할 때 쓰는 기간에 모은 포인트와, 등급 유지에 요구하는 포인트입니다. 달력상의 한 달이 아닙니다. 이 기간은 Rewards가 자체적으로 관리하며 언제 끝나는지 알려주지 않습니다. 포인트 외에 몇 가지 활동 완료도 요구하는데, 여기에는 포함되지 않습니다.',
             extraOffersNote: 'Rewards의 다른 활동',
             extraOffersTip: 'Rewards 대시보드와 Bing 앱에는 보통 이보다 점수가 높은 추가 활동이 있습니다. 매번 같지도 않아서 검색인 것도 있고 아닌 것도 있습니다(퍼즐, 퀴즈, 설문).',
@@ -695,6 +713,8 @@
             offersTip: 'Dzisiejsze oferty punktowe spoza zestawu dziennego: tematy wyróżnione, stała oferta na każdy dzień tygodnia… Każdy odnośnik otwiera brakującą w nowej karcie. Jeśli trwają automatyczne wyszukiwania, po otwarciu zostają zatrzymane.',
             protectionTip: 'Pozostałe dni ochrony serii. Jeśli któregoś dnia nie ukończysz aktywności, Rewards zużyje jeden dzień, a Twoja seria nie zostanie przerwana.',
             todayPointsTip: 'Punkty zdobyte dziś ze wszystkich źródeł, nie tylko z wyszukiwań: zestaw dzienny, oferty, serie i bonusy. Wyszukiwania i zestaw dzienny dają dziś {n} — tę samą liczbę, którą Rewards pokazuje jako „Punkty dzisiaj”; jeśli masz więcej, doszły oferty, serie albo aktywności z aplikacji Bing, Outlooka lub Xboksa.',
+            claimableLine: '{n} pkt do odebrania',
+            claimableTip: 'Punkty, które już zdobyłeś, a które Rewards przetrzymuje do momentu odebrania. Dopóki tu są, nie liczą się ani w liczbie powyżej, ani w Twoim saldzie. Kliknij, aby je odebrać.',
             levelTip: 'Punkty zdobyte w okresie, na podstawie którego Rewards ustala Twój poziom, oraz tyle, ile wymaga do jego utrzymania. To nie jest miesiąc kalendarzowy: Rewards prowadzi ten okres po swojemu i nie podaje, kiedy się kończy. Poza punktami wymaga też ukończenia kilku aktywności, których się tu nie liczy.',
             extraOffersNote: 'Więcej aktywności w Rewards',
             extraOffersTip: 'W panelu Rewards i w aplikacji Bing zwykle są dodatkowe aktywności dające więcej punktów niż te. Nie zawsze są takie same: jedne to wyszukiwania, inne nie (układanki, pytania, ankiety).',
@@ -755,6 +775,8 @@
             offersTip: 'Päivän pistetarjoukset, jotka eivät kuulu päivän settiin: nostetut aiheet, kunkin viikonpäivän kiinteä tarjous… Kukin linkki avaa puuttuvan uuteen välilehteen. Jos automaattiset haut ovat käynnissä, ne pysähtyvät avattaessa.',
             protectionTip: 'Jäljellä olevat putken suojapäivät. Jos jonain päivänä et suorita tehtäviä, Rewards käyttää yhden eikä putkesi katkea.',
             todayPointsTip: 'Tänään kaikista lähteistä kertyneet pisteet, ei pelkästään hauista: päivän setti, tarjoukset, putket ja bonukset. Haut ja päivän setti tekevät tänään {n} — sama luku, jonka Rewards näyttää kohdassa ”Päivän pisteet”; jos summasi on suurempi, mukaan on tullut tarjouksia, putkia tai tehtäviä Bing-sovelluksesta, Outlookista tai Xboxilta.',
+            claimableLine: '{n} p lunastettavana',
+            claimableTip: 'Pisteet, jotka olet jo ansainnut ja joita Rewards pitää hallussaan, kunnes lunastat ne. Niin kauan kuin ne ovat tässä, ne eivät näy yllä olevassa luvussa eivätkä saldossasi. Napsauta lunastaaksesi.',
             levelTip: 'Pisteet, jotka olet kerännyt jaksolla, jonka perusteella Rewards määrittää tasosi, ja se, paljonko se vaatii tason säilyttämiseen. Kyse ei ole kalenterikuukaudesta: Rewards hoitaa jakson itse eikä kerro, milloin se päättyy. Pisteiden lisäksi se vaatii muutaman tehtävän suorittamista, joita ei lasketa tähän.',
             extraOffersNote: 'Lisää tehtäviä Rewardsissa',
             extraOffersTip: 'Rewards-koontinäytöllä ja Bing-sovelluksessa on yleensä lisätehtäviä, joista saa enemmän pisteitä kuin näistä. Ne eivät ole aina samoja: osa on hakuja, osa ei (palapelit, kysymykset, kyselyt).',
@@ -815,6 +837,8 @@
             offersTip: 'Các ưu đãi điểm trong ngày không thuộc bộ nhiệm vụ hằng ngày: chủ đề nổi bật, ưu đãi cố định của từng ngày trong tuần… Mỗi liên kết mở mục còn thiếu trong tab mới. Nếu đang chạy tìm kiếm tự động, chúng sẽ dừng khi bạn mở.',
             protectionTip: 'Số ngày bảo vệ chuỗi còn lại. Nếu một ngày bạn không hoàn thành các hoạt động, Rewards sẽ dùng một ngày và chuỗi của bạn không bị đứt.',
             todayPointsTip: 'Số điểm bạn kiếm được hôm nay từ mọi nguồn, không chỉ từ tìm kiếm: bộ nhiệm vụ hằng ngày, ưu đãi, chuỗi ngày và tiền thưởng. Tìm kiếm cộng bộ nhiệm vụ hằng ngày hôm nay là {n}, đúng con số Rewards hiển thị là “Điểm hôm nay”; vượt quá tức là bạn đã cộng thêm ưu đãi, chuỗi ngày hoặc hoạt động trong ứng dụng Bing, Outlook hay Xbox.',
+            claimableLine: '{n} điểm chờ nhận',
+            claimableTip: 'Số điểm bạn đã kiếm được và Rewards đang giữ cho đến khi bạn nhận. Khi còn ở đây, chúng không được tính vào con số phía trên lẫn số dư của bạn. Nhấn để đi nhận.',
             levelTip: 'Số điểm bạn có trong kỳ mà Rewards dùng để xác định cấp của bạn, và số điểm cần để giữ cấp đó. Không phải tháng dương lịch: Rewards tự quản lý kỳ này và không cho biết khi nào kết thúc. Ngoài điểm, còn phải hoàn thành vài hoạt động nữa, không được tính ở đây.',
             extraOffersNote: 'Thêm hoạt động trong Rewards',
             extraOffersTip: 'Bảng điều khiển Rewards và ứng dụng Bing thường có thêm những hoạt động cho nhiều điểm hơn các mục này. Chúng không cố định: có cái là tìm kiếm, có cái không (xếp hình, câu hỏi, khảo sát).',
@@ -875,6 +899,8 @@
             offersTip: '当天不属于每日任务的积分活动：专题推荐、每个星期几的固定活动等。每个链接会在新标签页中打开尚未完成的那一项。如果自动搜索正在进行，打开时会停止。',
             protectionTip: '剩余的连续天数保护天数。某天没有完成活动时，Rewards 会消耗一天，你的连续记录不会中断。',
             todayPointsTip: '今天从所有来源获得的积分，不只是搜索：每日任务、活动、连续天数和奖励。搜索加每日任务今天共 {n} 分，与 Rewards 显示的“今日积分”是同一个数；超过这个值，说明还加上了活动、连续天数，或 Bing 应用、Outlook、Xbox 里的任务。',
+            claimableLine: '{n} 分待领取',
+            claimableTip: '你已经赚到、但 Rewards 会先保管到你领取的积分。只要还留在这里，就既不计入上面的数字，也不计入你的余额。点击前往领取。',
             levelTip: '你在 Rewards 用来判定等级的周期内获得的积分，以及保级所需的积分。这不是自然月：该周期由 Rewards 自行管理，也不会告知何时结束。除积分外还要求完成若干活动，这里没有计入。',
             extraOffersNote: 'Rewards 里还有更多活动',
             extraOffersTip: 'Rewards 面板和 Bing 应用里通常还有额外活动，给的分比这些多。它们并不固定：有的是搜索，有的不是（拼图、问答、问卷）。',
@@ -935,6 +961,8 @@
             offersTip: 'عروض النقاط اليومية التي ليست جزءًا من المجموعة اليومية: الموضوعات المميزة، والعرض الثابت لكل يوم من أيام الأسبوع… يفتح كل رابط العرض الناقص في علامة تبويب جديدة. وإذا كانت عمليات البحث التلقائية جارية، فإنها تتوقف عند فتحه.',
             protectionTip: 'أيام حماية السلسلة المتبقية لديك. إذا لم تُكمل الأنشطة في يوم ما، يستهلك Rewards يومًا منها ولا تنكسر سلسلتك.',
             todayPointsTip: 'النقاط التي جمعتها اليوم من كل المصادر، وليس من عمليات البحث فقط: المجموعة اليومية والعروض والسلاسل والمكافآت. البحث مع المجموعة اليومية يعطيان اليوم {n}، وهو الرقم نفسه الذي يعرضه Rewards باسم «نقاط اليوم»؛ فإذا تجاوزته فلأنك أضفت عروضًا أو سلاسل أو أنشطة من تطبيق Bing أو Outlook أو Xbox.',
+            claimableLine: '{n} نقطة للمطالبة',
+            claimableTip: 'نقاط كسبتها بالفعل ويحتفظ بها Rewards إلى أن تطالب بها. وما دامت هنا فهي لا تُحتسب في الرقم أعلاه ولا في رصيدك. انقر للذهاب والمطالبة بها.',
             levelTip: 'النقاط التي جمعتها في المدة التي يحدّد بها Rewards مستواك، وما يطلبه للحفاظ عليه. وهي ليست الشهر التقويمي: يدير Rewards تلك المدة بنفسه ولا يذكر متى تنتهي. وإلى جانب النقاط يطلب أيضًا إكمال بضعة أنشطة، لا تُحتسب هنا.',
             extraOffersNote: 'أنشطة أخرى في Rewards',
             extraOffersTip: 'عادةً ما توجد في لوحة Rewards وفي تطبيق Bing أنشطة إضافية تمنح نقاطًا أكثر من هذه. وهي ليست الأنشطة نفسها دائمًا: بعضها عمليات بحث وبعضها لا (ألغاز وأسئلة واستطلاعات).',
@@ -995,6 +1023,8 @@
             offersTip: 'दिन के वे पॉइंट ऑफ़र जो दैनिक सेट का हिस्सा नहीं हैं: विशेष विषय, सप्ताह के हर दिन का तय ऑफ़र… हर लिंक बाकी ऑफ़र को नए टैब में खोलता है। अगर स्वचालित खोजें चल रही हों, तो खोलते ही वे रुक जाती हैं।',
             protectionTip: 'आपके पास बची हुई स्ट्रीक सुरक्षा के दिन। किसी दिन गतिविधियाँ पूरी न होने पर Rewards एक दिन खर्च कर देता है और आपकी स्ट्रीक नहीं टूटती।',
             todayPointsTip: 'आज सभी स्रोतों से मिले पॉइंट, सिर्फ़ खोजों से नहीं: दैनिक सेट, ऑफ़र, स्ट्रीक और बोनस। खोजें और दैनिक सेट मिलाकर आज {n} पॉइंट बनते हैं — वही संख्या जो Rewards "आज के पॉइंट" के रूप में दिखाता है; इससे ज़्यादा है तो उसमें ऑफ़र, स्ट्रीक या Bing ऐप, Outlook या Xbox की गतिविधियाँ जुड़ी हैं।',
+            claimableLine: '{n} अंक क्लेम करने बाकी',
+            claimableTip: 'ऐसे पॉइंट जो आप कमा चुके हैं और Rewards तब तक रोके रखता है जब तक आप उन्हें क्लेम न करें। जब तक ये यहाँ हैं, न ऊपर वाली संख्या में गिने जाते हैं और न आपके बैलेंस में। क्लेम करने के लिए क्लिक करें।',
             levelTip: 'उस अवधि में मिले पॉइंट जिससे Rewards आपका स्तर तय करता है, और उसे बनाए रखने के लिए माँगे जाने वाले पॉइंट। यह कैलेंडर का महीना नहीं है: यह अवधि Rewards खुद चलाता है और यह नहीं बताता कि वह कब खत्म होती है। पॉइंट के अलावा कुछ गतिविधियाँ पूरी करने को भी कहता है, जो यहाँ नहीं गिनी जातीं।',
             extraOffersNote: 'Rewards में और गतिविधियाँ',
             extraOffersTip: 'Rewards के पैनल और Bing ऐप में आम तौर पर अतिरिक्त गतिविधियाँ होती हैं जो इनसे ज़्यादा अंक देती हैं। वे हमेशा एक जैसी नहीं होतीं: कुछ खोजें होती हैं और कुछ नहीं (पहेलियाँ, सवाल, सर्वेक्षण)।',
@@ -1055,6 +1085,8 @@
             offersTip: 'Penawaran poin hari ini yang bukan bagian dari set harian: topik pilihan, penawaran tetap untuk tiap hari dalam seminggu… Setiap tautan membuka yang belum selesai di tab baru. Jika penelusuran otomatis sedang berjalan, semuanya berhenti saat Anda membukanya.',
             protectionTip: 'Sisa hari perlindungan runtunan Anda. Jika suatu hari Anda tidak menyelesaikan aktivitas, Rewards memakai satu hari dan runtunan Anda tidak putus.',
             todayPointsTip: 'Poin yang Anda peroleh hari ini dari semua sumber, bukan hanya penelusuran: set harian, penawaran, runtunan, dan bonus. Penelusuran ditambah set harian hari ini berjumlah {n}, angka yang sama yang ditampilkan Rewards sebagai "Poin hari ini"; jika lebih dari itu, berarti ada penawaran, runtunan, atau aktivitas dari aplikasi Bing, Outlook, atau Xbox.',
+            claimableLine: '{n} poin untuk diklaim',
+            claimableTip: 'Poin yang sudah Anda peroleh dan ditahan Rewards sampai Anda mengklaimnya. Selama masih di sini, poin ini tidak dihitung dalam angka di atas maupun dalam saldo Anda. Klik untuk mengklaimnya.',
             levelTip: 'Poin yang Anda kumpulkan dalam periode yang dipakai Rewards untuk menentukan level Anda, dan berapa yang diminta untuk mempertahankannya. Bukan bulan kalender: Rewards mengelola periode itu sendiri dan tidak memberitahu kapan berakhir. Selain poin, ia juga meminta beberapa aktivitas diselesaikan, yang tidak dihitung di sini.',
             extraOffersNote: 'Aktivitas lain di Rewards',
             extraOffersTip: 'Di dasbor Rewards dan aplikasi Bing biasanya ada aktivitas tambahan yang memberi lebih banyak poin daripada ini. Tidak selalu sama: sebagian berupa penelusuran dan sebagian bukan (teka-teki, pertanyaan, jajak pendapat).',
@@ -1115,6 +1147,8 @@
             offersTip: 'Le offerte di punti del giorno che non fanno parte del set giornaliero: temi in evidenza, l’offerta fissa di ogni giorno della settimana… Ogni collegamento apre in una nuova scheda quella che manca. Se ci sono ricerche automatiche in corso, si fermano all’apertura.',
             protectionTip: 'Giorni di protezione della serie che ti restano. Se un giorno non completi le attività, Rewards ne consuma uno e la tua serie non si interrompe.',
             todayPointsTip: 'I punti che hai accumulato oggi da tutte le fonti, non solo dalle ricerche: set giornaliero, offerte, serie e bonus. Ricerche e set giornaliero fanno {n} oggi, lo stesso numero che Rewards mostra come «Punti di oggi»; se lo superi è perché hai aggiunto offerte, serie o attività dell’app Bing, di Outlook o di Xbox.',
+            claimableLine: '{n} pt da riscuotere',
+            claimableTip: 'Punti che hai già guadagnato e che Rewards trattiene finché non li riscuoti. Finché restano qui non contano né nella cifra qui sopra né nel tuo saldo. Fai clic per andare a riscuoterli.',
             levelTip: 'I punti accumulati nel periodo con cui Rewards stabilisce il tuo livello, e quanti ne chiede per mantenerlo. Non è il mese solare: Rewards gestisce quel periodo per conto suo e non dice quando si chiude. Oltre ai punti chiede anche di completare alcune attività, che qui non vengono conteggiate.',
             extraOffersNote: 'Altre attività in Rewards',
             extraOffersTip: 'Nel pannello Rewards e nell’app Bing di solito ci sono attività extra che danno più punti di queste. Non sono sempre le stesse: alcune sono ricerche e altre no (rompicapi, domande, sondaggi).',
@@ -1175,6 +1209,8 @@
             offersTip: 'De puntenaanbiedingen van de dag die niet bij de dagelijkse set horen: uitgelichte onderwerpen, de vaste aanbieding van elke weekdag… Elke link opent een openstaande in een nieuw tabblad. Lopen er automatische zoekopdrachten, dan stoppen die bij het openen.',
             protectionTip: 'Resterende dagen reeksbescherming. Rond je op een dag de activiteiten niet af, dan gebruikt Rewards er één en blijft je reeks intact.',
             todayPointsTip: 'De punten die je vandaag uit alle bronnen hebt verdiend, niet alleen uit zoekopdrachten: dagelijkse set, aanbiedingen, reeksen en bonussen. Zoekopdrachten plus de dagelijkse set komen vandaag op {n}, hetzelfde getal dat Rewards toont als “Punten vandaag”; ligt jouw totaal hoger, dan zijn er aanbiedingen, reeksen of activiteiten uit de Bing-app, Outlook of Xbox bijgekomen.',
+            claimableLine: '{n} ptn te claimen',
+            claimableTip: 'Punten die je al hebt verdiend en die Rewards vasthoudt tot je ze claimt. Zolang ze hier staan tellen ze niet mee in het getal hierboven en ook niet in je saldo. Klik om ze te claimen.',
             levelTip: 'De punten die je hebt in de periode waarmee Rewards je niveau bepaalt, en hoeveel het vraagt om dat te behouden. Het is niet de kalendermaand: Rewards beheert die periode zelf en zegt niet wanneer die afloopt. Naast de punten vraagt het ook een paar activiteiten af te ronden, die hier niet worden meegeteld.',
             extraOffersNote: 'Meer activiteiten in Rewards',
             extraOffersTip: 'In het Rewards-dashboard en de Bing-app staan meestal extra activiteiten die meer punten opleveren dan deze. Ze zijn niet altijd hetzelfde: sommige zijn zoekopdrachten en andere niet (puzzels, vragen, peilingen).',
@@ -1235,6 +1271,8 @@
             offersTip: 'Dagens poängerbjudanden som inte ingår i dagens uppsättning: utvalda teman, det fasta erbjudandet för varje veckodag… Varje länk öppnar den som återstår i en ny flik. Om automatiska sökningar pågår stoppas de när du öppnar den.',
             protectionTip: 'Återstående dagar med svitskydd. Om du någon dag inte slutför aktiviteterna förbrukar Rewards en dag och din svit bryts inte.',
             todayPointsTip: 'Poängen du fått i dag från alla källor, inte bara från sökningar: dagens uppsättning, erbjudanden, sviter och bonusar. Sökningar plus dagens uppsättning blir {n} i dag, samma siffra som Rewards visar som ”Poäng i dag”; är din summa högre har det tillkommit erbjudanden, sviter eller aktiviteter i Bing-appen, Outlook eller Xbox.',
+            claimableLine: '{n} p att hämta',
+            claimableTip: 'Poäng du redan har tjänat och som Rewards håller kvar tills du hämtar ut dem. Så länge de står här räknas de varken i siffran ovanför eller i ditt saldo. Klicka för att hämta ut dem.',
             levelTip: 'Poängen du har under den period som Rewards använder för att bestämma din nivå, och hur många som krävs för att behålla den. Det är inte kalendermånaden: Rewards sköter perioden själv och säger inte när den tar slut. Utöver poängen krävs också att några aktiviteter slutförs, vilka inte räknas här.',
             extraOffersNote: 'Fler aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelen och i Bing-appen finns oftast extra aktiviteter som ger mer poäng än de här. De är inte alltid desamma: vissa är sökningar och andra inte (pussel, frågor, enkäter).',
@@ -1295,6 +1333,8 @@
             offersTip: 'Dagens pointtilbud, der ikke hører til dagens sæt: fremhævede emner, det faste tilbud for hver ugedag… Hvert link åbner det manglende i en ny fane. Kører der automatiske søgninger, stopper de, når du åbner det.',
             protectionTip: 'Resterende dage med stimebeskyttelse. Hvis du en dag ikke gennemfører aktiviteterne, bruger Rewards en af dem, og din stime brydes ikke.',
             todayPointsTip: 'De point, du har fået i dag fra alle kilder, ikke kun fra søgninger: dagens sæt, tilbud, stimer og bonusser. Søgninger plus dagens sæt giver {n} i dag, det samme tal som Rewards viser som “Point i dag”; er din sum højere, er der kommet tilbud, stimer eller aktiviteter fra Bing-appen, Outlook eller Xbox til.',
+            claimableLine: '{n} p at hente',
+            claimableTip: 'Point, du allerede har optjent, og som Rewards holder tilbage, indtil du henter dem. Så længe de står her, tæller de hverken i tallet ovenfor eller i din saldo. Klik for at hente dem.',
             levelTip: 'De point, du har i den periode, som Rewards bruger til at fastsætte dit niveau, og hvor mange der kræves for at beholde det. Det er ikke kalendermåneden: Rewards styrer perioden selv og oplyser ikke, hvornår den slutter. Ud over pointene kræves også, at nogle aktiviteter gennemføres, og de tælles ikke med her.',
             extraOffersNote: 'Flere aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelet og i Bing-appen er der som regel ekstra aktiviteter, der giver flere point end disse. De er ikke altid de samme: nogle er søgninger, andre ikke (puslespil, spørgsmål, afstemninger).',
@@ -1355,6 +1395,8 @@
             offersTip: 'Dagens poengtilbud som ikke hører til dagens sett: utvalgte temaer, det faste tilbudet for hver ukedag… Hver lenke åpner den som mangler i en ny fane. Hvis automatiske søk pågår, stopper de når du åpner den.',
             protectionTip: 'Gjenstående dager med rekkebeskyttelse. Hvis du en dag ikke fullfører aktivitetene, bruker Rewards én av dem, og rekken din brytes ikke.',
             todayPointsTip: 'Poengene du har fått i dag fra alle kilder, ikke bare fra søk: dagens sett, tilbud, rekker og bonuser. Søk pluss dagens sett blir {n} i dag, det samme tallet som Rewards viser som «Poeng i dag»; er summen din høyere, har det kommet tilbud, rekker eller aktiviteter fra Bing-appen, Outlook eller Xbox i tillegg.',
+            claimableLine: '{n} p å hente',
+            claimableTip: 'Poeng du allerede har tjent, og som Rewards holder tilbake til du henter dem. Så lenge de står her, telles de verken i tallet over eller i saldoen din. Klikk for å hente dem.',
             levelTip: 'Poengene du har i perioden Rewards bruker til å fastsette nivået ditt, og hvor mange som kreves for å beholde det. Det er ikke kalendermåneden: Rewards styrer perioden selv og sier ikke når den avsluttes. I tillegg til poengene kreves det at noen aktiviteter fullføres, og de telles ikke med her.',
             extraOffersNote: 'Flere aktiviteter i Rewards',
             extraOffersTip: 'I Rewards-panelet og i Bing-appen finnes det som regel ekstra aktiviteter som gir flere poeng enn disse. De er ikke alltid de samme: noen er søk og andre ikke (puslespill, spørsmål, spørreundersøkelser).',
@@ -1415,6 +1457,8 @@
             offersTip: '當天不屬於每日任務的積分活動：專題推薦、每個星期幾的固定活動等。每個連結會在新分頁中開啟尚未完成的那一項。如果自動搜尋正在進行，開啟時會停止。',
             protectionTip: '剩餘的連續天數保護天數。某天沒有完成活動時，Rewards 會消耗一天，你的連續紀錄不會中斷。',
             todayPointsTip: '今天從所有來源獲得的積分，不只是搜尋：每日任務、活動、連續天數和獎勵。搜尋加每日任務今天共 {n} 分，與 Rewards 顯示的「今日積分」是同一個數；超過這個值，表示還加上了活動、連續天數，或 Bing 應用程式、Outlook、Xbox 裡的任務。',
+            claimableLine: '{n} 分待領取',
+            claimableTip: '你已經賺到、但 Rewards 會先保管到你領取的積分。只要還留在這裡，就既不計入上面的數字，也不計入你的餘額。點擊前往領取。',
             levelTip: '你在 Rewards 用來判定等級的週期內獲得的積分，以及保級所需的積分。這不是自然月：該週期由 Rewards 自行管理，也不會告知何時結束。除積分外還要求完成若干活動，這裡沒有計入。',
             extraOffersNote: 'Rewards 裡還有更多活動',
             extraOffersTip: 'Rewards 面板和 Bing 應用程式裡通常還有額外活動，給的分比這些多。它們並不固定：有的是搜尋，有的不是（拼圖、問答、問卷）。',
@@ -2133,6 +2177,83 @@
     }
 
     /**
+     * Los puntos ya GANADOS que Rewards retiene hasta que se reclaman.
+     *
+     * `readTodayPoints` NO los cuenta, y esa diferencia se ve: el 2026-09-05, un
+     * día que había pagado 60, `todays_points` marcaba 57 y el saldo también,
+     * con 3 esperando. Al reclamarlos los dos pasaron a 60. La app de Rewards sí
+     * los cuenta —cantaba 60/90 con los 3 sin cobrar—, así que sin esta línea el
+     * panel y la app se contradicen y el que parece roto es el panel.
+     *
+     * Se lee de `claimable_points_breakdown` y NO de `partner_bing_claimingPending`,
+     * que también existe y también lo marca. Dos razones:
+     *
+     *  - Es el TOTAL de todas las categorías. El volcado del 2026-09-06 traía
+     *    siete (`o`, `gub`, `bseb`, `bs`, `mtb`, `lsearchc`, `ds`), y de ellas
+     *    `claimingPending` solo cubre la escalera de Bing —es el único socio que
+     *    tiene ese campo—. Con la escalera sola se dejarían fuera seis fuentes.
+     *  - Da la cifra hecha. Por la otra vía habría que sacarla de
+     *    `partner_bing_points[currentStep - 1]`, que es reconstruirla.
+     *
+     * Es el único atributo de toda la respuesta que llega como JSON DE VERDAD y
+     * no como texto plano, así que aquí sí va `JSON.parse` —al revés que
+     * `partner_X_points`, que es una lista sin comillas y se lee con regex—.
+     * Cuando no hay nada que reclamar el valor no es un JSON vacío sino la
+     * frase `No Points Claim Data for this user`, de ahí la comprobación de la
+     * llave antes de parsear.
+     *
+     * La URL para reclamar sale de la propia respuesta, buscada por FORMA
+     * (`…#RewardsUrl`) y no por su clave completa, que viene con un prefijo de
+     * maquetación (`cp--BCxES1#`) que no hay motivo para creer estable. Sin URL
+     * la línea se pinta igual, solo que sin enlace: el número ya vale por sí
+     * mismo y es el mismo criterio que `appUrl`, no inventarse el destino.
+     *
+     * **Va al dashboard a secas, y NO hay forma de afinar más.** Comprobado el
+     * 2026-09-06, por si a alguien se le ocurre apuntar a la tarjeta:
+     *
+     *  - La respuesta no trae una URL de reclamo propia. El `ls#body` de
+     *    `layout_engagement` sí lista `PointClaimCard:PCxES1`, pero de todas
+     *    sus claves `cp--…#` no hay ninguna con ese prefijo: las únicas URLs
+     *    son `cp--BCxES1#RedeemUrl` y `#RewardsUrl`.
+     *  - El botón «Reclamar» no tiene id estable al que anclar. El suyo lo
+     *    genera React Aria (`react-aria-_R_2hlav5t6bslbH1_`) y cambia en cada
+     *    renderizado; subiendo por sus contenedores no hay ni un id ni un
+     *    `data-` hasta `#shell`, que es la raíz de la aplicación. Y un `#id` en
+     *    la URL solo desplazaría, no pulsaría. El `partner_dset_scrollToElement`
+     *    del check-in (`daily_set_card`) hacía pensar que existía un nombre de
+     *    ancla para cada tarjeta; para esta no lo hay.
+     *  - Y no hace falta: la tarjeta está en la PRIMERA FILA del dashboard,
+     *    junto a «Puntos disponibles», así que el enlace ya deja mirándola. Un
+     *    ancla no habría ahorrado ni un píxel de scroll.
+     *
+     * Meter `rewards.bing.com` en el `@match` para desplazar desde dentro se
+     * descartó por lo mismo: ampliar el script a otro sitio entero por un
+     * scroll que no existe.
+     *
+     * @param {object[]} promotions
+     * @returns {{points:number,url:string}|null}
+     */
+    function readClaimable(promotions) {
+        const promos = (promotions || []).filter(Boolean);
+        const level = promos.find((x) => x.name === 'level_info');
+        const raw = String((level && level.attributes &&
+            level.attributes.claimable_points_breakdown) || '').trim();
+        if (raw.charAt(0) !== '{') return null;
+        let points = 0;
+        try { points = num(JSON.parse(raw).TotalClaimablePoints); } catch (e) { return null; }
+        if (points <= 0) return null;
+
+        let url = '';
+        for (const promo of promos) {
+            const a = promo.attributes || {};
+            const key = Object.keys(a).find((k) => /#RewardsUrl$/.test(k) &&
+                /^https:\/\/rewards\.bing\.com\//i.test(String(a[k] || '')));
+            if (key) { url = String(a[key]); break; }
+        }
+        return { points: points, url: url };
+    }
+
+    /**
      * El nivel de Rewards: cómo se llama, cuántos puntos llevas en su periodo y
      * cuántos te pide para mantenerlo.
      *
@@ -2487,6 +2608,7 @@
             streakBonus: readStreakBonus(info.promotions),
             protection: readProtection(info.promotions),
             todayPoints: readTodayPoints(info.promotions),
+            claimable: readClaimable(info.promotions),
             level: readLevel(info.promotions),
             dayMax: readDayMax(info.promotions),
             value: catalog.value,
@@ -3761,8 +3883,9 @@
             const bonus = ok ? rewards.streakBonus : null;
             const prot = ok ? rewards.protection : null;
             const today = ok ? num(rewards.todayPoints) : 0;
+            const claim = ok ? rewards.claimable : null;
             const lvl = ok ? rewards.level : null;
-            if (!ci && !ds && !offers && !bonus && !prot && !today && !lvl) {
+            if (!ci && !ds && !offers && !bonus && !prot && !today && !lvl && !claim) {
                 tasksBox.style.display = 'none';
                 return;
             }
@@ -3809,12 +3932,25 @@
              * no lleva rótulo propio: el número lo explica el aviso, que ya
              * había que traducir, y no una etiqueta aparte en 22 idiomas.
              */
-            function infoLine(text, tip) {
-                const line = document.createElement('div');
+            function infoLine(text, tip, url) {
+                const line = document.createElement(url ? 'a' : 'div');
                 line.textContent = text;
                 line.title = tip;
-                line.style.cursor = 'help';
+                line.style.cursor = url ? 'pointer' : 'help';
                 line.style.color = colors.gray;
+                if (url) {
+                    line.href = url;
+                    line.target = '_blank';
+                    line.rel = 'noopener noreferrer';
+                    line.style.display = 'block';
+                    line.style.textDecoration = 'none';
+                    line.onmouseenter = () => { line.style.textDecoration = 'underline'; };
+                    line.onmouseleave = () => { line.style.textDecoration = 'none'; };
+                    // Sin el corte de sesión que sí lleva `taskLine`: estos
+                    // enlaces van a rewards.bing.com, que está fuera del @match,
+                    // así que el script no corre en la pestaña nueva y no hay
+                    // ninguna sesión que se pueda llevar por delante.
+                }
                 tasksBox.appendChild(line);
             }
 
@@ -3822,6 +3958,21 @@
             // 2026-09-04 el panel decía 60/60 con el día ya en 147.
             if (today) infoLine(`\u{1F4C8} ${fmt(today)} ${t.pointsShort}`,
                 t.todayPointsTip.replace('{n}', fmt(ok ? num(rewards.dayMax) : 0)));
+            // Pegada a la de arriba a propósito: es justo lo que a esa cifra le
+            // falta, y verlas separadas invita a pensar que una de las dos está
+            // mal. Va con enlace porque, al contrario que el resto de líneas
+            // grises, esta se puede accionar: son puntos ganados a un clic de
+            // cobrarse.
+            //
+            // Y es la ÚNICA gris con rótulo. Las demás se explican con su glifo
+            // y su aviso porque cada una tiene una forma distinta —`10/12 ·
+            // ✱1000`, `Nivel Oro · 2146/750`—, pero esta y la de arriba son las
+            // dos «N pts» y quedan pegadas, así que sin rótulo se distinguirían
+            // solo por el emoji. El rótulo dice QUÉ es y no qué hacer: que se
+            // puede pulsar ya lo dicen el cursor y el subrayado al pasar por
+            // encima, y un «haz clic aquí» sobre un enlace es ruido.
+            if (claim) infoLine(`\u{1F381} ${t.claimableLine.replace('{n}', fmt(claim.points))}`,
+                t.claimableTip, claim.url);
             // La frase de Bing tal cual, que ya trae la cuenta hecha y traducida
             // por el mercado («Faltan 3 días para desbloquear tu bonificación de
             // 150 puntos»). A diferencia de `taskLine`, `infoLine` NO recorta:
