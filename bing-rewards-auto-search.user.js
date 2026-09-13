@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.14
-// @description  Runs only the Bing searches you still need today: reads your Microsoft Rewards progress, does just the missing ones, stops when the day is complete, and shows what your points are worth in Xbox credit. Lists what else Rewards asks today, the points waiting to be claimed, your streak, and the day's points from every source. Queries from your own keywords, rotating search types, randomised delays, 22 languages. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms.
+// @version      1.3.15
+// @description  Daily Bing searches for Microsoft Rewards. The points need a set number of searches a day and Rewards never says how many you have left, so you either count them yourself or do far more than you needed. This reads your real progress, runs only what is missing, stops when the day is done and tells you what your points are worth in Xbox credit. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms. 22 languages.
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAOVBMVEVHcEwQbr4Qbr4QcL8Qbr8Qbr4Qbb4QcL8QcL8Qbr0Qb78Qb78QbrwQb70Qbr4Qb70Qbr0QbrwQbr7qzZxUAAAAEnRSTlMAkN8gf8+/QBCAn4+gn6CP0JCpAaXzAAAAmElEQVQ4y92TyxaCMAxE02daFdD5/481iNV4EnTjillNyc0QcijRwcS3CJQp7ZTbGU8tza1f8VLxiLW/ciOe1wxbT/K4b7aLZQNcgNPwFQgGKKqLgWgAiX3Pqw8KaC49FD9fUQwQ5CO9gUl1IW82i3XWLRGYmBpXqDC96gKl7BFhVOsOQWmWlBj4sez89c/4F0E/iH6k63QHcX8J1w5Wo/0AAAAASUVORK5CYII=
 // @author       g31w0fw0rld
 // @license      MIT
@@ -16,7 +16,7 @@
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.14';
+    const SCRIPT_VERSION = '1.3.15';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)

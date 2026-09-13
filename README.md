@@ -5,6 +5,12 @@ Userscript that automates daily Bing searches to collect Microsoft Rewards point
 > [!WARNING]
 > **USE AT YOUR OWN RISK / USO BAJO TU PROPIO RIESGO:** automating activity may violate the Microsoft Rewards terms and put your account at risk. / Automatizar la actividad puede infringir los términos de Microsoft Rewards y poner tu cuenta en riesgo.
 
+**⚡ Quick install / Instalación rápida:** **[Install / Instalar](https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js)** — also on / también en [GreasyFork](https://greasyfork.org/scripts/573686) · [OpenUserJS](https://openuserjs.org/scripts/g31w0fw0rldgmail.com/Bing_Rewards_Auto_Search).
+
+> You need a userscript manager first: [Violentmonkey](https://violentmonkey.github.io/) (open source) or [Tampermonkey](https://www.tampermonkey.net/). On Chrome and Edge, also turn on **Allow user scripts** on the extension's own page in `chrome://extensions` — without it nothing runs. Step-by-step under [English](#english).
+>
+> Necesitas antes un gestor de userscripts: [Violentmonkey](https://violentmonkey.github.io/) (código abierto) o [Tampermonkey](https://www.tampermonkey.net/). En Chrome y Edge, activa además **Allow user scripts** en la página de la propia extensión en `chrome://extensions`; sin eso no se ejecuta nada. Pasos detallados en [Español](#español).
+
 <img src="docs/screenshot-search.png" width="330" alt="The search tab of the floating panel: the day complete at 60 of 60 points, with the start button still offered to search anyway and a line saying how long ago the Rewards data was read; below it the journey counter, the puzzle of stamps, the whole day's points from every source, the points Rewards is holding back until they are claimed, the sentence Rewards writes about the streak bonus still to come, the days of streak protection left and the level with the points of its period; then one line per check-in partner with the days already earned of its seven-step streak and what the last step pays; and links to the other Rewards activities, to the Bing app, to the missions Outlook shows only inside itself and to the tasks Xbox runs on its own; at the bottom, the points balance converted to Xbox credit">
 
 *Search tab: the day's progress in points as Rewards counts it, the controls for the current state, five grey lines of context — the whole day's points, the points waiting to be claimed, the streak bonus, the protection left and your level —, the day's tasks with a link to each one pending, and what your points are worth. / Pestaña de búsqueda: el progreso del día en puntos, tal como los cuenta Rewards, los controles según el estado, cinco líneas grises de contexto —los puntos del día, los que están por reclamar, la bonificación de racha, la protección que queda y tu nivel—, las tareas del día con enlace a cada una que falte, y cuánto valen tus puntos.*
@@ -70,7 +76,7 @@ Userscript that automates daily Bing searches to collect Microsoft Rewards point
 
 **Install:**
 1. Install a userscript manager: [Violentmonkey](https://violentmonkey.github.io/) (open source, Chrome/Edge/Firefox) or [Tampermonkey](https://www.tampermonkey.net/). On Chrome and Edge, also turn on **Allow user scripts** on the extension's own page in `chrome://extensions` — without it nothing runs.
-2. Open the installer: [bing-rewards-auto-search.user.js](https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js) (also on [GreasyFork](https://greasyfork.org/es-419/users/1590477-g31w) and [OpenUserJS](https://openuserjs.org/users/g31w0fw0rldgmail.com/scripts)).
+2. Open the installer: [bing-rewards-auto-search.user.js](https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js) (also on [GreasyFork](https://greasyfork.org/scripts/573686) and [OpenUserJS](https://openuserjs.org/scripts/g31w0fw0rldgmail.com/Bing_Rewards_Auto_Search)).
 
 **Site:** `bing.com`
 
@@ -127,7 +133,7 @@ Userscript that automates daily Bing searches to collect Microsoft Rewards point
 
 **Instalación:**
 1. Instala un gestor de userscripts: [Violentmonkey](https://violentmonkey.github.io/) (código abierto, Chrome/Edge/Firefox) o [Tampermonkey](https://www.tampermonkey.net/). En Chrome y Edge, activa además **Allow user scripts** en la página de la propia extensión en `chrome://extensions`; sin eso no se ejecuta nada.
-2. Abre el instalador: [bing-rewards-auto-search.user.js](https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js) (también en [GreasyFork](https://greasyfork.org/es-419/users/1590477-g31w) y [OpenUserJS](https://openuserjs.org/users/g31w0fw0rldgmail.com/scripts)).
+2. Abre el instalador: [bing-rewards-auto-search.user.js](https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js) (también en [GreasyFork](https://greasyfork.org/scripts/573686) y [OpenUserJS](https://openuserjs.org/scripts/g31w0fw0rldgmail.com/Bing_Rewards_Auto_Search)).
 
 **Sitio:** `bing.com`
 
