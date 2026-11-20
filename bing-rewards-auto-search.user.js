@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Bing Rewards Auto Search
 // @namespace    https://www.bing.com/
-// @version      1.3.15
+// @version      1.3.16
 // @description  Daily Bing searches for Microsoft Rewards. The points need a set number of searches a day and Rewards never says how many you have left, so you either count them yourself or do far more than you needed. This reads your real progress, runs only what is missing, stops when the day is done and tells you what your points are worth in Xbox credit. USE AT YOUR OWN RISK: automating activity may violate the Microsoft Rewards terms. 22 languages.
 // @icon         data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAOVBMVEVHcEwQbr4Qbr4QcL8Qbr8Qbr4Qbb4QcL8QcL8Qbr0Qb78Qb78QbrwQb70Qbr4Qb70Qbr0QbrwQbr7qzZxUAAAAEnRSTlMAkN8gf8+/QBCAn4+gn6CP0JCpAaXzAAAAmElEQVQ4y92TyxaCMAxE02daFdD5/481iNV4EnTjillNyc0QcijRwcS3CJQp7ZTbGU8tza1f8VLxiLW/ciOe1wxbT/K4b7aLZQNcgNPwFQgGKKqLgWgAiX3Pqw8KaC49FD9fUQwQ5CO9gUl1IW82i3XWLRGYmBpXqDC96gKl7BFhVOsOQWmWlBj4sez89c/4F0E/iH6k63QHcX8J1w5Wo/0AAAAASUVORK5CYII=
 // @author       g31w0fw0rld
@@ -11,12 +11,14 @@
 // @updateURL    https://github.com/g31w0fw0rld/bing-rewards-auto-search/raw/main/bing-rewards-auto-search.user.js
 // @grant        GM_getValue
 // @grant        GM_setValue
+// @grant        GM_xmlhttpRequest
+// @connect      rewards.bing.com
 // ==/UserScript==
 
 (function () {
     'use strict';
 
-    const SCRIPT_VERSION = '1.3.15';
+    const SCRIPT_VERSION = '1.3.16';
 
     // =============================================
     // INTERNACIONALIZACION (i18n)
@@ -169,9 +171,34 @@
             infoAuthor: 'Autor:',
             infoGitHub: 'GitHub:',
             infoPrivacy: 'Privacidad:',
-            infoPrivacyText: 'Tus palabras clave y el contador de búsquedas se guardan solo en el almacenamiento local del gestor de userscripts, en tu navegador. Con «Usar mi progreso de Rewards» activado, el script hace una petición GET a bing.com —el mismo endpoint que alimenta el panel de puntos de la cabecera de Bing— para leer tu progreso del día, tu saldo y el catálogo de canje; viaja con tu sesión de Bing y nada de eso sale hacia terceros ni hacia el autor del script. Desactiva esa casilla y el script no hace ninguna petición de red propia: solo navega a URLs de búsqueda de bing.com, igual que si las escribieras tú. De esa misma respuesta salen las tareas del día que aparecen en esa lista, y lo leído se guarda también en local para no volver a pedirlo en cada página de Bing.',
+            infoPrivacyText: 'Tus palabras clave y el contador de búsquedas se guardan solo en el almacenamiento local del gestor de userscripts, en tu navegador. Con «Usar mi progreso de Rewards» activado, el script hace una petición GET a bing.com —el mismo endpoint que alimenta el panel de puntos de la cabecera de Bing— para leer tu progreso del día, tu saldo y el catálogo de canje; viaja con tu sesión de Bing y nada de eso sale hacia terceros ni hacia el autor del script. Desactiva esa casilla y el script no hace ninguna petición de red propia: solo navega a URLs de búsqueda de bing.com, igual que si las escribieras tú. De esa misma respuesta salen las tareas del día que aparecen en esa lista, y lo leído se guarda también en local para no volver a pedirlo en cada página de Bing. Para la calculadora de canje guarda además, una vez al día, tu saldo y lo que canjeas, y el objetivo que elijas, separados por cuenta con una huella anónima y no con su identificador; y para traer la meta que tengas puesta en Rewards pide la página de canje de rewards.bing.com, como mucho cada media hora y con tu misma sesión.',
             infoHow: 'Cómo funciona:',
-            infoHowText: 'Le pregunta a Rewards cuántos puntos de búsqueda faltan hoy y ejecuta solo las necesarias, parando cuando Rewards marca el día como completo; si el contador no sube en varias búsquedas seguidas espera medio minuto, vuelve a mirar y sigue, porque casi siempre es que Rewards acredita con retraso. Genera queries combinando 1 a 3 palabras clave y rota entre búsquedas web (70%), imágenes, videos, shopping y noticias para simular navegación humana. Los delays son aleatorios entre 3-10s, con pausas ocasionales de 10-25s que imitan lectura de resultados. Cada URL incluye parámetros rotados (form, cvid, PC) que Bing identifica como tráfico legítimo. Detecta mobile/desktop automáticamente, el progreso persiste entre recargas de página y el contador se resetea cada día a medianoche. Al completar el día deja la pestaña en la portada de Bing, para que volver a ella no cuente como la primera búsqueda del día siguiente.'
+            infoHowText: 'Le pregunta a Rewards cuántos puntos de búsqueda faltan hoy y ejecuta solo las necesarias, parando cuando Rewards marca el día como completo; si el contador no sube en varias búsquedas seguidas espera medio minuto, vuelve a mirar y sigue, porque casi siempre es que Rewards acredita con retraso. Genera queries combinando 1 a 3 palabras clave y rota entre búsquedas web (70%), imágenes, videos, shopping y noticias para simular navegación humana. Los delays son aleatorios entre 3-10s, con pausas ocasionales de 10-25s que imitan lectura de resultados. Cada URL incluye parámetros rotados (form, cvid, PC) que Bing identifica como tráfico legítimo. Detecta mobile/desktop automáticamente, el progreso persiste entre recargas de página y el contador se resetea cada día a medianoche. Al completar el día deja la pestaña en la portada de Bing, para que volver a ella no cuente como la primera búsqueda del día siguiente. El 🧮 junto al saldo abre la calculadora de canje: trae ya elegida tu meta de Rewards (🎯) si tienes una, o eliges un premio del catálogo o el saldo Xbox que quieras, y te dice cuántos puntos te faltan y en qué fecha llegarías, con tu ritmo medido de las últimas cuatro semanas o, hasta tener una semana de registro, con un mínimo estimado por tareas.',
+            calcBtnTip: 'Calculadora de canje: cuántos puntos te faltan para un premio del catálogo o un saldo Xbox, y en qué fecha llegarías.',
+            calcTitle: 'Calculadora de canje',
+            calcAmount: 'Saldo Xbox que quieres:',
+            calcCost: 'Cuesta {n} pts',
+            calcCustom: 'importe personalizado',
+            calcCostTipCustom: 'Con el canje de importe personalizado Rewards cobra {r} puntos por 1 {c}, a partir de {m} {c}. Por debajo de eso solo hay tarjetas de importe fijo, y se toma la combinación más barata que llegue al saldo pedido. El redondeo exacto lo hace Rewards al canjear.',
+            calcCostTipCards: 'En tu mercado no hay canje de importe personalizado, así que se toma la combinación de tarjetas más barata que llegue al saldo pedido.',
+            calcHave: 'Tienes {n} pts',
+            calcEnough: 'ya te alcanza',
+            calcRate: 'Ritmo de puntos:',
+            calcMeasured: 'Medido: {n} pts/día en los últimos {d} días',
+            calcMeasuredPending: 'Medido: disponible tras 7 días de registro ({d}/7)',
+            calcMeasuredTip: 'Lo que ha subido de verdad tu saldo, sumando lo que hayas canjeado, según la lectura diaria que el script guarda en tu navegador para cada cuenta. Cuenta todo lo que ganas, también en la app de Bing, en Xbox y con las bonificaciones, así que en cuanto hay una semana de datos es la cifra buena.',
+            calcEstimate: 'Estimado por tareas: {n} pts/día',
+            calcEstimateTip: 'Un mínimo con lo que Rewards dice que paga cada tarea. El rompecabezas cuenta un sello por cada racha de siete días de las tareas marcadas. Deja fuera el premio del séptimo día de las rachas, las bonificaciones mensuales y lo que ganes fuera de esta web (app de Bing, Xbox, Outlook), así que lo normal es llegar antes.',
+            calcSrcSearch: 'Búsquedas',
+            calcSrcStreak: 'Bonificación de racha',
+            calcSrcPuzzle: 'Rompecabezas de sellos',
+            calcPerDay: '{n}/día',
+            calcResult: 'Llegas {when}, hacia el {date}',
+            calcNoSource: 'Marca al menos una tarea para calcular la fecha.',
+            calcLineTip: 'Tu objetivo de canje: lo que te falta y la fecha en que llegarías a tu ritmo. Pulsa para abrir la calculadora.',
+            calcGoal: 'Objetivo:',
+            calcGoalXbox: 'Saldo Xbox (importe libre)',
+            calcSearch: 'Buscar premio…'
         },
         en: {
             tabSearch: '🔍',
@@ -249,9 +276,34 @@
             infoAuthor: 'Author:',
             infoGitHub: 'GitHub:',
             infoPrivacy: 'Privacy:',
-            infoPrivacyText: 'Your keywords and the search counter are stored only in your userscript manager\'s local storage, in your browser. With "Use my Rewards progress" on, the script makes a GET request to bing.com — the same endpoint that feeds the points panel in the Bing header — to read your progress for the day, your balance and the redemption catalogue; it travels with your Bing session and none of it goes to third parties or to the script author. Turn that checkbox off and the script makes no network requests of its own: it only navigates to bing.com search URLs, exactly as if you typed them yourself. The tasks of the day shown in that list come from the same response, and what is read is also kept locally so it is not requested again on every Bing page.',
+            infoPrivacyText: 'Your keywords and the search counter are stored only in your userscript manager\'s local storage, in your browser. With "Use my Rewards progress" on, the script makes a GET request to bing.com — the same endpoint that feeds the points panel in the Bing header — to read your progress for the day, your balance and the redemption catalogue; it travels with your Bing session and none of it goes to third parties or to the script author. Turn that checkbox off and the script makes no network requests of its own: it only navigates to bing.com search URLs, exactly as if you typed them yourself. The tasks of the day shown in that list come from the same response, and what is read is also kept locally so it is not requested again on every Bing page. For the redemption calculator it also stores, once a day, your balance and what you redeem, plus the goal you pick, kept apart per account by an anonymous fingerprint rather than the account ID; and to bring in the goal you have set in Rewards it requests the redeem page on rewards.bing.com, at most every half hour and with your own session.',
             infoHow: 'How it works:',
-            infoHowText: 'It asks Rewards how many search points are missing today and runs only what is needed, stopping when Rewards marks the day as complete; if the counter does not move across several searches in a row it waits half a minute, checks again and carries on, because almost always Rewards is simply crediting late. Generates queries by combining 1 to 3 keywords and rotates between web (70%), image, video, shopping, and news searches to simulate human browsing. Delays are randomized between 3-10s with occasional 10-25s "reading pauses". Each URL includes rotated parameters (form, cvid, PC) that Bing identifies as legitimate traffic. Mobile/desktop detection is automatic, progress persists across page reloads, and the counter resets daily at midnight. When the day is complete it leaves the tab on the Bing home page, so returning to it does not count as the next day\'s first search.'
+            infoHowText: 'It asks Rewards how many search points are missing today and runs only what is needed, stopping when Rewards marks the day as complete; if the counter does not move across several searches in a row it waits half a minute, checks again and carries on, because almost always Rewards is simply crediting late. Generates queries by combining 1 to 3 keywords and rotates between web (70%), image, video, shopping, and news searches to simulate human browsing. Delays are randomized between 3-10s with occasional 10-25s "reading pauses". Each URL includes rotated parameters (form, cvid, PC) that Bing identifies as legitimate traffic. Mobile/desktop detection is automatic, progress persists across page reloads, and the counter resets daily at midnight. When the day is complete it leaves the tab on the Bing home page, so returning to it does not count as the next day\'s first search. The 🧮 next to the balance opens the redemption calculator: it comes with your Rewards goal (🎯) already picked if you have one, or you choose a catalogue reward or the Xbox balance you want, and it tells you how many points you still need and the date you would get there, at your measured pace over the last four weeks or, until there is a week of records, at a minimum estimated from tasks.',
+            calcBtnTip: 'Redemption calculator: how many points you still need for a catalogue reward or an Xbox balance, and the date you would get there.',
+            calcTitle: 'Redemption calculator',
+            calcAmount: 'Xbox balance you want:',
+            calcCost: 'Costs {n} pts',
+            calcCustom: 'custom amount',
+            calcCostTipCustom: 'With a custom-amount redemption Rewards charges {r} points per 1 {c}, from {m} {c} up. Below that there are only fixed-value cards, and the cheapest combination that reaches the balance is used. Rewards does the exact rounding when you redeem.',
+            calcCostTipCards: 'Your market has no custom-amount redemption, so the cheapest combination of cards that reaches the balance is used.',
+            calcHave: 'You have {n} pts',
+            calcEnough: 'you have enough',
+            calcRate: 'Points pace:',
+            calcMeasured: 'Measured: {n} pts/day over the last {d} days',
+            calcMeasuredPending: 'Measured: available after 7 days of records ({d}/7)',
+            calcMeasuredTip: 'How much your balance has really grown, adding back anything you redeemed, from the daily reading the script keeps in your browser for each account. It counts everything you earn, including the Bing app, Xbox and bonuses, so once there is a week of data this is the number to trust.',
+            calcEstimate: 'Estimated from tasks: {n} pts/day',
+            calcEstimateTip: 'A minimum built from what Rewards says each task pays. The puzzle counts one stamp for every seven-day streak of the ticked tasks. It leaves out the seventh-day streak prizes, the monthly bonuses and anything you earn outside this site (Bing app, Xbox, Outlook), so you will usually get there sooner.',
+            calcSrcSearch: 'Searches',
+            calcSrcStreak: 'Streak bonus',
+            calcSrcPuzzle: 'Stamp puzzle',
+            calcPerDay: '{n}/day',
+            calcResult: 'You get there {when}, around {date}',
+            calcNoSource: 'Tick at least one task to work out the date.',
+            calcLineTip: 'Your redemption goal: what you still need and the date you would reach it at your pace. Click to open the calculator.',
+            calcGoal: 'Goal:',
+            calcGoalXbox: 'Xbox balance (any amount)',
+            calcSearch: 'Search rewards…'
         },
         de: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -310,9 +362,34 @@
             infoName: 'Name:', infoVersion: 'Version:', infoDescription: 'Beschreibung:',
             infoDescriptionText: 'Automatisiert die täglichen Bing-Suchen, um ohne manuelles Zutun Punkte für Microsoft Rewards zu sammeln. Es fragt bei Microsoft Rewards nach, wie viele Suchpunkte dir heute noch fehlen, führt nur die nötigen Suchen aus, hört von selbst auf, wenn sie erledigt sind, und zeigt, was deine Punkte als Xbox-Guthaben wert sind; die Zahl unter ⚙ bleibt als Ersatz, wenn keine Rewards-Sitzung besteht. Die Anzahl der Suchen lässt sich mit ⚙ einstellen (1-100, Standard 20), und die Schaltflächen zum Starten, Fortsetzen, Anhalten und Zurücksetzen wechseln je nach Zustand. Im Reiter für Schlüsselwörter kannst du jedes mit einem Klick löschen, mehrere durch Komma getrennt hinzufügen, alle auf einmal bearbeiten oder die ursprüngliche Liste wiederherstellen. Das schwebende Fenster lässt sich einklappen und merkt sich, wie du es hinterlassen hast; die Sprache des Skripts wird hier oben gewählt. Unter den Schaltflächen steht eine Liste mit dem, was Rewards heute außer den Suchen verlangt — die Serie, das Einchecken in der App, das Tagesset — und ein Link zu allem, was noch fehlt.',
             infoAuthor: 'Autor:', infoGitHub: 'GitHub:', infoPrivacy: 'Datenschutz:',
-            infoPrivacyText: 'Deine Schlüsselwörter und der Suchzähler werden nur im lokalen Speicher der Userscript-Verwaltung in deinem Browser abgelegt. Ist „Meinen Rewards-Fortschritt verwenden“ aktiv, stellt das Skript eine GET-Anfrage an bing.com — an denselben Endpunkt, der das Punkte-Panel in der Bing-Kopfzeile versorgt —, um deinen Tagesfortschritt, dein Guthaben und den Einlösekatalog zu lesen; sie läuft über deine Bing-Sitzung, und nichts davon geht an Dritte oder an den Autor des Skripts. Schalte das Kästchen aus, dann stellt das Skript keine eigenen Netzwerkanfragen: es navigiert nur zu Such-URLs von bing.com, genauso als hättest du sie selbst eingetippt. Aus derselben Antwort stammen die Tagesaufgaben in dieser Liste, und das Gelesene wird ebenfalls lokal gespeichert, damit es nicht auf jeder Bing-Seite erneut abgefragt wird.',
+            infoPrivacyText: 'Deine Schlüsselwörter und der Suchzähler werden nur im lokalen Speicher der Userscript-Verwaltung in deinem Browser abgelegt. Ist „Meinen Rewards-Fortschritt verwenden“ aktiv, stellt das Skript eine GET-Anfrage an bing.com — an denselben Endpunkt, der das Punkte-Panel in der Bing-Kopfzeile versorgt —, um deinen Tagesfortschritt, dein Guthaben und den Einlösekatalog zu lesen; sie läuft über deine Bing-Sitzung, und nichts davon geht an Dritte oder an den Autor des Skripts. Schalte das Kästchen aus, dann stellt das Skript keine eigenen Netzwerkanfragen: es navigiert nur zu Such-URLs von bing.com, genauso als hättest du sie selbst eingetippt. Aus derselben Antwort stammen die Tagesaufgaben in dieser Liste, und das Gelesene wird ebenfalls lokal gespeichert, damit es nicht auf jeder Bing-Seite erneut abgefragt wird. Für den Einlöse-Rechner speichert es außerdem einmal täglich dein Guthaben und deine Einlösungen sowie das gewählte Ziel, nach Konto getrennt über einen anonymen Fingerabdruck statt der Kontokennung; und um das Ziel zu übernehmen, das du in Rewards eingestellt hast, ruft es höchstens alle halbe Stunde die Einlöseseite auf rewards.bing.com mit deiner eigenen Sitzung ab.',
             infoHow: 'Funktionsweise:',
-            infoHowText: 'Es fragt bei Rewards nach, wie viele Suchpunkte heute noch fehlen, und führt nur die nötigen Suchen aus; es hört auf, sobald Rewards den Tag als abgeschlossen meldet. Steigt der Zähler über mehrere Suchen hinweg nicht, wartet es eine halbe Minute, sieht erneut nach und macht weiter, denn fast immer rechnet Rewards nur verspätet an. Es bildet Suchanfragen aus 1 bis 3 Schlüsselwörtern und wechselt zwischen Websuche (70 %), Bildern, Videos, Shopping und Nachrichten, um menschliches Surfen nachzuahmen. Die Wartezeiten liegen zufällig zwischen 3 und 10 s, mit gelegentlichen Pausen von 10 bis 25 s, die das Lesen von Ergebnissen nachbilden. Jede URL enthält wechselnde Parameter (form, cvid, PC), die Bing als legitimen Verkehr einstuft. Mobil und Desktop werden automatisch erkannt, der Fortschritt übersteht das Neuladen der Seite und der Zähler wird täglich um Mitternacht zurückgesetzt. Ist der Tag abgeschlossen, bleibt der Tab auf der Bing-Startseite, damit die Rückkehr dorthin nicht als erste Suche des nächsten Tages zählt.'
+            infoHowText: 'Es fragt bei Rewards nach, wie viele Suchpunkte heute noch fehlen, und führt nur die nötigen Suchen aus; es hört auf, sobald Rewards den Tag als abgeschlossen meldet. Steigt der Zähler über mehrere Suchen hinweg nicht, wartet es eine halbe Minute, sieht erneut nach und macht weiter, denn fast immer rechnet Rewards nur verspätet an. Es bildet Suchanfragen aus 1 bis 3 Schlüsselwörtern und wechselt zwischen Websuche (70 %), Bildern, Videos, Shopping und Nachrichten, um menschliches Surfen nachzuahmen. Die Wartezeiten liegen zufällig zwischen 3 und 10 s, mit gelegentlichen Pausen von 10 bis 25 s, die das Lesen von Ergebnissen nachbilden. Jede URL enthält wechselnde Parameter (form, cvid, PC), die Bing als legitimen Verkehr einstuft. Mobil und Desktop werden automatisch erkannt, der Fortschritt übersteht das Neuladen der Seite und der Zähler wird täglich um Mitternacht zurückgesetzt. Ist der Tag abgeschlossen, bleibt der Tab auf der Bing-Startseite, damit die Rückkehr dorthin nicht als erste Suche des nächsten Tages zählt. Das 🧮 neben dem Guthaben öffnet den Einlöse-Rechner: Dein Ziel aus Rewards (🎯) ist bereits ausgewählt, falls du eines hast, oder du wählst eine Prämie aus dem Katalog oder das gewünschte Xbox-Guthaben, und er sagt dir, wie viele Punkte dir fehlen und an welchem Tag du es erreichst, mit deinem gemessenen Tempo der letzten vier Wochen oder, bis eine Woche aufgezeichnet ist, mit einem aus den Aufgaben geschätzten Mindestwert.',
+            calcBtnTip: 'Einlöse-Rechner: wie viele Punkte dir für eine Prämie aus dem Katalog oder ein Xbox-Guthaben noch fehlen und an welchem Tag du es erreichst.',
+            calcTitle: 'Einlöse-Rechner',
+            calcAmount: 'Gewünschtes Xbox-Guthaben:',
+            calcCost: 'Kostet {n} Pkt.',
+            calcCustom: 'frei wählbarer Betrag',
+            calcCostTipCustom: 'Beim Einlösen eines frei wählbaren Betrags verlangt Rewards {r} Punkte pro 1 {c}, ab {m} {c}. Darunter gibt es nur Karten mit festem Betrag, und es wird die günstigste Kombination genommen, die das gewünschte Guthaben erreicht. Die genaue Rundung macht Rewards beim Einlösen.',
+            calcCostTipCards: 'In deinem Markt gibt es keinen frei wählbaren Betrag, daher wird die günstigste Kartenkombination genommen, die das gewünschte Guthaben erreicht.',
+            calcHave: 'Du hast {n} Pkt.',
+            calcEnough: 'reicht schon',
+            calcRate: 'Punktetempo:',
+            calcMeasured: 'Gemessen: {n} Pkt./Tag in den letzten {d} Tagen',
+            calcMeasuredPending: 'Gemessen: verfügbar nach 7 Tagen Aufzeichnung ({d}/7)',
+            calcMeasuredTip: 'Wie stark dein Guthaben tatsächlich gewachsen ist, Eingelöstes wieder hinzugerechnet, laut der täglichen Ablesung, die das Skript für jedes Konto in deinem Browser speichert. Es zählt alles, was du verdienst, auch in der Bing-App, bei Xbox und durch Boni, deshalb ist das ab einer Woche Daten die verlässliche Zahl.',
+            calcEstimate: 'Geschätzt nach Aufgaben: {n} Pkt./Tag',
+            calcEstimateTip: 'Ein Mindestwert aus dem, was Rewards für jede Aufgabe angibt. Das Puzzle zählt einen Stempel für jede siebentägige Serie der angehakten Aufgaben. Nicht enthalten sind die Prämien am siebten Serientag, die Monatsboni und alles, was du außerhalb dieser Website verdienst (Bing-App, Xbox, Outlook), daher erreichst du das Ziel meist früher.',
+            calcSrcSearch: 'Suchen',
+            calcSrcStreak: 'Serienbonus',
+            calcSrcPuzzle: 'Stempelpuzzle',
+            calcPerDay: '{n}/Tag',
+            calcResult: 'Du erreichst es {when}, um den {date}',
+            calcNoSource: 'Hake mindestens eine Aufgabe an, um das Datum zu berechnen.',
+            calcLineTip: 'Dein Einlöseziel: was dir noch fehlt und an welchem Tag du es in deinem Tempo erreichst. Klicken öffnet den Rechner.',
+            calcGoal: 'Ziel:',
+            calcGoalXbox: 'Xbox-Guthaben (freier Betrag)',
+            calcSearch: 'Prämie suchen…'
         },
         fr: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -371,9 +448,34 @@
             infoName: 'Nom :', infoVersion: 'Version :', infoDescription: 'Description :',
             infoDescriptionText: 'Automatise les recherches quotidiennes sur Bing pour accumuler des points Microsoft Rewards sans intervention manuelle. Il demande à Microsoft Rewards combien de points de recherche vous manquent aujourd’hui, effectue uniquement les recherches nécessaires, s’arrête de lui-même une fois terminé et affiche ce que valent vos points en crédit Xbox ; le nombre sous ⚙ reste en réserve pour les cas où aucune session Rewards n’est ouverte. Le nombre de recherches se règle avec ⚙ (1-100, 20 par défaut) et les commandes démarrer / poursuivre / arrêter / réinitialiser changent selon l’état. Dans l’onglet des mots-clés, vous pouvez en supprimer un d’un clic, en ajouter plusieurs séparés par des virgules, les modifier tous d’un coup ou rétablir la liste d’origine. Le panneau flottant se replie et retient la position où vous l’avez laissé, et la langue du script se choisit ici en haut. Sous les commandes figure une liste de ce que Rewards demande aujourd’hui en dehors des recherches — la série, l’enregistrement dans l’application, l’ensemble quotidien — avec un lien vers chaque élément qui reste.',
             infoAuthor: 'Auteur :', infoGitHub: 'GitHub :', infoPrivacy: 'Confidentialité :',
-            infoPrivacyText: 'Vos mots-clés et le compteur de recherches sont conservés uniquement dans le stockage local du gestionnaire de userscripts, dans votre navigateur. Lorsque « Utiliser ma progression Rewards » est activé, le script envoie une requête GET à bing.com — le même point d’accès qui alimente le panneau de points de l’en-tête de Bing — pour lire votre progression du jour, votre solde et le catalogue d’échange ; elle passe par votre session Bing et rien de tout cela ne part vers des tiers ni vers l’auteur du script. Décochez cette case et le script n’effectue aucune requête réseau qui lui soit propre : il navigue seulement vers des URL de recherche de bing.com, exactement comme si vous les saisissiez vous-même. Les tâches du jour affichées dans cette liste proviennent de la même réponse, et ce qui est lu est également conservé en local pour ne pas le redemander sur chaque page de bing.com.',
+            infoPrivacyText: 'Vos mots-clés et le compteur de recherches sont conservés uniquement dans le stockage local du gestionnaire de userscripts, dans votre navigateur. Lorsque « Utiliser ma progression Rewards » est activé, le script envoie une requête GET à bing.com — le même point d’accès qui alimente le panneau de points de l’en-tête de Bing — pour lire votre progression du jour, votre solde et le catalogue d’échange ; elle passe par votre session Bing et rien de tout cela ne part vers des tiers ni vers l’auteur du script. Décochez cette case et le script n’effectue aucune requête réseau qui lui soit propre : il navigue seulement vers des URL de recherche de bing.com, exactement comme si vous les saisissiez vous-même. Les tâches du jour affichées dans cette liste proviennent de la même réponse, et ce qui est lu est également conservé en local pour ne pas le redemander sur chaque page de bing.com. Pour le calculateur d’échange, il enregistre aussi une fois par jour votre solde et vos échanges, ainsi que l’objectif choisi, séparés par compte au moyen d’une empreinte anonyme et non de l’identifiant du compte ; et pour récupérer l’objectif que vous avez fixé dans Rewards, il demande la page d’échange de rewards.bing.com, au plus une fois par demi-heure et avec votre propre session.',
             infoHow: 'Fonctionnement :',
-            infoHowText: 'Il demande à Rewards combien de points de recherche manquent aujourd’hui et n’effectue que les recherches nécessaires, en s’arrêtant lorsque Rewards déclare la journée terminée ; si le compteur ne bouge pas sur plusieurs recherches d’affilée, il attend une demi-minute, revérifie et poursuit, car il s’agit presque toujours d’un crédit tardif de Rewards. Il compose des requêtes en combinant 1 à 3 mots-clés et alterne entre recherche web (70 %), images, vidéos, shopping et actualités pour imiter une navigation humaine. Les délais sont aléatoires entre 3 et 10 s, avec des pauses occasionnelles de 10 à 25 s qui imitent la lecture des résultats. Chaque URL comporte des paramètres qui tournent (form, cvid, PC) et que Bing identifie comme du trafic légitime. Le mode mobile ou bureau est détecté automatiquement, la progression survit aux rechargements de page et le compteur se remet à zéro chaque jour à minuit. Une fois la journée terminée, l’onglet reste sur la page d’accueil de Bing, pour qu’y revenir ne compte pas comme la première recherche du lendemain.'
+            infoHowText: 'Il demande à Rewards combien de points de recherche manquent aujourd’hui et n’effectue que les recherches nécessaires, en s’arrêtant lorsque Rewards déclare la journée terminée ; si le compteur ne bouge pas sur plusieurs recherches d’affilée, il attend une demi-minute, revérifie et poursuit, car il s’agit presque toujours d’un crédit tardif de Rewards. Il compose des requêtes en combinant 1 à 3 mots-clés et alterne entre recherche web (70 %), images, vidéos, shopping et actualités pour imiter une navigation humaine. Les délais sont aléatoires entre 3 et 10 s, avec des pauses occasionnelles de 10 à 25 s qui imitent la lecture des résultats. Chaque URL comporte des paramètres qui tournent (form, cvid, PC) et que Bing identifie comme du trafic légitime. Le mode mobile ou bureau est détecté automatiquement, la progression survit aux rechargements de page et le compteur se remet à zéro chaque jour à minuit. Une fois la journée terminée, l’onglet reste sur la page d’accueil de Bing, pour qu’y revenir ne compte pas comme la première recherche du lendemain. Le 🧮 à côté du solde ouvre le calculateur d’échange : votre objectif Rewards (🎯) y est déjà sélectionné si vous en avez un, ou vous choisissez une récompense du catalogue ou le crédit Xbox voulu, et il vous dit combien de points il vous manque et à quelle date vous y arriveriez, avec votre rythme mesuré sur les quatre dernières semaines ou, tant qu’il n’y a pas une semaine de relevés, avec un minimum estimé d’après les tâches.',
+            calcBtnTip: 'Calculateur d’échange : combien de points il vous manque pour une récompense du catalogue ou un crédit Xbox, et à quelle date vous y arriveriez.',
+            calcTitle: 'Calculateur d’échange',
+            calcAmount: 'Crédit Xbox souhaité :',
+            calcCost: 'Coûte {n} pts',
+            calcCustom: 'montant personnalisé',
+            calcCostTipCustom: 'Avec l’échange à montant personnalisé, Rewards demande {r} points pour 1 {c}, à partir de {m} {c}. En dessous, il n’y a que des cartes à montant fixe, et on retient la combinaison la moins chère qui atteint le crédit demandé. L’arrondi exact est fait par Rewards au moment de l’échange.',
+            calcCostTipCards: 'Votre marché ne propose pas d’échange à montant personnalisé : on retient donc la combinaison de cartes la moins chère qui atteint le crédit demandé.',
+            calcHave: 'Vous avez {n} pts',
+            calcEnough: 'c’est suffisant',
+            calcRate: 'Rythme de points :',
+            calcMeasured: 'Mesuré : {n} pts/jour sur les {d} derniers jours',
+            calcMeasuredPending: 'Mesuré : disponible après 7 jours de relevés ({d}/7)',
+            calcMeasuredTip: 'De combien votre solde a réellement augmenté, en rajoutant ce que vous avez échangé, d’après le relevé quotidien que le script garde dans votre navigateur pour chaque compte. Il compte tout ce que vous gagnez, y compris dans l’application Bing, sur Xbox et avec les bonus : dès qu’il y a une semaine de données, c’est le chiffre fiable.',
+            calcEstimate: 'Estimé d’après les tâches : {n} pts/jour',
+            calcEstimateTip: 'Un minimum calculé à partir de ce que Rewards annonce pour chaque tâche. Le puzzle compte un tampon pour chaque série de sept jours des tâches cochées. Il laisse de côté les primes du septième jour des séries, les bonus mensuels et ce que vous gagnez hors de ce site (application Bing, Xbox, Outlook) : en général, vous y arriverez plus tôt.',
+            calcSrcSearch: 'Recherches',
+            calcSrcStreak: 'Bonus de série',
+            calcSrcPuzzle: 'Puzzle de tampons',
+            calcPerDay: '{n}/jour',
+            calcResult: 'Vous y arrivez {when}, vers le {date}',
+            calcNoSource: 'Cochez au moins une tâche pour calculer la date.',
+            calcLineTip: 'Votre objectif d’échange : ce qu’il vous manque et la date à laquelle vous l’atteindriez à votre rythme. Cliquez pour ouvrir le calculateur.',
+            calcGoal: 'Objectif :',
+            calcGoalXbox: 'Crédit Xbox (montant libre)',
+            calcSearch: 'Rechercher une récompense…'
         },
         pt: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -432,9 +534,34 @@
             infoName: 'Nome:', infoVersion: 'Versão:', infoDescription: 'Descrição:',
             infoDescriptionText: 'Automatiza pesquisas diárias no Bing para acumular pontos do Microsoft Rewards sem intervenção manual. Pergunta ao Microsoft Rewards quantos pontos de pesquisa lhe faltam hoje, faz apenas as pesquisas necessárias, para sozinho quando as termina e mostra quanto valem os seus pontos em saldo Xbox; o número do ⚙ fica como suplente para quando não há sessão do Rewards. O número de pesquisas configura-se com ⚙ (1-100, 20 por omissão) e os controlos de iniciar / continuar / parar / reiniciar mudam consoante o estado. No separador de palavras-chave pode apagar cada uma com um clique, adicionar várias separadas por vírgula, editá-las todas de uma vez ou repor a lista original. O painel flutuante recolhe-se e lembra-se de como o deixou, e o idioma do script escolhe-se aqui em cima. Por baixo dos controlos há uma lista com o que o Rewards pede hoje além das pesquisas — a sequência, o registo na aplicação, o conjunto diário — e uma ligação para cada coisa que falte.',
             infoAuthor: 'Autor:', infoGitHub: 'GitHub:', infoPrivacy: 'Privacidade:',
-            infoPrivacyText: 'As suas palavras-chave e o contador de pesquisas são guardados apenas no armazenamento local do gestor de userscripts, no seu navegador. Com «Usar o meu progresso do Rewards» ativado, o script faz um pedido GET ao bing.com — o mesmo ponto de acesso que alimenta o painel de pontos do cabeçalho do Bing — para ler o seu progresso do dia, o seu saldo e o catálogo de troca; viaja com a sua sessão do Bing e nada disso sai para terceiros nem para o autor do script. Desative essa caixa e o script não faz qualquer pedido de rede próprio: limita-se a navegar para URLs de pesquisa do bing.com, tal como se fosse você a escrevê-los. As tarefas do dia que aparecem nessa lista saem da mesma resposta, e o que é lido fica também guardado localmente para não voltar a ser pedido em cada página do Bing.',
+            infoPrivacyText: 'As suas palavras-chave e o contador de pesquisas são guardados apenas no armazenamento local do gestor de userscripts, no seu navegador. Com «Usar o meu progresso do Rewards» ativado, o script faz um pedido GET ao bing.com — o mesmo ponto de acesso que alimenta o painel de pontos do cabeçalho do Bing — para ler o seu progresso do dia, o seu saldo e o catálogo de troca; viaja com a sua sessão do Bing e nada disso sai para terceiros nem para o autor do script. Desative essa caixa e o script não faz qualquer pedido de rede próprio: limita-se a navegar para URLs de pesquisa do bing.com, tal como se fosse você a escrevê-los. As tarefas do dia que aparecem nessa lista saem da mesma resposta, e o que é lido fica também guardado localmente para não voltar a ser pedido em cada página do Bing. Para a calculadora de resgate guarda ainda, uma vez por dia, o seu saldo e o que resgata, e a meta que escolher, separados por conta com uma impressão anónima e não com o identificador da conta; e, para trazer a meta que tiver definida no Rewards, pede a página de resgate de rewards.bing.com, no máximo a cada meia hora e com a sua própria sessão.',
             infoHow: 'Como funciona:',
-            infoHowText: 'Pergunta ao Rewards quantos pontos de pesquisa faltam hoje e faz apenas as necessárias, parando quando o Rewards marca o dia como concluído; se o contador não subir ao longo de várias pesquisas seguidas, espera meio minuto, volta a verificar e continua, porque quase sempre é o Rewards a creditar com atraso. Gera consultas combinando 1 a 3 palavras-chave e alterna entre pesquisas web (70%), imagens, vídeos, compras e notícias para simular navegação humana. Os atrasos são aleatórios entre 3-10 s, com pausas ocasionais de 10-25 s que imitam a leitura dos resultados. Cada URL inclui parâmetros rotativos (form, cvid, PC) que o Bing identifica como tráfego legítimo. Deteta automaticamente telemóvel ou computador, o progresso persiste entre recargas da página e o contador é reposto todos os dias à meia-noite. Ao completar o dia deixa o separador na página inicial do Bing, para que voltar a ele não conte como a primeira pesquisa do dia seguinte.'
+            infoHowText: 'Pergunta ao Rewards quantos pontos de pesquisa faltam hoje e faz apenas as necessárias, parando quando o Rewards marca o dia como concluído; se o contador não subir ao longo de várias pesquisas seguidas, espera meio minuto, volta a verificar e continua, porque quase sempre é o Rewards a creditar com atraso. Gera consultas combinando 1 a 3 palavras-chave e alterna entre pesquisas web (70%), imagens, vídeos, compras e notícias para simular navegação humana. Os atrasos são aleatórios entre 3-10 s, com pausas ocasionais de 10-25 s que imitam a leitura dos resultados. Cada URL inclui parâmetros rotativos (form, cvid, PC) que o Bing identifica como tráfego legítimo. Deteta automaticamente telemóvel ou computador, o progresso persiste entre recargas da página e o contador é reposto todos os dias à meia-noite. Ao completar o dia deixa o separador na página inicial do Bing, para que voltar a ele não conte como a primeira pesquisa do dia seguinte. O 🧮 ao lado do saldo abre a calculadora de resgate: traz já escolhida a sua meta do Rewards (🎯), se tiver uma, ou escolhe uma recompensa do catálogo ou o saldo Xbox que quiser, e ela diz quantos pontos faltam e em que data lá chegaria, com o seu ritmo medido das últimas quatro semanas ou, até haver uma semana de registo, com um mínimo estimado pelas tarefas.',
+            calcBtnTip: 'Calculadora de resgate: quantos pontos faltam para uma recompensa do catálogo ou um saldo Xbox, e em que data lá chegaria.',
+            calcTitle: 'Calculadora de resgate',
+            calcAmount: 'Saldo Xbox pretendido:',
+            calcCost: 'Custa {n} pts',
+            calcCustom: 'valor personalizado',
+            calcCostTipCustom: 'No resgate de valor personalizado, o Rewards cobra {r} pontos por 1 {c}, a partir de {m} {c}. Abaixo disso só há cartões de valor fixo, e usa-se a combinação mais barata que chegue ao saldo pedido. O arredondamento exato é feito pelo Rewards no resgate.',
+            calcCostTipCards: 'No seu mercado não há resgate de valor personalizado, por isso usa-se a combinação de cartões mais barata que chegue ao saldo pedido.',
+            calcHave: 'Tem {n} pts',
+            calcEnough: 'já chega',
+            calcRate: 'Ritmo de pontos:',
+            calcMeasured: 'Medido: {n} pts/dia nos últimos {d} dias',
+            calcMeasuredPending: 'Medido: disponível após 7 dias de registo ({d}/7)',
+            calcMeasuredTip: 'Quanto o seu saldo subiu de facto, somando o que tiver resgatado, segundo a leitura diária que o script guarda no seu navegador para cada conta. Conta tudo o que ganha, incluindo na aplicação Bing, na Xbox e com bónus, por isso, a partir de uma semana de dados, é o número em que pode confiar.',
+            calcEstimate: 'Estimado por tarefas: {n} pts/dia',
+            calcEstimateTip: 'Um mínimo feito com o que o Rewards diz que cada tarefa paga. O quebra-cabeças conta um selo por cada sequência de sete dias das tarefas marcadas. Deixa de fora o prémio do sétimo dia das sequências, os bónus mensais e o que ganha fora deste site (aplicação Bing, Xbox, Outlook), por isso o normal é chegar lá antes.',
+            calcSrcSearch: 'Pesquisas',
+            calcSrcStreak: 'Bónus de sequência',
+            calcSrcPuzzle: 'Quebra-cabeças de selos',
+            calcPerDay: '{n}/dia',
+            calcResult: 'Chega lá {when}, por volta de {date}',
+            calcNoSource: 'Marque pelo menos uma tarefa para calcular a data.',
+            calcLineTip: 'A sua meta de resgate: quanto falta e a data em que lá chegaria ao seu ritmo. Clique para abrir a calculadora.',
+            calcGoal: 'Meta:',
+            calcGoalXbox: 'Saldo Xbox (valor livre)',
+            calcSearch: 'Procurar recompensa…'
         },
         ru: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -493,9 +620,34 @@
             infoName: 'Название:', infoVersion: 'Версия:', infoDescription: 'Описание:',
             infoDescriptionText: 'Автоматизирует ежедневные запросы в Bing, чтобы копить баллы Microsoft Rewards без ручных действий. Скрипт спрашивает у Microsoft Rewards, сколько поисковых баллов вам осталось получить сегодня, выполняет только нужные запросы, сам останавливается по завершении и показывает, сколько ваши баллы стоят в виде счёта Xbox; число под ⚙ остаётся на подмену, когда сессии Rewards нет. Количество запросов настраивается кнопкой ⚙ (1-100, по умолчанию 20), а кнопки запуска, продолжения, остановки и сброса меняются в зависимости от состояния. На вкладке ключевых слов каждое можно удалить одним щелчком, добавить несколько через запятую, изменить все сразу или вернуть исходный список. Плавающая панель сворачивается и запоминает, как вы её оставили, а язык скрипта выбирается здесь наверху. Под кнопками идёт список того, что Rewards просит сегодня помимо поиска — серия, отметка в приложении, ежедневный набор — со ссылкой на каждое невыполненное задание.',
             infoAuthor: 'Автор:', infoGitHub: 'GitHub:', infoPrivacy: 'Конфиденциальность:',
-            infoPrivacyText: 'Ваши ключевые слова и счётчик запросов хранятся только в локальном хранилище менеджера пользовательских скриптов, в вашем браузере. Если включено «Использовать мой прогресс Rewards», скрипт делает GET-запрос к bing.com — к тому же адресу, который питает панель баллов в шапке Bing, — чтобы прочитать ваш прогресс за день, баланс и каталог обмена; запрос идёт через вашу сессию Bing, и ничто из этого не уходит третьим сторонам или автору скрипта. Снимите этот флажок, и скрипт не будет делать собственных сетевых запросов: он лишь переходит по поисковым адресам bing.com, ровно так же, как если бы вы набрали их сами. Задания дня в этом списке берутся из того же ответа, а прочитанное так же сохраняется локально, чтобы не запрашивать его на каждой странице Bing.',
+            infoPrivacyText: 'Ваши ключевые слова и счётчик запросов хранятся только в локальном хранилище менеджера пользовательских скриптов, в вашем браузере. Если включено «Использовать мой прогресс Rewards», скрипт делает GET-запрос к bing.com — к тому же адресу, который питает панель баллов в шапке Bing, — чтобы прочитать ваш прогресс за день, баланс и каталог обмена; запрос идёт через вашу сессию Bing, и ничто из этого не уходит третьим сторонам или автору скрипта. Снимите этот флажок, и скрипт не будет делать собственных сетевых запросов: он лишь переходит по поисковым адресам bing.com, ровно так же, как если бы вы набрали их сами. Задания дня в этом списке берутся из того же ответа, а прочитанное так же сохраняется локально, чтобы не запрашивать его на каждой странице Bing. Для калькулятора обмена он также раз в день сохраняет ваш баланс и обменянное, а также выбранную цель — отдельно по учётным записям, с анонимным отпечатком вместо идентификатора; а чтобы подтянуть цель, заданную в Rewards, он запрашивает страницу обмена на rewards.bing.com не чаще раза в полчаса и с вашим же сеансом.',
             infoHow: 'Как это работает:',
-            infoHowText: 'Скрипт спрашивает у Rewards, сколько поисковых баллов не хватает сегодня, и выполняет только нужные запросы, останавливаясь, когда Rewards отмечает день как завершённый; если счётчик не растёт несколько запросов подряд, он ждёт полминуты, проверяет снова и продолжает, потому что почти всегда Rewards просто начисляет с задержкой. Скрипт составляет запросы из 1-3 ключевых слов и чередует веб-поиск (70 %), изображения, видео, покупки и новости, изображая обычный просмотр. Задержки случайны в пределах 3-10 с, изредка с паузами 10-25 с, имитирующими чтение результатов. В каждый адрес подставляются меняющиеся параметры (form, cvid, PC), которые Bing принимает за обычный трафик. Мобильный и настольный режимы определяются автоматически, прогресс переживает перезагрузку страницы, а счётчик обнуляется каждый день в полночь. По завершении дня вкладка остаётся на главной странице Bing, чтобы возврат к ней не засчитывался как первый поиск следующего дня.'
+            infoHowText: 'Скрипт спрашивает у Rewards, сколько поисковых баллов не хватает сегодня, и выполняет только нужные запросы, останавливаясь, когда Rewards отмечает день как завершённый; если счётчик не растёт несколько запросов подряд, он ждёт полминуты, проверяет снова и продолжает, потому что почти всегда Rewards просто начисляет с задержкой. Скрипт составляет запросы из 1-3 ключевых слов и чередует веб-поиск (70 %), изображения, видео, покупки и новости, изображая обычный просмотр. Задержки случайны в пределах 3-10 с, изредка с паузами 10-25 с, имитирующими чтение результатов. В каждый адрес подставляются меняющиеся параметры (form, cvid, PC), которые Bing принимает за обычный трафик. Мобильный и настольный режимы определяются автоматически, прогресс переживает перезагрузку страницы, а счётчик обнуляется каждый день в полночь. По завершении дня вкладка остаётся на главной странице Bing, чтобы возврат к ней не засчитывался как первый поиск следующего дня. Значок 🧮 рядом с балансом открывает калькулятор обмена: ваша цель из Rewards (🎯), если она есть, уже выбрана, либо вы выбираете награду из каталога или нужный баланс Xbox, и он показывает, сколько баллов вам не хватает и к какой дате вы их накопите — в вашем замеренном темпе за последние четыре недели или, пока не набралась неделя записей, по минимальной оценке по заданиям.',
+            calcBtnTip: 'Калькулятор обмена: сколько баллов вам не хватает до награды из каталога или баланса Xbox и к какой дате вы их накопите.',
+            calcTitle: 'Калькулятор обмена',
+            calcAmount: 'Нужный баланс Xbox:',
+            calcCost: 'Стоит {n} б.',
+            calcCustom: 'произвольная сумма',
+            calcCostTipCustom: 'При обмене на произвольную сумму Rewards берёт {r} баллов за 1 {c}, начиная с {m} {c}. Ниже есть только карты фиксированного номинала, и берётся самая дешёвая комбинация, которая покрывает нужный баланс. Точное округление делает Rewards при обмене.',
+            calcCostTipCards: 'В вашем регионе нет обмена на произвольную сумму, поэтому берётся самая дешёвая комбинация карт, которая покрывает нужный баланс.',
+            calcHave: 'У вас {n} б.',
+            calcEnough: 'уже хватает',
+            calcRate: 'Темп набора баллов:',
+            calcMeasured: 'Замерено: {n} б./день за последние {d} дн.',
+            calcMeasuredPending: 'Замерено: появится после 7 дней записей ({d}/7)',
+            calcMeasuredTip: 'Насколько на самом деле вырос ваш баланс с учётом обменянного — по ежедневной записи, которую скрипт хранит в вашем браузере для каждой учётной записи. Учитывается всё, что вы зарабатываете, в том числе в приложении Bing, в Xbox и бонусами, поэтому, как только накопится неделя данных, это и есть надёжная цифра.',
+            calcEstimate: 'Оценка по заданиям: {n} б./день',
+            calcEstimateTip: 'Минимум по тому, сколько, по словам Rewards, платит каждое задание. Пазл засчитывает одну печать за каждую семидневную серию отмеченных заданий. Не учитываются призы седьмого дня серий, ежемесячные бонусы и то, что вы зарабатываете вне этого сайта (приложение Bing, Xbox, Outlook), так что обычно вы доберётесь раньше.',
+            calcSrcSearch: 'Поиски',
+            calcSrcStreak: 'Бонус за серию',
+            calcSrcPuzzle: 'Пазл из печатей',
+            calcPerDay: '{n}/день',
+            calcResult: 'Накопите {when}, примерно к {date}',
+            calcNoSource: 'Отметьте хотя бы одно задание, чтобы рассчитать дату.',
+            calcLineTip: 'Ваша цель обмена: сколько не хватает и к какой дате вы её достигнете в своём темпе. Нажмите, чтобы открыть калькулятор.',
+            calcGoal: 'Цель:',
+            calcGoalXbox: 'Баланс Xbox (любая сумма)',
+            calcSearch: 'Поиск награды…'
         },
         tr: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -554,9 +706,34 @@
             infoName: 'Ad:', infoVersion: 'Sürüm:', infoDescription: 'Açıklama:',
             infoDescriptionText: 'Microsoft Rewards puanı biriktirmek için günlük Bing aramalarını elle uğraşmadan otomatikleştirir. Betik, Microsoft Rewards’a bugün kaç arama puanınızın eksik olduğunu sorar, yalnızca gereken aramaları yapar, bitince kendiliğinden durur ve puanlarınızın Xbox bakiyesi olarak ne değerde olduğunu gösterir; ⚙ altındaki sayı, Rewards oturumu olmadığı durumlar için yedek kalır. Arama sayısı ⚙ ile ayarlanır (1-100, varsayılan 20); başlat / sürdür / durdur / sıfırla düğmeleri duruma göre değişir. Anahtar kelimeler sekmesinde her birini tek tıkla silebilir, virgülle ayırarak birkaçını ekleyebilir, hepsini birden düzenleyebilir veya özgün listeyi geri yükleyebilirsiniz. Yüzen panel katlanır ve onu nasıl bıraktığınızı hatırlar; betiğin dili de buradan, en üstten seçilir. Düğmelerin altında, Rewards’ın bugün aramaların dışında istediklerinin listesi vardır — seri, uygulamada oturum işaretleme, günlük set — ve eksik olan her birine bir bağlantı.',
             infoAuthor: 'Yazar:', infoGitHub: 'GitHub:', infoPrivacy: 'Gizlilik:',
-            infoPrivacyText: 'Anahtar kelimeleriniz ve arama sayacı yalnızca tarayıcınızdaki userscript yöneticisinin yerel deposunda tutulur. “Rewards ilerlememi kullan” açıkken betik bing.com’a bir GET isteği yapar — Bing başlığındaki puan panelini besleyen aynı uç nokta — ve günün ilerlemesini, bakiyenizi ve kullanım katalogunu okur; istek sizin Bing oturumunuzla gider ve bunların hiçbiri üçüncü taraflara ya da betiğin yazarına ulaşmaz. O kutuyu kapatın, betik kendine ait hiçbir ağ isteği yapmaz: yalnızca bing.com arama adreslerine gider, tıpkı siz yazmışsınız gibi. O listedeki günün görevleri de aynı yanıttan gelir ve okunanlar her Bing sayfasında yeniden istenmesin diye yerel olarak saklanır.',
+            infoPrivacyText: 'Anahtar kelimeleriniz ve arama sayacı yalnızca tarayıcınızdaki userscript yöneticisinin yerel deposunda tutulur. “Rewards ilerlememi kullan” açıkken betik bing.com’a bir GET isteği yapar — Bing başlığındaki puan panelini besleyen aynı uç nokta — ve günün ilerlemesini, bakiyenizi ve kullanım katalogunu okur; istek sizin Bing oturumunuzla gider ve bunların hiçbiri üçüncü taraflara ya da betiğin yazarına ulaşmaz. O kutuyu kapatın, betik kendine ait hiçbir ağ isteği yapmaz: yalnızca bing.com arama adreslerine gider, tıpkı siz yazmışsınız gibi. O listedeki günün görevleri de aynı yanıttan gelir ve okunanlar her Bing sayfasında yeniden istenmesin diye yerel olarak saklanır. Kullanım hesaplayıcısı için ayrıca günde bir kez bakiyenizi ve kullandıklarınızı, ayrıca seçtiğiniz hedefi, hesap kimliği yerine anonim bir parmak iziyle hesaplara ayrılmış olarak saklar; Rewards’ta belirlediğiniz hedefi getirmek için de rewards.bing.com’daki kullanım sayfasını en fazla yarım saatte bir ve kendi oturumunuzla ister.',
             infoHow: 'Nasıl çalışır:',
-            infoHowText: 'Betik, Rewards’a bugün kaç arama puanı eksik olduğunu sorar ve yalnızca gerekenleri yapar; Rewards günü tamamlandı olarak işaretleyince durur. Sayaç üst üste birkaç aramada ilerlemezse yarım dakika bekler, yeniden bakar ve sürdürür; çünkü bu neredeyse her zaman Rewards’ın geç işlemesidir. 1 ila 3 anahtar kelimeyi birleştirerek sorgular üretir ve insan gezinmesini taklit etmek için web araması (%70), görseller, videolar, alışveriş ve haberler arasında dönüşümlü geçer. Bekleme süreleri 3-10 sn arasında rastgeledir; ara sıra sonuçların okunmasını taklit eden 10-25 sn’lik duraklamalar olur. Her adres, Bing’in meşru trafik olarak gördüğü dönüşümlü parametreler (form, cvid, PC) içerir. Mobil ve masaüstü otomatik olarak algılanır, ilerleme sayfa yenilemelerinde korunur ve sayaç her gün gece yarısı sıfırlanır. Gün tamamlandığında sekmeyi Bing ana sayfasında bırakır; böylece o sekmeye dönmek ertesi günün ilk araması sayılmaz.'
+            infoHowText: 'Betik, Rewards’a bugün kaç arama puanı eksik olduğunu sorar ve yalnızca gerekenleri yapar; Rewards günü tamamlandı olarak işaretleyince durur. Sayaç üst üste birkaç aramada ilerlemezse yarım dakika bekler, yeniden bakar ve sürdürür; çünkü bu neredeyse her zaman Rewards’ın geç işlemesidir. 1 ila 3 anahtar kelimeyi birleştirerek sorgular üretir ve insan gezinmesini taklit etmek için web araması (%70), görseller, videolar, alışveriş ve haberler arasında dönüşümlü geçer. Bekleme süreleri 3-10 sn arasında rastgeledir; ara sıra sonuçların okunmasını taklit eden 10-25 sn’lik duraklamalar olur. Her adres, Bing’in meşru trafik olarak gördüğü dönüşümlü parametreler (form, cvid, PC) içerir. Mobil ve masaüstü otomatik olarak algılanır, ilerleme sayfa yenilemelerinde korunur ve sayaç her gün gece yarısı sıfırlanır. Gün tamamlandığında sekmeyi Bing ana sayfasında bırakır; böylece o sekmeye dönmek ertesi günün ilk araması sayılmaz. Bakiyenin yanındaki 🧮 kullanım hesaplayıcısını açar: varsa Rewards hedefiniz (🎯) zaten seçili gelir, yoksa katalogdan bir ödül ya da istediğiniz Xbox bakiyesini seçersiniz; size kaç puanınızın eksik olduğunu ve hangi tarihte ulaşacağınızı, son dört haftadaki ölçülen hızınızla ya da bir haftalık kayıt olana kadar görevlerden tahmin edilen bir alt sınırla gösterir.',
+            calcBtnTip: 'Kullanım hesaplayıcısı: katalogdaki bir ödül ya da bir Xbox bakiyesi için kaç puanınızın eksik olduğu ve hangi tarihte ulaşacağınız.',
+            calcTitle: 'Kullanım hesaplayıcısı',
+            calcAmount: 'İstediğiniz Xbox bakiyesi:',
+            calcCost: 'Maliyeti {n} p',
+            calcCustom: 'özel tutar',
+            calcCostTipCustom: 'Özel tutarlı kullanımda Rewards 1 {c} için {r} puan alır; {m} {c} ve üzerinde geçerlidir. Bunun altında yalnızca sabit tutarlı kartlar vardır ve istenen bakiyeye ulaşan en ucuz kombinasyon seçilir. Kesin yuvarlamayı kullanım sırasında Rewards yapar.',
+            calcCostTipCards: 'Pazarınızda özel tutarlı kullanım yok, bu yüzden istenen bakiyeye ulaşan en ucuz kart kombinasyonu seçilir.',
+            calcHave: '{n} p puanınız var',
+            calcEnough: 'yetiyor',
+            calcRate: 'Puan hızı:',
+            calcMeasured: 'Ölçülen: son {d} günde günde {n} p',
+            calcMeasuredPending: 'Ölçülen: 7 günlük kayıttan sonra ({d}/7)',
+            calcMeasuredTip: 'Kullandıklarınız geri eklenerek bakiyenizin gerçekte ne kadar arttığı; betiğin her hesap için tarayıcınızda tuttuğu günlük okumaya göre. Bing uygulaması, Xbox ve bonuslar dahil kazandığınız her şeyi sayar; bu yüzden bir haftalık veri olduğunda güvenilecek rakam budur.',
+            calcEstimate: 'Görevlere göre tahmin: günde {n} p',
+            calcEstimateTip: 'Rewards’ın her görev için ödediğini söylediği tutarlardan çıkan bir alt sınır. Yapboz, işaretli görevlerin her yedi günlük serisi için bir damga sayar. Serilerin yedinci gün ödüllerini, aylık bonusları ve bu sitenin dışında kazandıklarınızı (Bing uygulaması, Xbox, Outlook) hesaba katmaz; bu yüzden genellikle daha erken ulaşırsınız.',
+            calcSrcSearch: 'Aramalar',
+            calcSrcStreak: 'Seri bonusu',
+            calcSrcPuzzle: 'Damga yapbozu',
+            calcPerDay: 'günde {n}',
+            calcResult: '{when}, yaklaşık {date} tarihinde ulaşırsınız',
+            calcNoSource: 'Tarihi hesaplamak için en az bir görev işaretleyin.',
+            calcLineTip: 'Kullanım hedefiniz: ne kadar eksik olduğu ve kendi hızınızla hangi tarihte ulaşacağınız. Hesaplayıcıyı açmak için tıklayın.',
+            calcGoal: 'Hedef:',
+            calcGoalXbox: 'Xbox bakiyesi (serbest tutar)',
+            calcSearch: 'Ödül ara…'
         },
         ja: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -615,9 +792,34 @@
             infoName: '名前:', infoVersion: 'バージョン:', infoDescription: '説明:',
             infoDescriptionText: 'Microsoft Rewards のポイントを手作業なしで貯めるため、Bing の毎日の検索を自動化します。今日あと何ポイント足りないかを Microsoft Rewards に問い合わせ、必要な回数だけ検索し、終われば自動で停止して、ポイントが Xbox 残高でいくらになるかを表示します。⚙ の回数は、Rewards のセッションがないときの控えとして残ります。検索回数は ⚙ で設定でき（1〜100、既定は 20）、開始・再開・停止・リセットのボタンは状態に応じて切り替わります。キーワードのタブでは、ひとつずつクリックで削除、カンマ区切りでまとめて追加、全体を一括編集、元の一覧に復元ができます。浮動パネルは折りたためて状態を記憶し、スクリプトの言語はこの上部で選べます。ボタンの下には、検索以外にその日の Rewards が求めるもの（連続記録、アプリでの登録、デイリーセット）の一覧が出て、未完了のものにはリンクが付きます。',
             infoAuthor: '作者:', infoGitHub: 'GitHub:', infoPrivacy: 'プライバシー:',
-            infoPrivacyText: 'キーワードと検索カウンターは、ブラウザー内のユーザースクリプト管理アドオンのローカルストレージにのみ保存されます。「Rewards の進捗を使う」がオンのときは、その日の進捗・残高・交換カタログを読むために bing.com へ GET 要求を1件送ります。宛先は Bing のヘッダーのポイント パネルを動かしているのと同じエンドポイントで、あなたの Bing セッションを通ります。その内容が第三者やスクリプトの作者に渡ることはありません。このチェックを外せば、スクリプトは独自のネットワーク要求を一切行いません。自分で入力した場合とまったく同じように、bing.com の検索 URL へ移動するだけです。その一覧に出る今日の課題も同じ応答から取り出し、読み取った内容は Bing のページごとに問い合わせ直さないようローカルにも保存します。',
+            infoPrivacyText: 'キーワードと検索カウンターは、ブラウザー内のユーザースクリプト管理アドオンのローカルストレージにのみ保存されます。「Rewards の進捗を使う」がオンのときは、その日の進捗・残高・交換カタログを読むために bing.com へ GET 要求を1件送ります。宛先は Bing のヘッダーのポイント パネルを動かしているのと同じエンドポイントで、あなたの Bing セッションを通ります。その内容が第三者やスクリプトの作者に渡ることはありません。このチェックを外せば、スクリプトは独自のネットワーク要求を一切行いません。自分で入力した場合とまったく同じように、bing.com の検索 URL へ移動するだけです。その一覧に出る今日の課題も同じ応答から取り出し、読み取った内容は Bing のページごとに問い合わせ直さないようローカルにも保存します。交換計算機のため、1 日 1 回、残高と交換した分、選んだ目標も保存します。アカウントは ID ではなく匿名のフィンガープリントで区別します。また、Rewards で設定した目標を取り込むために、rewards.bing.com の交換ページを、同じセッションで 30 分に 1 回まで取得します。',
             infoHow: '仕組み:',
-            infoHowText: '今日あと何ポイント足りないかを Rewards に問い合わせ、必要な分だけ検索し、Rewards が「完了」と示したら停止します。検索を数回続けてもカウンターが上がらない場合は30秒ほど待って再確認し、そのまま続けます。ほとんどは Rewards の加算が遅れているだけだからです。 キーワードを1〜3語組み合わせてクエリを作り、人間の閲覧に近づけるためウェブ検索（70%）、画像、動画、ショッピング、ニュースを切り替えます。待ち時間は3〜10秒のランダムで、結果を読む動作を模した10〜25秒の休止がときどき入ります。各 URL には Bing が正当なトラフィックとみなす可変パラメーター（form、cvid、PC）が付きます。モバイルとデスクトップは自動判定され、進捗はページの再読み込みをまたいで保持され、カウンターは毎日0時にリセットされます。 その日の分が完了するとタブを Bing のトップページに戻すので、そのタブに戻っても翌日の最初の検索として数えられません。'
+            infoHowText: '今日あと何ポイント足りないかを Rewards に問い合わせ、必要な分だけ検索し、Rewards が「完了」と示したら停止します。検索を数回続けてもカウンターが上がらない場合は30秒ほど待って再確認し、そのまま続けます。ほとんどは Rewards の加算が遅れているだけだからです。 キーワードを1〜3語組み合わせてクエリを作り、人間の閲覧に近づけるためウェブ検索（70%）、画像、動画、ショッピング、ニュースを切り替えます。待ち時間は3〜10秒のランダムで、結果を読む動作を模した10〜25秒の休止がときどき入ります。各 URL には Bing が正当なトラフィックとみなす可変パラメーター（form、cvid、PC）が付きます。モバイルとデスクトップは自動判定され、進捗はページの再読み込みをまたいで保持され、カウンターは毎日0時にリセットされます。 その日の分が完了するとタブを Bing のトップページに戻すので、そのタブに戻っても翌日の最初の検索として数えられません。残高の横の 🧮 で交換計算機が開きます。Rewards で目標を設定していれば最初から選ばれており（🎯）、ほかにカタログの特典か欲しい Xbox 残高も選べます。足りないポイントと届く日付を、直近 4 週間の実測ペース、または記録が 1 週間分たまるまではタスクから見積もった最低ラインで示します。',
+            calcBtnTip: '交換計算機：カタログの特典や Xbox 残高まであと何ポイント必要で、いつ届くかを計算します。',
+            calcTitle: '交換計算機',
+            calcAmount: '欲しい Xbox 残高：',
+            calcCost: '{n} pt 必要',
+            calcCustom: '金額指定',
+            calcCostTipCustom: '金額指定の交換では、Rewards は 1 {c} あたり {r} ポイントを差し引きます（{m} {c} から）。それ未満は固定額のカードだけなので、指定の残高に届く最も安い組み合わせを使います。最終的な端数処理は交換時に Rewards が行います。',
+            calcCostTipCards: 'お住まいの地域には金額指定の交換がないため、指定の残高に届く最も安いカードの組み合わせを使います。',
+            calcHave: '所持 {n} pt',
+            calcEnough: '足りています',
+            calcRate: 'ポイントのペース：',
+            calcMeasured: '実測：直近 {d} 日で 1 日 {n} pt',
+            calcMeasuredPending: '実測：記録が 7 日分たまると表示（{d}/7）',
+            calcMeasuredTip: '交換した分を足し戻したうえで、残高が実際にどれだけ増えたかです。スクリプトがアカウントごとにブラウザーに保存している毎日の記録から計算します。Bing アプリ、Xbox、ボーナスも含めて稼いだものをすべて数えるので、1 週間分のデータがそろえばこれが頼れる数字です。',
+            calcEstimate: 'タスクからの見積もり：1 日 {n} pt',
+            calcEstimateTip: '各タスクの支払額として Rewards が示す値から出した最低ラインです。パズルは、チェックしたタスクの 7 日連続を 1 回達成するごとにスタンプ 1 個として数えます。連続 7 日目の特典、月間ボーナス、このサイト以外（Bing アプリ、Xbox、Outlook）で稼ぐ分は含まないので、たいていはもっと早く届きます。',
+            calcSrcSearch: '検索',
+            calcSrcStreak: '連続記録ボーナス',
+            calcSrcPuzzle: 'スタンプパズル',
+            calcPerDay: '1 日 {n}',
+            calcResult: '{when}（{date}ごろ）に到達します',
+            calcNoSource: '日付を計算するには、タスクを 1 つ以上チェックしてください。',
+            calcLineTip: '交換の目標：足りない分と、今のペースで届く日付です。クリックで計算機を開きます。',
+            calcGoal: '目標：',
+            calcGoalXbox: 'Xbox 残高（金額自由）',
+            calcSearch: '特典を検索…'
         },
         ko: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -676,9 +878,34 @@
             infoName: '이름:', infoVersion: '버전:', infoDescription: '설명:',
             infoDescriptionText: '손대지 않고도 Microsoft Rewards 포인트를 쌓도록 Bing의 일일 검색을 자동화합니다. 오늘 검색 포인트가 얼마나 남았는지 Microsoft Rewards에 물어보고, 필요한 만큼만 검색하고, 끝나면 스스로 멈추며, 포인트가 Xbox 잔액으로 얼마인지 보여줍니다. ⚙의 횟수는 Rewards 세션이 없을 때를 위한 대비로 남습니다. 검색 횟수는 ⚙로 설정하며(1-100, 기본 20), 시작·계속·중지·초기화 버튼은 상태에 따라 바뀝니다. 키워드 탭에서는 하나씩 클릭해 삭제하거나, 쉼표로 구분해 여러 개를 추가하거나, 전체를 한 번에 편집하거나, 원래 목록으로 되돌릴 수 있습니다. 떠 있는 패널은 접을 수 있고 마지막 상태를 기억하며, 스크립트 언어는 이 위쪽에서 고릅니다. 버튼 아래에는 검색 말고 오늘 Rewards가 요구하는 것들(연속 기록, 앱 체크인, 데일리 세트)이 목록으로 나오고, 남은 항목마다 링크가 붙습니다.',
             infoAuthor: '제작자:', infoGitHub: 'GitHub:', infoPrivacy: '개인정보:',
-            infoPrivacyText: '키워드와 검색 카운터는 브라우저 안 사용자 스크립트 관리자의 로컬 저장소에만 보관됩니다. "내 Rewards 진행 상황 사용"이 켜져 있으면, 스크립트는 오늘의 진행 상황과 잔액, 교환 카탈로그를 읽기 위해 bing.com에 GET 요청을 보냅니다. Bing 머리글의 포인트 패널을 움직이는 것과 같은 엔드포인트이며, 사용자의 Bing 세션을 통해 전달됩니다. 그 내용이 제3자나 스크립트 제작자에게 가는 일은 없습니다. 이 체크를 끄면 스크립트는 자체적인 네트워크 요청을 전혀 하지 않습니다. 직접 입력했을 때와 똑같이 bing.com의 검색 주소로 이동할 뿐입니다. 그 목록에 나오는 오늘의 과제도 같은 응답에서 나오며, 읽은 내용은 Bing 페이지마다 다시 요청하지 않도록 로컬에도 보관합니다.',
+            infoPrivacyText: '키워드와 검색 카운터는 브라우저 안 사용자 스크립트 관리자의 로컬 저장소에만 보관됩니다. "내 Rewards 진행 상황 사용"이 켜져 있으면, 스크립트는 오늘의 진행 상황과 잔액, 교환 카탈로그를 읽기 위해 bing.com에 GET 요청을 보냅니다. Bing 머리글의 포인트 패널을 움직이는 것과 같은 엔드포인트이며, 사용자의 Bing 세션을 통해 전달됩니다. 그 내용이 제3자나 스크립트 제작자에게 가는 일은 없습니다. 이 체크를 끄면 스크립트는 자체적인 네트워크 요청을 전혀 하지 않습니다. 직접 입력했을 때와 똑같이 bing.com의 검색 주소로 이동할 뿐입니다. 그 목록에 나오는 오늘의 과제도 같은 응답에서 나오며, 읽은 내용은 Bing 페이지마다 다시 요청하지 않도록 로컬에도 보관합니다. 교환 계산기를 위해 하루에 한 번 잔액과 교환 내역, 선택한 목표도 저장하며, 계정은 ID가 아니라 익명 지문으로 구분합니다. 또한 Rewards에 설정한 목표를 가져오기 위해 rewards.bing.com의 교환 페이지를 같은 세션으로 30분에 한 번까지만 요청합니다.',
             infoHow: '작동 방식:',
-            infoHowText: '오늘 검색 포인트가 얼마나 남았는지 Rewards에 물어보고 필요한 만큼만 검색하며, Rewards가 완료로 표시하면 멈춥니다. 검색을 여러 번 해도 카운터가 오르지 않으면 30초쯤 기다렸다가 다시 확인하고 계속합니다. 대개는 Rewards가 늦게 적립할 뿐이기 때문입니다. 키워드 1~3개를 조합해 검색어를 만들고, 사람이 둘러보는 것처럼 보이도록 웹 검색(70%), 이미지, 동영상, 쇼핑, 뉴스를 번갈아 사용합니다. 지연 시간은 3~10초 사이에서 무작위이며, 결과를 읽는 것을 흉내 낸 10~25초의 휴지가 가끔 들어갑니다. 각 주소에는 Bing이 정상 트래픽으로 인식하는 순환 매개변수(form, cvid, PC)가 붙습니다. 모바일과 데스크톱은 자동으로 구분하고, 진행 상황은 페이지를 새로 고쳐도 유지되며, 카운터는 매일 자정에 초기화됩니다. 하루치가 끝나면 탭을 Bing 첫 페이지에 남겨 두므로, 그 탭으로 돌아와도 다음 날의 첫 검색으로 집계되지 않습니다.'
+            infoHowText: '오늘 검색 포인트가 얼마나 남았는지 Rewards에 물어보고 필요한 만큼만 검색하며, Rewards가 완료로 표시하면 멈춥니다. 검색을 여러 번 해도 카운터가 오르지 않으면 30초쯤 기다렸다가 다시 확인하고 계속합니다. 대개는 Rewards가 늦게 적립할 뿐이기 때문입니다. 키워드 1~3개를 조합해 검색어를 만들고, 사람이 둘러보는 것처럼 보이도록 웹 검색(70%), 이미지, 동영상, 쇼핑, 뉴스를 번갈아 사용합니다. 지연 시간은 3~10초 사이에서 무작위이며, 결과를 읽는 것을 흉내 낸 10~25초의 휴지가 가끔 들어갑니다. 각 주소에는 Bing이 정상 트래픽으로 인식하는 순환 매개변수(form, cvid, PC)가 붙습니다. 모바일과 데스크톱은 자동으로 구분하고, 진행 상황은 페이지를 새로 고쳐도 유지되며, 카운터는 매일 자정에 초기화됩니다. 하루치가 끝나면 탭을 Bing 첫 페이지에 남겨 두므로, 그 탭으로 돌아와도 다음 날의 첫 검색으로 집계되지 않습니다. 잔액 옆의 🧮를 누르면 교환 계산기가 열립니다. Rewards에 목표가 있으면 이미 선택되어 있고(🎯), 아니면 카탈로그 보상이나 원하는 Xbox 잔액을 고를 수 있으며, 부족한 포인트와 도달 날짜를 최근 4주의 실측 속도로, 또는 기록이 일주일치 쌓이기 전까지는 작업에서 추정한 최소치로 보여 줍니다.',
+            calcBtnTip: '교환 계산기: 카탈로그 보상이나 Xbox 잔액까지 몇 포인트가 부족한지, 언제 도달하는지 계산합니다.',
+            calcTitle: '교환 계산기',
+            calcAmount: '원하는 Xbox 잔액:',
+            calcCost: '{n} pt 필요',
+            calcCustom: '금액 직접 지정',
+            calcCostTipCustom: '금액을 직접 지정해 교환하면 Rewards는 1 {c}당 {r} 포인트를 차감하며, {m} {c}부터 가능합니다. 그보다 적으면 정액 카드만 있으므로 원하는 잔액에 도달하는 가장 싼 조합을 사용합니다. 정확한 반올림은 교환할 때 Rewards가 합니다.',
+            calcCostTipCards: '사용하시는 지역에는 금액 직접 지정 교환이 없어서, 원하는 잔액에 도달하는 가장 싼 카드 조합을 사용합니다.',
+            calcHave: '보유 {n} pt',
+            calcEnough: '충분합니다',
+            calcRate: '포인트 속도:',
+            calcMeasured: '실측: 최근 {d}일 동안 하루 {n} pt',
+            calcMeasuredPending: '실측: 기록이 7일 쌓이면 표시 ({d}/7)',
+            calcMeasuredTip: '교환한 만큼을 되더해서 잔액이 실제로 얼마나 늘었는지입니다. 스크립트가 계정별로 브라우저에 저장하는 일일 기록으로 계산합니다. Bing 앱, Xbox, 보너스까지 번 것을 모두 세므로, 일주일치 데이터가 모이면 이 숫자를 믿으면 됩니다.',
+            calcEstimate: '작업 기준 추정: 하루 {n} pt',
+            calcEstimateTip: 'Rewards가 각 작업에 지급한다고 밝힌 값으로 만든 최소치입니다. 퍼즐은 체크한 작업의 7일 연속을 한 번 채울 때마다 스탬프 1개로 셉니다. 연속 7일째 보상, 월간 보너스, 이 사이트 밖(Bing 앱, Xbox, Outlook)에서 버는 것은 빠져 있으므로 보통은 더 일찍 도달합니다.',
+            calcSrcSearch: '검색',
+            calcSrcStreak: '연속 기록 보너스',
+            calcSrcPuzzle: '스탬프 퍼즐',
+            calcPerDay: '하루 {n}',
+            calcResult: '{when}, {date}쯤 도달합니다',
+            calcNoSource: '날짜를 계산하려면 작업을 하나 이상 체크하세요.',
+            calcLineTip: '교환 목표: 부족한 만큼과 지금 속도로 도달하는 날짜입니다. 클릭하면 계산기가 열립니다.',
+            calcGoal: '목표:',
+            calcGoalXbox: 'Xbox 잔액(금액 자유)',
+            calcSearch: '보상 검색…'
         },
         pl: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -737,9 +964,34 @@
             infoName: 'Nazwa:', infoVersion: 'Wersja:', infoDescription: 'Opis:',
             infoDescriptionText: 'Automatyzuje codzienne wyszukiwania w Bingu, aby zbierać punkty Microsoft Rewards bez ręcznej pracy. Skrypt pyta Microsoft Rewards, ile punktów za wyszukiwania brakuje ci dzisiaj, wykonuje tylko potrzebne wyszukiwania, sam się zatrzymuje po ich ukończeniu i pokazuje, ile twoje punkty są warte w środkach Xbox; liczba pod ⚙ zostaje na zastępstwo, gdy nie ma sesji Rewards. Liczbę wyszukiwań ustawia się przyciskiem ⚙ (1-100, domyślnie 20), a przyciski start / kontynuuj / zatrzymaj / wyzeruj zmieniają się zależnie od stanu. W zakładce słów kluczowych możesz usunąć każde jednym kliknięciem, dodać kilka oddzielonych przecinkami, zmienić wszystkie naraz albo przywrócić pierwotną listę. Pływający panel zwija się i pamięta, jak go zostawiłeś, a język skryptu wybiera się tutaj, na górze. Pod przyciskami jest lista tego, czego Rewards wymaga dziś poza wyszukiwaniami — seria, zameldowanie w aplikacji, zestaw dzienny — z odnośnikiem do każdej zaległej pozycji.',
             infoAuthor: 'Autor:', infoGitHub: 'GitHub:', infoPrivacy: 'Prywatność:',
-            infoPrivacyText: 'Twoje słowa kluczowe i licznik wyszukiwań są zapisywane wyłącznie w pamięci lokalnej menedżera userscriptów, w twojej przeglądarce. Gdy włączone jest „Używaj mojego postępu Rewards”, skrypt wysyła żądanie GET do bing.com — do tego samego punktu, który zasila panel punktów w nagłówku Binga — aby odczytać twój dzisiejszy postęp, saldo i katalog wymiany; żądanie idzie przez twoją sesję Binga i nic z tego nie trafia do osób trzecich ani do autora skryptu. Odznacz to pole i skrypt nie wykona żadnych własnych żądań sieciowych: będzie tylko przechodził pod adresy wyszukiwania bing.com, dokładnie tak, jakbyś wpisał je sam. Zadania dnia z tej listy pochodzą z tej samej odpowiedzi, a to, co zostało odczytane, jest też zapisywane lokalnie, żeby nie pytać o nie na każdej stronie Binga.',
+            infoPrivacyText: 'Twoje słowa kluczowe i licznik wyszukiwań są zapisywane wyłącznie w pamięci lokalnej menedżera userscriptów, w twojej przeglądarce. Gdy włączone jest „Używaj mojego postępu Rewards”, skrypt wysyła żądanie GET do bing.com — do tego samego punktu, który zasila panel punktów w nagłówku Binga — aby odczytać twój dzisiejszy postęp, saldo i katalog wymiany; żądanie idzie przez twoją sesję Binga i nic z tego nie trafia do osób trzecich ani do autora skryptu. Odznacz to pole i skrypt nie wykona żadnych własnych żądań sieciowych: będzie tylko przechodził pod adresy wyszukiwania bing.com, dokładnie tak, jakbyś wpisał je sam. Zadania dnia z tej listy pochodzą z tej samej odpowiedzi, a to, co zostało odczytane, jest też zapisywane lokalnie, żeby nie pytać o nie na każdej stronie Binga. Na potrzeby kalkulatora wymiany zapisuje też raz dziennie twoje saldo i wymiany oraz wybrany cel, rozdzielone według konta anonimowym odciskiem zamiast identyfikatora konta; a żeby pobrać cel ustawiony w Rewards, pobiera stronę wymiany z rewards.bing.com najwyżej co pół godziny i w ramach twojej sesji.',
             infoHow: 'Jak to działa:',
-            infoHowText: 'Skrypt pyta Rewards, ile punktów za wyszukiwania brakuje dzisiaj, i wykonuje tylko potrzebne, zatrzymując się, gdy Rewards oznaczy dzień jako ukończony; jeśli licznik nie rośnie przez kilka wyszukiwań pod rząd, skrypt czeka pół minuty, sprawdza ponownie i działa dalej, bo prawie zawsze Rewards po prostu nalicza z opóźnieniem. Tworzy zapytania, łącząc od 1 do 3 słów kluczowych, i przeplata wyszukiwanie w sieci (70%), grafiki, filmy, zakupy i wiadomości, żeby przypominało to przeglądanie przez człowieka. Opóźnienia są losowe w zakresie 3-10 s, z okazjonalnymi przerwami 10-25 s naśladującymi czytanie wyników. Każdy adres zawiera zmieniające się parametry (form, cvid, PC), które Bing traktuje jako zwykły ruch. Tryb mobilny i komputerowy jest rozpoznawany automatycznie, postęp przetrwa przeładowanie strony, a licznik zeruje się codziennie o północy. Po ukończeniu dnia zostawia kartę na stronie głównej Bing, żeby powrót do niej nie liczył się jako pierwsze wyszukiwanie następnego dnia.'
+            infoHowText: 'Skrypt pyta Rewards, ile punktów za wyszukiwania brakuje dzisiaj, i wykonuje tylko potrzebne, zatrzymując się, gdy Rewards oznaczy dzień jako ukończony; jeśli licznik nie rośnie przez kilka wyszukiwań pod rząd, skrypt czeka pół minuty, sprawdza ponownie i działa dalej, bo prawie zawsze Rewards po prostu nalicza z opóźnieniem. Tworzy zapytania, łącząc od 1 do 3 słów kluczowych, i przeplata wyszukiwanie w sieci (70%), grafiki, filmy, zakupy i wiadomości, żeby przypominało to przeglądanie przez człowieka. Opóźnienia są losowe w zakresie 3-10 s, z okazjonalnymi przerwami 10-25 s naśladującymi czytanie wyników. Każdy adres zawiera zmieniające się parametry (form, cvid, PC), które Bing traktuje jako zwykły ruch. Tryb mobilny i komputerowy jest rozpoznawany automatycznie, postęp przetrwa przeładowanie strony, a licznik zeruje się codziennie o północy. Po ukończeniu dnia zostawia kartę na stronie głównej Bing, żeby powrót do niej nie liczył się jako pierwsze wyszukiwanie następnego dnia. Ikona 🧮 obok salda otwiera kalkulator wymiany: jeśli masz cel w Rewards (🎯), jest już wybrany, a jeśli nie, wybierasz nagrodę z katalogu albo saldo Xbox, a on mówi, ile punktów ci brakuje i kiedy je uzbierasz, w twoim zmierzonym tempie z ostatnich czterech tygodni albo, dopóki nie ma tygodnia zapisów, według minimum szacowanego z zadań.',
+            calcBtnTip: 'Kalkulator wymiany: ile punktów brakuje ci do nagrody z katalogu albo salda Xbox i kiedy je uzbierasz.',
+            calcTitle: 'Kalkulator wymiany',
+            calcAmount: 'Środki Xbox, które chcesz:',
+            calcCost: 'Kosztuje {n} pkt',
+            calcCustom: 'dowolna kwota',
+            calcCostTipCustom: 'Przy wymianie na dowolną kwotę Rewards pobiera {r} punktów za 1 {c}, od {m} {c} w górę. Poniżej są tylko karty o stałej wartości i bierze się najtańszą kombinację, która pokrywa żądane saldo. Dokładne zaokrąglenie robi Rewards przy wymianie.',
+            calcCostTipCards: 'Na twoim rynku nie ma wymiany na dowolną kwotę, więc bierze się najtańszą kombinację kart, która pokrywa żądane saldo.',
+            calcHave: 'Masz {n} pkt',
+            calcEnough: 'już wystarczy',
+            calcRate: 'Tempo punktów:',
+            calcMeasured: 'Zmierzone: {n} pkt/dzień przez ostatnie {d} dni',
+            calcMeasuredPending: 'Zmierzone: dostępne po 7 dniach zapisów ({d}/7)',
+            calcMeasuredTip: 'O ile naprawdę wzrosło twoje saldo, po doliczeniu tego, co wymieniłeś, według codziennego odczytu, który skrypt trzyma w twojej przeglądarce dla każdego konta. Liczy wszystko, co zarabiasz, także w aplikacji Bing, na Xbox i z premii, więc gdy zbierze się tydzień danych, to jest wiarygodna liczba.',
+            calcEstimate: 'Szacunek z zadań: {n} pkt/dzień',
+            calcEstimateTip: 'Minimum na podstawie tego, ile według Rewards płaci każde zadanie. Układanka liczy jedną pieczątkę za każdą siedmiodniową serię zaznaczonych zadań. Pomija nagrody za siódmy dzień serii, premie miesięczne i to, co zarabiasz poza tą stroną (aplikacja Bing, Xbox, Outlook), więc zwykle dojdziesz do celu wcześniej.',
+            calcSrcSearch: 'Wyszukiwania',
+            calcSrcStreak: 'Premia za serię',
+            calcSrcPuzzle: 'Układanka z pieczątek',
+            calcPerDay: '{n}/dzień',
+            calcResult: 'Dojdziesz do celu {when}, około {date}',
+            calcNoSource: 'Zaznacz co najmniej jedno zadanie, żeby obliczyć datę.',
+            calcLineTip: 'Twój cel wymiany: ile brakuje i kiedy dojdziesz do celu w swoim tempie. Kliknij, aby otworzyć kalkulator.',
+            calcGoal: 'Cel:',
+            calcGoalXbox: 'Saldo Xbox (dowolna kwota)',
+            calcSearch: 'Szukaj nagrody…'
         },
         fi: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -798,9 +1050,34 @@
             infoName: 'Nimi:', infoVersion: 'Versio:', infoDescription: 'Kuvaus:',
             infoDescriptionText: 'Automatisoi päivittäiset Bing-haut, jotta Microsoft Rewards -pisteitä kertyy ilman käsityötä. Skripti kysyy Microsoft Rewardsilta, montako hakupistettä sinulta puuttuu tänään, tekee vain tarvittavat haut, pysähtyy itse kun ne on tehty ja näyttää, paljonko pisteesi ovat arvoltaan Xbox-saldona; ⚙-painikkeen luku jää varalle niitä tilanteita varten, joissa Rewards-istuntoa ei ole. Hakujen määrä säädetään ⚙-painikkeella (1-100, oletus 20), ja aloitus-, jatkamis-, pysäytys- ja nollauspainikkeet vaihtuvat tilan mukaan. Avainsanavälilehdellä voit poistaa jokaisen yhdellä napsautuksella, lisätä useita pilkulla eroteltuina, muokata kaikkia kerralla tai palauttaa alkuperäisen listan. Kelluva paneeli taittuu kokoon ja muistaa, mihin sen jätit, ja skriptin kieli valitaan täältä ylhäältä. Painikkeiden alla on lista siitä, mitä Rewards pyytää tänään hakujen lisäksi — putki, kirjautuminen sovelluksessa, päivän setti — ja linkki jokaiseen puuttuvaan.',
             infoAuthor: 'Tekijä:', infoGitHub: 'GitHub:', infoPrivacy: 'Tietosuoja:',
-            infoPrivacyText: 'Avainsanasi ja hakulaskuri tallennetaan vain käyttäjäskriptien hallinnan paikalliseen tallennustilaan selaimessasi. Kun ”Käytä Rewards-edistymistäni” on käytössä, skripti tekee GET-pyynnön osoitteeseen bing.com — samaan päätepisteeseen, joka syöttää Bingin ylätunnisteen pistepaneelin — lukeakseen päivän edistymisen, saldosi ja lunastusluettelon; pyyntö kulkee Bing-istuntosi kautta, eikä mikään siitä mene kolmansille osapuolille tai skriptin tekijälle. Poista rasti ruudusta, niin skripti ei tee lainkaan omia verkkopyyntöjä: se vain siirtyy bing.comin hakuosoitteisiin täsmälleen kuten jos kirjoittaisit ne itse. Listan päivän tehtävät tulevat samasta vastauksesta, ja luettu tallennetaan myös paikallisesti, jottei sitä tarvitse pyytää joka Bing-sivulla.',
+            infoPrivacyText: 'Avainsanasi ja hakulaskuri tallennetaan vain käyttäjäskriptien hallinnan paikalliseen tallennustilaan selaimessasi. Kun ”Käytä Rewards-edistymistäni” on käytössä, skripti tekee GET-pyynnön osoitteeseen bing.com — samaan päätepisteeseen, joka syöttää Bingin ylätunnisteen pistepaneelin — lukeakseen päivän edistymisen, saldosi ja lunastusluettelon; pyyntö kulkee Bing-istuntosi kautta, eikä mikään siitä mene kolmansille osapuolille tai skriptin tekijälle. Poista rasti ruudusta, niin skripti ei tee lainkaan omia verkkopyyntöjä: se vain siirtyy bing.comin hakuosoitteisiin täsmälleen kuten jos kirjoittaisit ne itse. Listan päivän tehtävät tulevat samasta vastauksesta, ja luettu tallennetaan myös paikallisesti, jottei sitä tarvitse pyytää joka Bing-sivulla. Lunastuslaskuria varten se tallentaa lisäksi kerran päivässä saldosi ja lunastuksesi sekä valitsemasi tavoitteen tileittäin eroteltuina nimettömällä sormenjäljellä tilitunnuksen sijaan; ja tuodakseen Rewardsissa asettamasi tavoitteen se hakee rewards.bing.com-sivuston lunastussivun enintään puolen tunnin välein omalla istunnollasi.',
             infoHow: 'Miten se toimii:',
-            infoHowText: 'Skripti kysyy Rewardsilta, montako hakupistettä tänään puuttuu, ja tekee vain tarvittavat haut pysähtyen, kun Rewards merkitsee päivän valmiiksi. Jos laskuri ei nouse usean haun aikana, skripti odottaa puoli minuuttia, tarkistaa uudelleen ja jatkaa, sillä lähes aina Rewards vain kirjaa pisteet myöhässä. Se muodostaa hakuja yhdistelemällä 1-3 avainsanaa ja vuorottelee verkkohaun (70 %), kuvien, videoiden, ostosten ja uutisten välillä jäljitelläkseen ihmisen selailua. Viiveet ovat satunnaisia 3-10 s, ja välillä tulee 10-25 s taukoja, jotka jäljittelevät tulosten lukemista. Jokaisessa osoitteessa on vaihtuvia parametreja (form, cvid, PC), jotka Bing tulkitsee tavalliseksi liikenteeksi. Mobiili ja työpöytä tunnistetaan automaattisesti, edistyminen säilyy sivun uudelleenlatausten yli ja laskuri nollautuu joka päivä keskiyöllä. Kun päivä on valmis, välilehti jää Bingin etusivulle, jottei siihen palaamista laskettaisi seuraavan päivän ensimmäiseksi hauksi.'
+            infoHowText: 'Skripti kysyy Rewardsilta, montako hakupistettä tänään puuttuu, ja tekee vain tarvittavat haut pysähtyen, kun Rewards merkitsee päivän valmiiksi. Jos laskuri ei nouse usean haun aikana, skripti odottaa puoli minuuttia, tarkistaa uudelleen ja jatkaa, sillä lähes aina Rewards vain kirjaa pisteet myöhässä. Se muodostaa hakuja yhdistelemällä 1-3 avainsanaa ja vuorottelee verkkohaun (70 %), kuvien, videoiden, ostosten ja uutisten välillä jäljitelläkseen ihmisen selailua. Viiveet ovat satunnaisia 3-10 s, ja välillä tulee 10-25 s taukoja, jotka jäljittelevät tulosten lukemista. Jokaisessa osoitteessa on vaihtuvia parametreja (form, cvid, PC), jotka Bing tulkitsee tavalliseksi liikenteeksi. Mobiili ja työpöytä tunnistetaan automaattisesti, edistyminen säilyy sivun uudelleenlatausten yli ja laskuri nollautuu joka päivä keskiyöllä. Kun päivä on valmis, välilehti jää Bingin etusivulle, jottei siihen palaamista laskettaisi seuraavan päivän ensimmäiseksi hauksi. Saldon vieressä oleva 🧮 avaa lunastuslaskurin: Rewards-tavoitteesi (🎯) on valmiiksi valittuna, jos sinulla on sellainen, tai valitset luettelon palkinnon tai haluamasi Xbox-saldon, ja se kertoo, montako pistettä puuttuu ja minä päivänä pääset siihen, mitatulla tahdillasi viimeisiltä neljältä viikolta tai, kunnes kirjauksia on viikon verran, tehtävistä arvioidulla vähimmäistahdilla.',
+            calcBtnTip: 'Lunastuslaskuri: montako pistettä luettelon palkintoon tai Xbox-saldoon vielä puuttuu ja minä päivänä pääset siihen.',
+            calcTitle: 'Lunastuslaskuri',
+            calcAmount: 'Haluamasi Xbox-saldo:',
+            calcCost: 'Maksaa {n} p',
+            calcCustom: 'vapaa summa',
+            calcCostTipCustom: 'Vapaan summan lunastuksessa Rewards veloittaa {r} pistettä / 1 {c}, alkaen {m} {c}. Sitä pienemmille summille on vain kiinteän arvon kortteja, ja valitaan halvin yhdistelmä, joka kattaa pyydetyn saldon. Tarkan pyöristyksen tekee Rewards lunastettaessa.',
+            calcCostTipCards: 'Markkinallasi ei ole vapaan summan lunastusta, joten valitaan halvin korttiyhdistelmä, joka kattaa pyydetyn saldon.',
+            calcHave: 'Sinulla on {n} p',
+            calcEnough: 'riittää jo',
+            calcRate: 'Pistetahti:',
+            calcMeasured: 'Mitattu: {n} p/päivä viimeisten {d} päivän ajalta',
+            calcMeasuredPending: 'Mitattu: saatavilla 7 päivän kirjausten jälkeen ({d}/7)',
+            calcMeasuredTip: 'Kuinka paljon saldosi on oikeasti kasvanut, lunastetut takaisin laskettuina, sen päivittäisen lukeman mukaan, jonka skripti tallentaa selaimeesi jokaiselle tilille. Se laskee kaiken ansaitsemasi, myös Bing-sovelluksessa, Xboxissa ja bonuksista, joten kun dataa on viikon verran, tähän lukuun voi luottaa.',
+            calcEstimate: 'Arvio tehtävistä: {n} p/päivä',
+            calcEstimateTip: 'Vähimmäisarvio siitä, mitä Rewards kertoo kunkin tehtävän maksavan. Palapeli laskee yhden leiman jokaisesta valittujen tehtävien seitsemän päivän putkesta. Mukana eivät ole putkien seitsemännen päivän palkinnot, kuukausibonukset eikä se, mitä ansaitset tämän sivuston ulkopuolella (Bing-sovellus, Xbox, Outlook), joten yleensä pääset perille aiemmin.',
+            calcSrcSearch: 'Haut',
+            calcSrcStreak: 'Putkibonus',
+            calcSrcPuzzle: 'Leimapalapeli',
+            calcPerDay: '{n}/päivä',
+            calcResult: 'Pääset tavoitteeseen {when}, noin {date}',
+            calcNoSource: 'Valitse vähintään yksi tehtävä, jotta päivämäärä voidaan laskea.',
+            calcLineTip: 'Lunastustavoitteesi: mitä vielä puuttuu ja minä päivänä pääset siihen omaa tahtiasi. Avaa laskuri napsauttamalla.',
+            calcGoal: 'Tavoite:',
+            calcGoalXbox: 'Xbox-saldo (vapaa summa)',
+            calcSearch: 'Hae palkintoa…'
         },
         vi: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -859,9 +1136,34 @@
             infoName: 'Tên:', infoVersion: 'Phiên bản:', infoDescription: 'Mô tả:',
             infoDescriptionText: 'Tự động hóa các lượt tìm kiếm hằng ngày trên Bing để tích điểm Microsoft Rewards mà không cần thao tác tay. Tập lệnh hỏi Microsoft Rewards xem hôm nay bạn còn thiếu bao nhiêu điểm tìm kiếm, chỉ chạy những lượt tìm cần thiết, tự dừng khi xong, và cho biết điểm của bạn quy ra bao nhiêu số dư Xbox; con số trong ⚙ vẫn còn đó để dự phòng cho lúc không có phiên Rewards. Số lượt tìm kiếm được đặt bằng ⚙ (1-100, mặc định 20) và các nút bắt đầu / tiếp tục / dừng / đặt lại thay đổi theo trạng thái. Trong thẻ từ khóa, bạn có thể xóa từng mục bằng một cú bấm, thêm nhiều mục cách nhau bằng dấu phẩy, sửa tất cả cùng lúc hoặc khôi phục danh sách ban đầu. Bảng nổi có thể thu gọn và nhớ trạng thái bạn để lại, còn ngôn ngữ của tập lệnh được chọn ở phía trên này. Bên dưới các nút là danh sách những gì Rewards yêu cầu hôm nay ngoài tìm kiếm — chuỗi ngày, việc điểm danh trong ứng dụng, bộ nhiệm vụ hằng ngày — kèm liên kết tới từng mục còn thiếu.',
             infoAuthor: 'Tác giả:', infoGitHub: 'GitHub:', infoPrivacy: 'Quyền riêng tư:',
-            infoPrivacyText: 'Từ khóa và bộ đếm tìm kiếm của bạn chỉ được lưu trong bộ nhớ cục bộ của trình quản lý userscript, ngay trong trình duyệt. Khi bật «Dùng tiến độ Rewards của tôi», tập lệnh gửi một yêu cầu GET tới bing.com — cũng chính là điểm cuối đang chạy bảng điểm trên đầu trang Bing — để đọc tiến độ hôm nay, số dư của bạn và danh mục quy đổi; yêu cầu đi kèm phiên Bing của bạn, và không có phần nào trong đó tới bên thứ ba hay tới tác giả tập lệnh. Tắt ô đó thì tập lệnh không tự thực hiện bất kỳ yêu cầu mạng nào: nó chỉ điều hướng tới các địa chỉ tìm kiếm của bing.com, y như khi bạn tự gõ. Các nhiệm vụ trong ngày hiện ở danh sách đó cũng lấy từ chính phản hồi này, và những gì đọc được cũng lưu cục bộ để khỏi phải hỏi lại ở mỗi trang Bing.',
+            infoPrivacyText: 'Từ khóa và bộ đếm tìm kiếm của bạn chỉ được lưu trong bộ nhớ cục bộ của trình quản lý userscript, ngay trong trình duyệt. Khi bật «Dùng tiến độ Rewards của tôi», tập lệnh gửi một yêu cầu GET tới bing.com — cũng chính là điểm cuối đang chạy bảng điểm trên đầu trang Bing — để đọc tiến độ hôm nay, số dư của bạn và danh mục quy đổi; yêu cầu đi kèm phiên Bing của bạn, và không có phần nào trong đó tới bên thứ ba hay tới tác giả tập lệnh. Tắt ô đó thì tập lệnh không tự thực hiện bất kỳ yêu cầu mạng nào: nó chỉ điều hướng tới các địa chỉ tìm kiếm của bing.com, y như khi bạn tự gõ. Các nhiệm vụ trong ngày hiện ở danh sách đó cũng lấy từ chính phản hồi này, và những gì đọc được cũng lưu cục bộ để khỏi phải hỏi lại ở mỗi trang Bing. Để phục vụ máy tính đổi điểm, tiện ích còn lưu mỗi ngày một lần số dư và các lần đổi của bạn, cùng mục tiêu bạn chọn, tách theo tài khoản bằng một dấu vân tay ẩn danh thay vì mã tài khoản; và để lấy mục tiêu bạn đã đặt trong Rewards, tiện ích tải trang đổi điểm của rewards.bing.com tối đa nửa giờ một lần, bằng chính phiên đăng nhập của bạn.',
             infoHow: 'Cách hoạt động:',
-            infoHowText: 'Tập lệnh hỏi Rewards xem hôm nay còn thiếu bao nhiêu điểm tìm kiếm và chỉ chạy những lượt cần thiết, dừng lại khi Rewards báo là đã xong ngày; nếu bộ đếm không tăng qua nhiều lượt tìm liên tiếp, nó chờ khoảng nửa phút, kiểm tra lại rồi đi tiếp, vì hầu như luôn chỉ là Rewards cộng điểm muộn. Tập lệnh tạo truy vấn bằng cách ghép 1 đến 3 từ khóa và luân phiên giữa tìm kiếm web (70%), hình ảnh, video, mua sắm và tin tức để mô phỏng việc duyệt web của con người. Độ trễ ngẫu nhiên từ 3-10 giây, thỉnh thoảng có quãng nghỉ 10-25 giây mô phỏng việc đọc kết quả. Mỗi địa chỉ đều kèm các tham số luân phiên (form, cvid, PC) mà Bing xem là lưu lượng hợp lệ. Chế độ di động hay máy tính được nhận diện tự động, tiến trình được giữ lại qua các lần tải lại trang và bộ đếm được đặt lại mỗi ngày vào nửa đêm. Khi xong ngày, tiện ích để tab ở trang chủ Bing, để việc quay lại tab đó không bị tính là lượt tìm kiếm đầu tiên của ngày hôm sau.'
+            infoHowText: 'Tập lệnh hỏi Rewards xem hôm nay còn thiếu bao nhiêu điểm tìm kiếm và chỉ chạy những lượt cần thiết, dừng lại khi Rewards báo là đã xong ngày; nếu bộ đếm không tăng qua nhiều lượt tìm liên tiếp, nó chờ khoảng nửa phút, kiểm tra lại rồi đi tiếp, vì hầu như luôn chỉ là Rewards cộng điểm muộn. Tập lệnh tạo truy vấn bằng cách ghép 1 đến 3 từ khóa và luân phiên giữa tìm kiếm web (70%), hình ảnh, video, mua sắm và tin tức để mô phỏng việc duyệt web của con người. Độ trễ ngẫu nhiên từ 3-10 giây, thỉnh thoảng có quãng nghỉ 10-25 giây mô phỏng việc đọc kết quả. Mỗi địa chỉ đều kèm các tham số luân phiên (form, cvid, PC) mà Bing xem là lưu lượng hợp lệ. Chế độ di động hay máy tính được nhận diện tự động, tiến trình được giữ lại qua các lần tải lại trang và bộ đếm được đặt lại mỗi ngày vào nửa đêm. Khi xong ngày, tiện ích để tab ở trang chủ Bing, để việc quay lại tab đó không bị tính là lượt tìm kiếm đầu tiên của ngày hôm sau. Biểu tượng 🧮 cạnh số dư mở máy tính đổi điểm: nếu bạn đã đặt mục tiêu trong Rewards (🎯) thì mục tiêu đó được chọn sẵn, nếu không bạn chọn một phần thưởng trong danh mục hoặc số dư Xbox mong muốn, và nó cho biết còn thiếu bao nhiêu điểm và ngày nào bạn đạt được, theo tốc độ đo được trong bốn tuần gần nhất hoặc, cho đến khi có một tuần ghi nhận, theo mức tối thiểu ước tính từ các nhiệm vụ.',
+            calcBtnTip: 'Máy tính đổi điểm: còn thiếu bao nhiêu điểm cho một phần thưởng trong danh mục hoặc một khoản số dư Xbox, và ngày nào bạn đạt được.',
+            calcTitle: 'Máy tính đổi điểm',
+            calcAmount: 'Số dư Xbox bạn muốn:',
+            calcCost: 'Tốn {n} điểm',
+            calcCustom: 'số tiền tùy chọn',
+            calcCostTipCustom: 'Khi đổi theo số tiền tùy chọn, Rewards lấy {r} điểm cho 1 {c}, từ {m} {c} trở lên. Dưới mức đó chỉ có thẻ mệnh giá cố định, và sẽ chọn tổ hợp rẻ nhất đạt tới số dư yêu cầu. Việc làm tròn chính xác do Rewards thực hiện khi đổi.',
+            calcCostTipCards: 'Thị trường của bạn không có đổi theo số tiền tùy chọn, nên sẽ chọn tổ hợp thẻ rẻ nhất đạt tới số dư yêu cầu.',
+            calcHave: 'Bạn có {n} điểm',
+            calcEnough: 'đã đủ',
+            calcRate: 'Tốc độ tích điểm:',
+            calcMeasured: 'Đo được: {n} điểm/ngày trong {d} ngày gần nhất',
+            calcMeasuredPending: 'Đo được: có sau 7 ngày ghi nhận ({d}/7)',
+            calcMeasuredTip: 'Số dư của bạn thực sự tăng bao nhiêu, cộng lại phần đã đổi, theo lần đọc hằng ngày mà tiện ích lưu trong trình duyệt cho từng tài khoản. Nó tính mọi thứ bạn kiếm được, kể cả trong ứng dụng Bing, Xbox và tiền thưởng, nên khi có đủ một tuần dữ liệu thì đây là con số đáng tin.',
+            calcEstimate: 'Ước tính theo nhiệm vụ: {n} điểm/ngày',
+            calcEstimateTip: 'Mức tối thiểu dựa trên số điểm Rewards nói mỗi nhiệm vụ trả. Trò ghép hình tính một con dấu cho mỗi chuỗi bảy ngày của các nhiệm vụ đã chọn. Không tính phần thưởng ngày thứ bảy của chuỗi, tiền thưởng hằng tháng và những gì bạn kiếm ngoài trang này (ứng dụng Bing, Xbox, Outlook), nên thường bạn sẽ đạt sớm hơn.',
+            calcSrcSearch: 'Tìm kiếm',
+            calcSrcStreak: 'Thưởng chuỗi',
+            calcSrcPuzzle: 'Ghép hình con dấu',
+            calcPerDay: '{n}/ngày',
+            calcResult: 'Bạn sẽ đạt {when}, khoảng {date}',
+            calcNoSource: 'Hãy chọn ít nhất một nhiệm vụ để tính ngày.',
+            calcLineTip: 'Mục tiêu đổi điểm của bạn: còn thiếu bao nhiêu và ngày bạn đạt được với tốc độ hiện tại. Nhấn để mở máy tính.',
+            calcGoal: 'Mục tiêu:',
+            calcGoalXbox: 'Số dư Xbox (số tiền tùy ý)',
+            calcSearch: 'Tìm phần thưởng…'
         },
         zh: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -920,9 +1222,34 @@
             infoName: '名称：', infoVersion: '版本：', infoDescription: '描述：',
             infoDescriptionText: '自动完成每日的 Bing 搜索，无需手动操作即可累积 Microsoft Rewards 积分。脚本会向 Microsoft Rewards 查询你今天还差多少搜索积分，只执行必要的搜索，完成后自动停止，并显示你的积分折合多少 Xbox 余额；⚙ 里的次数则留作没有 Rewards 会话时的备用。搜索次数可用 ⚙ 设置（1-100，默认 20），开始／继续／停止／重置按钮会随状态变化。在关键词标签页中，你可以点击逐个删除、用逗号分隔一次添加多个、一次性编辑全部，或恢复原始列表。浮动面板可以折叠并记住你上次的状态，脚本语言就在上方选择。按钮下面会列出除搜索之外今天 Rewards 要求的事项（连续天数、在应用里登记、每日任务），未完成的都带链接。',
             infoAuthor: '作者：', infoGitHub: 'GitHub：', infoPrivacy: '隐私：',
-            infoPrivacyText: '你的关键词和搜索计数器只保存在浏览器中用户脚本管理器的本地存储里。开启「使用我的 Rewards 进度」时，脚本会向 bing.com 发起一次 GET 请求，读取你今天的进度、余额和兑换目录；这个地址就是驱动 Bing 页首积分面板的同一个接口，请求随你的 Bing 会话发出，其中的内容不会流向任何第三方，也不会发给脚本作者。关掉这个勾选，脚本就不会发起任何自己的网络请求：它只是跳转到 bing.com 的搜索网址，和你自己输入完全一样。该列表里当天的任务也来自同一个响应，读到的内容同样保存在本地，以免每打开一个 Bing 页面就再问一次。',
+            infoPrivacyText: '你的关键词和搜索计数器只保存在浏览器中用户脚本管理器的本地存储里。开启「使用我的 Rewards 进度」时，脚本会向 bing.com 发起一次 GET 请求，读取你今天的进度、余额和兑换目录；这个地址就是驱动 Bing 页首积分面板的同一个接口，请求随你的 Bing 会话发出，其中的内容不会流向任何第三方，也不会发给脚本作者。关掉这个勾选，脚本就不会发起任何自己的网络请求：它只是跳转到 bing.com 的搜索网址，和你自己输入完全一样。该列表里当天的任务也来自同一个响应，读到的内容同样保存在本地，以免每打开一个 Bing 页面就再问一次。为了兑换计算器，它还会每天保存一次你的余额、兑换记录和你选择的目标，按账户分开存放，用匿名指纹而不是账户标识区分；为了读取你在 Rewards 中设置的目标，它还会用你自己的会话请求 rewards.bing.com 的兑换页面，最多每半小时一次。',
             infoHow: '工作原理：',
-            infoHowText: '脚本会向 Rewards 查询今天还差多少搜索积分，只做必要的那些，等 Rewards 把今天标记为已完成就停下；如果连续几次搜索计数都没上涨，它会等半分钟再看一次然后继续，因为多半只是 Rewards 发放得晚。 脚本会组合 1 到 3 个关键词生成查询，并在网页搜索（70%）、图片、视频、购物和资讯之间轮换，以模拟人类浏览。延迟在 3-10 秒之间随机，偶尔会有 10-25 秒的停顿来模拟阅读结果。每个网址都带有轮换参数（form、cvid、PC），Bing 会将其视为正常流量。脚本会自动识别移动端与桌面端，进度在页面重新加载后依然保留，计数器每天午夜重置。 当天完成后会把标签页停在 Bing 首页，这样再回到该标签页时不会被算作第二天的第一次搜索。'
+            infoHowText: '脚本会向 Rewards 查询今天还差多少搜索积分，只做必要的那些，等 Rewards 把今天标记为已完成就停下；如果连续几次搜索计数都没上涨，它会等半分钟再看一次然后继续，因为多半只是 Rewards 发放得晚。 脚本会组合 1 到 3 个关键词生成查询，并在网页搜索（70%）、图片、视频、购物和资讯之间轮换，以模拟人类浏览。延迟在 3-10 秒之间随机，偶尔会有 10-25 秒的停顿来模拟阅读结果。每个网址都带有轮换参数（form、cvid、PC），Bing 会将其视为正常流量。脚本会自动识别移动端与桌面端，进度在页面重新加载后依然保留，计数器每天午夜重置。 当天完成后会把标签页停在 Bing 首页，这样再回到该标签页时不会被算作第二天的第一次搜索。余额旁边的 🧮 会打开兑换计算器：如果你在 Rewards 中设置了目标，它会预先选好（🎯）；也可以选择目录中的奖励或想要的 Xbox 余额。它会告诉你还差多少积分、哪天能达到，按最近四周的实测速度计算；记录不满一周时，则按任务估算的最低值计算。',
+            calcBtnTip: '兑换计算器：距离目录中的奖励或一笔 Xbox 余额还差多少积分，以及哪天能攒够。',
+            calcTitle: '兑换计算器',
+            calcAmount: '想要的 Xbox 余额：',
+            calcCost: '需要 {n} 分',
+            calcCustom: '自定义金额',
+            calcCostTipCustom: '自定义金额兑换时，Rewards 按每 1 {c} 收取 {r} 积分，{m} {c} 起兑。低于这个金额只有固定面额的卡，会选用能达到所需余额的最便宜组合。最终的取整由 Rewards 在兑换时完成。',
+            calcCostTipCards: '你所在的市场没有自定义金额兑换，所以会选用能达到所需余额的最便宜的卡片组合。',
+            calcHave: '你有 {n} 分',
+            calcEnough: '已经够了',
+            calcRate: '积分速度：',
+            calcMeasured: '实测：最近 {d} 天每天 {n} 分',
+            calcMeasuredPending: '实测：记录满 7 天后可用（{d}/7）',
+            calcMeasuredTip: '把兑换掉的积分加回去后，你的余额实际涨了多少，依据的是脚本为每个账户保存在浏览器里的每日读数。它会计入你赚到的一切，包括 Bing 应用、Xbox 和各种奖励，所以一旦有一周的数据，这就是可靠的数字。',
+            calcEstimate: '按任务估算：每天 {n} 分',
+            calcEstimateTip: '根据 Rewards 标明的每项任务奖励得出的最低值。拼图按所勾选任务每完成一次 7 天连续记录算一枚印章。不包括连续记录第 7 天的奖励、每月奖励以及你在本网站以外（Bing 应用、Xbox、Outlook）赚到的积分，所以通常会更早达到。',
+            calcSrcSearch: '搜索',
+            calcSrcStreak: '连续奖励',
+            calcSrcPuzzle: '印章拼图',
+            calcPerDay: '每天 {n}',
+            calcResult: '{when}达到，大约在 {date}',
+            calcNoSource: '至少勾选一项任务才能计算日期。',
+            calcLineTip: '你的兑换目标：还差多少，以及按你的速度哪天能达到。点击打开计算器。',
+            calcGoal: '目标：',
+            calcGoalXbox: 'Xbox 余额（金额自选）',
+            calcSearch: '搜索奖励…'
         },
         ar: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -981,9 +1308,34 @@
             infoName: 'الاسم:', infoVersion: 'الإصدار:', infoDescription: 'الوصف:',
             infoDescriptionText: 'يؤتمت عمليات البحث اليومية في Bing لتجميع نقاط Microsoft Rewards دون تدخل يدوي. يسأل البرنامج النصي Microsoft Rewards عن عدد نقاط البحث الناقصة اليوم، وينفّذ عمليات البحث اللازمة فقط، ويتوقّف من تلقاء نفسه عند إتمامها، ويعرض قيمة نقاطك كرصيد Xbox؛ ويبقى العدد الموجود في ⚙ بديلًا للحالات التي لا توجد فيها جلسة Rewards. يُضبط عدد عمليات البحث بزر ⚙ (من 1 إلى 100، والافتراضي 20)، وتتغيّر أزرار البدء والمتابعة والإيقاف والتصفير بحسب الحالة. في تبويب الكلمات المفتاحية يمكنك حذف كل واحدة بنقرة، أو إضافة عدة كلمات مفصولة بفواصل، أو تحريرها كلها دفعة واحدة، أو استعادة القائمة الأصلية. تُطوى اللوحة العائمة وتتذكّر الوضع الذي تركتها عليه، ولغة البرنامج النصي تُختار من هنا في الأعلى. وتحت الأزرار قائمة بما تطلبه Rewards اليوم إلى جانب عمليات البحث — السلسلة، والتسجيل في التطبيق، والمجموعة اليومية — مع رابط لكل ما لم يكتمل بعد.',
             infoAuthor: 'المؤلف:', infoGitHub: 'GitHub:', infoPrivacy: 'الخصوصية:',
-            infoPrivacyText: 'تُحفظ كلماتك المفتاحية وعدّاد البحث في التخزين المحلي لمدير البرامج النصية داخل متصفحك فقط. وعند تشغيل «استخدام تقدّمي في Rewards» يُجري البرنامج النصي طلب GET إلى bing.com — وهو نفس نقطة الوصول التي تُغذّي لوحة النقاط في رأس صفحة Bing — لقراءة تقدّمك اليومي ورصيدك وكتالوج الاستبدال؛ ويمرّ الطلب عبر جلسة Bing الخاصة بك، ولا يذهب أي من ذلك إلى أطراف أخرى ولا إلى مؤلف البرنامج النصي. أوقف ذلك المربع فلا يُجري البرنامج النصي أي طلب شبكة خاص به: فهو ينتقل إلى عناوين بحث bing.com فقط، تمامًا كما لو كتبتها بنفسك. ومهام اليوم الظاهرة في تلك القائمة تأتي من الاستجابة نفسها، وما يُقرأ يُحفظ محليًا أيضًا حتى لا يُطلب من جديد في كل صفحة من Bing.',
+            infoPrivacyText: 'تُحفظ كلماتك المفتاحية وعدّاد البحث في التخزين المحلي لمدير البرامج النصية داخل متصفحك فقط. وعند تشغيل «استخدام تقدّمي في Rewards» يُجري البرنامج النصي طلب GET إلى bing.com — وهو نفس نقطة الوصول التي تُغذّي لوحة النقاط في رأس صفحة Bing — لقراءة تقدّمك اليومي ورصيدك وكتالوج الاستبدال؛ ويمرّ الطلب عبر جلسة Bing الخاصة بك، ولا يذهب أي من ذلك إلى أطراف أخرى ولا إلى مؤلف البرنامج النصي. أوقف ذلك المربع فلا يُجري البرنامج النصي أي طلب شبكة خاص به: فهو ينتقل إلى عناوين بحث bing.com فقط، تمامًا كما لو كتبتها بنفسك. ومهام اليوم الظاهرة في تلك القائمة تأتي من الاستجابة نفسها، وما يُقرأ يُحفظ محليًا أيضًا حتى لا يُطلب من جديد في كل صفحة من Bing. ومن أجل حاسبة الاستبدال يحفظ أيضًا مرة في اليوم رصيدك وما تستبدله والهدف الذي تختاره، مفصولة حسب الحساب ببصمة مجهولة لا بمعرّف الحساب؛ ولجلب الهدف الذي حددته في Rewards يطلب صفحة الاستبدال من rewards.bing.com مرة كل نصف ساعة على الأكثر وبجلستك نفسها.',
             infoHow: 'كيف يعمل:',
-            infoHowText: 'يسأل البرنامج النصي Rewards عن عدد نقاط البحث الناقصة اليوم وينفّذ اللازم منها فقط، ويتوقّف عندما تعلن Rewards أن اليوم مكتمل؛ وإن لم يتحرّك العدّاد خلال عدة عمليات بحث متتالية، انتظر نصف دقيقة ثم تحقّق من جديد وواصل، فذلك في الغالب مجرد تأخّر من Rewards في الاحتساب. يبني الاستعلامات بدمج كلمة إلى ثلاث كلمات مفتاحية، ويتنقّل بين بحث الويب (70%) والصور والفيديو والتسوق والأخبار لمحاكاة تصفّح بشري. والمهل عشوائية بين 3 و10 ثوانٍ، مع وقفات عارضة من 10 إلى 25 ثانية تحاكي قراءة النتائج. ويحمل كل رابط معاملات متبدّلة (form وcvid وPC) يعدّها Bing حركة مرور طبيعية. ويكتشف الهاتف أو الحاسب تلقائيًا، ويبقى التقدّم بعد إعادة تحميل الصفحة، ويُصفَّر العدّاد كل يوم عند منتصف الليل. وعند اكتمال اليوم يترك علامة التبويب على صفحة Bing الرئيسية، حتى لا تُحتسب العودة إليها بحثًا أول في اليوم التالي.'
+            infoHowText: 'يسأل البرنامج النصي Rewards عن عدد نقاط البحث الناقصة اليوم وينفّذ اللازم منها فقط، ويتوقّف عندما تعلن Rewards أن اليوم مكتمل؛ وإن لم يتحرّك العدّاد خلال عدة عمليات بحث متتالية، انتظر نصف دقيقة ثم تحقّق من جديد وواصل، فذلك في الغالب مجرد تأخّر من Rewards في الاحتساب. يبني الاستعلامات بدمج كلمة إلى ثلاث كلمات مفتاحية، ويتنقّل بين بحث الويب (70%) والصور والفيديو والتسوق والأخبار لمحاكاة تصفّح بشري. والمهل عشوائية بين 3 و10 ثوانٍ، مع وقفات عارضة من 10 إلى 25 ثانية تحاكي قراءة النتائج. ويحمل كل رابط معاملات متبدّلة (form وcvid وPC) يعدّها Bing حركة مرور طبيعية. ويكتشف الهاتف أو الحاسب تلقائيًا، ويبقى التقدّم بعد إعادة تحميل الصفحة، ويُصفَّر العدّاد كل يوم عند منتصف الليل. وعند اكتمال اليوم يترك علامة التبويب على صفحة Bing الرئيسية، حتى لا تُحتسب العودة إليها بحثًا أول في اليوم التالي. يفتح الرمز 🧮 بجوار الرصيد حاسبة الاستبدال: يأتي هدفك في Rewards (🎯) محددًا مسبقًا إن كان لديك هدف، وإلا تختار مكافأة من الكتالوج أو رصيد Xbox الذي تريده، فتخبرك كم نقطة ينقصك وفي أي تاريخ ستصل إليه، بوتيرتك المقاسة في الأسابيع الأربعة الأخيرة أو، إلى أن يتوفر أسبوع من التسجيل، بحد أدنى مقدّر من المهام.',
+            calcBtnTip: 'حاسبة الاستبدال: كم نقطة ينقصك لمكافأة من الكتالوج أو لرصيد Xbox، وفي أي تاريخ ستصل إليه.',
+            calcTitle: 'حاسبة الاستبدال',
+            calcAmount: 'رصيد Xbox الذي تريده:',
+            calcCost: 'يكلف {n} نقطة',
+            calcCustom: 'مبلغ مخصص',
+            calcCostTipCustom: 'عند الاستبدال بمبلغ مخصص يحتسب Rewards ‏{r} نقطة مقابل 1 {c}، بدءًا من {m} {c}. وما دون ذلك لا توجد إلا بطاقات بقيمة ثابتة، فتُختار أرخص مجموعة تبلغ الرصيد المطلوب. أما التقريب الدقيق فيجريه Rewards عند الاستبدال.',
+            calcCostTipCards: 'لا يتوفر في سوقك استبدال بمبلغ مخصص، لذلك تُختار أرخص مجموعة بطاقات تبلغ الرصيد المطلوب.',
+            calcHave: 'لديك {n} نقطة',
+            calcEnough: 'يكفيك الآن',
+            calcRate: 'وتيرة النقاط:',
+            calcMeasured: 'مُقاس: {n} نقطة/يوم في آخر {d} يومًا',
+            calcMeasuredPending: 'مُقاس: متاح بعد 7 أيام من التسجيل ({d}/7)',
+            calcMeasuredTip: 'مقدار ما زاد رصيدك فعلًا، مع إضافة ما استبدلته، بحسب القراءة اليومية التي يحفظها السكربت في متصفحك لكل حساب. وهو يحتسب كل ما تكسبه، بما في ذلك تطبيق Bing وXbox والمكافآت، لذا فهو الرقم الموثوق ما إن يتوفر أسبوع من البيانات.',
+            calcEstimate: 'تقدير حسب المهام: {n} نقطة/يوم',
+            calcEstimateTip: 'حد أدنى مبني على ما يقول Rewards إن كل مهمة تمنحه. ويحتسب اللغز ختمًا واحدًا لكل سلسلة من سبعة أيام في المهام المحددة. ولا يدخل فيه جائزة اليوم السابع من السلاسل ولا المكافآت الشهرية ولا ما تكسبه خارج هذا الموقع (تطبيق Bing وXbox وOutlook)، لذا ستصل غالبًا قبل ذلك.',
+            calcSrcSearch: 'عمليات البحث',
+            calcSrcStreak: 'مكافأة السلسلة',
+            calcSrcPuzzle: 'لغز الأختام',
+            calcPerDay: '{n}/يوم',
+            calcResult: 'ستصل {when}، نحو {date}',
+            calcNoSource: 'حدد مهمة واحدة على الأقل لحساب التاريخ.',
+            calcLineTip: 'هدف الاستبدال لديك: ما ينقصك والتاريخ الذي ستبلغه فيه بوتيرتك. انقر لفتح الحاسبة.',
+            calcGoal: 'الهدف:',
+            calcGoalXbox: 'رصيد Xbox (مبلغ حر)',
+            calcSearch: 'ابحث عن مكافأة…'
         },
         hi: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1042,9 +1394,34 @@
             infoName: 'नाम:', infoVersion: 'संस्करण:', infoDescription: 'विवरण:',
             infoDescriptionText: 'बिना हाथ लगाए Microsoft Rewards अंक जमा करने के लिए Bing की रोज़ाना खोजों को स्वचालित करती है। स्क्रिप्ट Microsoft Rewards से पूछती है कि आज आपके कितने खोज-अंक बाकी हैं, सिर्फ़ ज़रूरी खोजें करती है, पूरा होने पर खुद रुक जाती है, और बताती है कि आपके अंक Xbox बैलेंस में कितने बनते हैं; ⚙ में दी गई संख्या उन मौकों के लिए बची रहती है जब Rewards का सत्र न हो। खोजों की संख्या ⚙ से तय होती है (1-100, डिफ़ॉल्ट 20) और शुरू / जारी रखें / रोकें / रीसेट के बटन स्थिति के अनुसार बदलते हैं। मुख्य शब्दों वाले टैब में आप हर एक को एक क्लिक से हटा सकते हैं, अल्पविराम से अलग करके कई जोड़ सकते हैं, सबको एक साथ संपादित कर सकते हैं या मूल सूची बहाल कर सकते हैं। तैरता पैनल मुड़ जाता है और जैसा आपने छोड़ा था वैसा याद रखता है, और स्क्रिप्ट की भाषा यहीं ऊपर चुनी जाती है। बटनों के नीचे उन चीज़ों की सूची रहती है जो Rewards आज खोजों के अलावा माँगता है — शृंखला, ऐप में हाज़िरी, दैनिक सेट — और हर बाकी चीज़ का लिंक।',
             infoAuthor: 'लेखक:', infoGitHub: 'GitHub:', infoPrivacy: 'निजता:',
-            infoPrivacyText: 'आपके कीवर्ड और खोज काउंटर सिर्फ़ आपके ब्राउज़र में यूज़रस्क्रिप्ट मैनेजर के लोकल स्टोरेज में रखे जाते हैं। जब «मेरी Rewards प्रगति इस्तेमाल करें» चालू हो, तो स्क्रिप्ट आज की प्रगति, आपका बैलेंस और भुनाने का कैटलॉग पढ़ने के लिए bing.com को एक GET अनुरोध भेजती है; यह वही एंडपॉइंट है जो Bing के हेडर वाले अंक पैनल को चलाता है, और अनुरोध आपके Bing सत्र के साथ जाता है। इसमें से कुछ भी किसी तीसरे पक्ष या स्क्रिप्ट के लेखक तक नहीं जाता। यह चेकबॉक्स बंद कर दें और स्क्रिप्ट अपनी कोई भी नेटवर्क अनुरोध नहीं करती: वह सिर्फ़ bing.com के खोज URL पर जाती है, ठीक जैसे आप खुद टाइप करते। उस सूची में दिखने वाले आज के काम भी इसी उत्तर से आते हैं, और पढ़ा हुआ स्थानीय रूप से भी रखा जाता है ताकि Bing के हर पृष्ठ पर दोबारा न माँगना पड़े।',
+            infoPrivacyText: 'आपके कीवर्ड और खोज काउंटर सिर्फ़ आपके ब्राउज़र में यूज़रस्क्रिप्ट मैनेजर के लोकल स्टोरेज में रखे जाते हैं। जब «मेरी Rewards प्रगति इस्तेमाल करें» चालू हो, तो स्क्रिप्ट आज की प्रगति, आपका बैलेंस और भुनाने का कैटलॉग पढ़ने के लिए bing.com को एक GET अनुरोध भेजती है; यह वही एंडपॉइंट है जो Bing के हेडर वाले अंक पैनल को चलाता है, और अनुरोध आपके Bing सत्र के साथ जाता है। इसमें से कुछ भी किसी तीसरे पक्ष या स्क्रिप्ट के लेखक तक नहीं जाता। यह चेकबॉक्स बंद कर दें और स्क्रिप्ट अपनी कोई भी नेटवर्क अनुरोध नहीं करती: वह सिर्फ़ bing.com के खोज URL पर जाती है, ठीक जैसे आप खुद टाइप करते। उस सूची में दिखने वाले आज के काम भी इसी उत्तर से आते हैं, और पढ़ा हुआ स्थानीय रूप से भी रखा जाता है ताकि Bing के हर पृष्ठ पर दोबारा न माँगना पड़े। रिडीम कैलकुलेटर के लिए यह दिन में एक बार आपका बैलेंस, आपके रिडीम और आपका चुना हुआ लक्ष्य भी सहेजती है, हर खाते के लिए अलग, खाते की पहचान के बजाय एक गुमनाम फ़िंगरप्रिंट से; और Rewards में आपका तय किया लक्ष्य लाने के लिए यह आपके अपने सेशन से rewards.bing.com का रिडीम पेज मँगाती है, ज़्यादा से ज़्यादा हर आधे घंटे में एक बार।',
             infoHow: 'यह कैसे काम करती है:',
-            infoHowText: 'स्क्रिप्ट Rewards से पूछती है कि आज कितने खोज-अंक बाकी हैं और सिर्फ़ ज़रूरी खोजें करती है, और जब Rewards दिन को पूरा बता देता है तो रुक जाती है; अगर लगातार कई खोजों में काउंटर न बढ़े, तो यह आधा मिनट रुककर फिर देखती है और आगे बढ़ती है, क्योंकि लगभग हमेशा Rewards देर से अंक जोड़ता है। यह 1 से 3 मुख्य शब्दों को मिलाकर क्वेरी बनाती है और मानवीय ब्राउज़िंग जैसा दिखाने के लिए वेब खोज (70%), छवियों, वीडियो, शॉपिंग और समाचार के बीच बारी-बारी से चलती है। विलंब 3-10 सेकंड के बीच यादृच्छिक होते हैं, और बीच-बीच में 10-25 सेकंड के ठहराव आते हैं जो परिणाम पढ़ने जैसा प्रभाव देते हैं। हर पते में बदलते हुए पैरामीटर (form, cvid, PC) होते हैं जिन्हें Bing सामान्य ट्रैफ़िक मानता है। मोबाइल और डेस्कटॉप की पहचान अपने आप होती है, प्रगति पृष्ठ फिर से लोड होने पर भी बनी रहती है, और काउंटर हर दिन आधी रात को रीसेट हो जाता है। दिन पूरा होने पर टैब को Bing के होम पेज पर छोड़ देता है, ताकि उस टैब पर लौटना अगले दिन की पहली खोज न गिना जाए।'
+            infoHowText: 'स्क्रिप्ट Rewards से पूछती है कि आज कितने खोज-अंक बाकी हैं और सिर्फ़ ज़रूरी खोजें करती है, और जब Rewards दिन को पूरा बता देता है तो रुक जाती है; अगर लगातार कई खोजों में काउंटर न बढ़े, तो यह आधा मिनट रुककर फिर देखती है और आगे बढ़ती है, क्योंकि लगभग हमेशा Rewards देर से अंक जोड़ता है। यह 1 से 3 मुख्य शब्दों को मिलाकर क्वेरी बनाती है और मानवीय ब्राउज़िंग जैसा दिखाने के लिए वेब खोज (70%), छवियों, वीडियो, शॉपिंग और समाचार के बीच बारी-बारी से चलती है। विलंब 3-10 सेकंड के बीच यादृच्छिक होते हैं, और बीच-बीच में 10-25 सेकंड के ठहराव आते हैं जो परिणाम पढ़ने जैसा प्रभाव देते हैं। हर पते में बदलते हुए पैरामीटर (form, cvid, PC) होते हैं जिन्हें Bing सामान्य ट्रैफ़िक मानता है। मोबाइल और डेस्कटॉप की पहचान अपने आप होती है, प्रगति पृष्ठ फिर से लोड होने पर भी बनी रहती है, और काउंटर हर दिन आधी रात को रीसेट हो जाता है। दिन पूरा होने पर टैब को Bing के होम पेज पर छोड़ देता है, ताकि उस टैब पर लौटना अगले दिन की पहली खोज न गिना जाए। बैलेंस के पास वाला 🧮 रिडीम कैलकुलेटर खोलता है: अगर आपने Rewards में लक्ष्य रखा है तो वह पहले से चुना होता है (🎯), नहीं तो आप कैटलॉग का कोई इनाम या मनचाहा Xbox बैलेंस चुनते हैं, और यह बताता है कि कितने अंक बाकी हैं और आप किस तारीख तक पहुँचेंगे, पिछले चार हफ़्तों की मापी गई रफ़्तार से, या जब तक एक हफ़्ते का रिकॉर्ड न हो, कामों से अनुमानित न्यूनतम रफ़्तार से।',
+            calcBtnTip: 'रिडीम कैलकुलेटर: कैटलॉग के किसी इनाम या Xbox बैलेंस के लिए आपको कितने अंक और चाहिए और आप किस तारीख तक पहुँचेंगे।',
+            calcTitle: 'रिडीम कैलकुलेटर',
+            calcAmount: 'आपको चाहिए Xbox बैलेंस:',
+            calcCost: 'कीमत {n} अंक',
+            calcCustom: 'मनचाही राशि',
+            calcCostTipCustom: 'मनचाही राशि रिडीम करने पर Rewards हर 1 {c} के लिए {r} अंक लेता है, {m} {c} से शुरू। इससे कम पर सिर्फ़ तय राशि वाले कार्ड हैं, और माँगे गए बैलेंस तक पहुँचने वाला सबसे सस्ता मेल लिया जाता है। सटीक राउंडिंग Rewards रिडीम करते समय करता है।',
+            calcCostTipCards: 'आपके बाज़ार में मनचाही राशि रिडीम नहीं होती, इसलिए माँगे गए बैलेंस तक पहुँचने वाला कार्डों का सबसे सस्ता मेल लिया जाता है।',
+            calcHave: 'आपके पास {n} अंक',
+            calcEnough: 'अब काफ़ी है',
+            calcRate: 'अंकों की रफ़्तार:',
+            calcMeasured: 'मापा गया: पिछले {d} दिनों में {n} अंक/दिन',
+            calcMeasuredPending: 'मापा गया: 7 दिन के रिकॉर्ड के बाद उपलब्ध ({d}/7)',
+            calcMeasuredTip: 'रिडीम किए गए अंक वापस जोड़कर आपका बैलेंस असल में कितना बढ़ा, उस दैनिक रीडिंग के हिसाब से जो स्क्रिप्ट हर खाते के लिए आपके ब्राउज़र में रखती है। इसमें आपकी हर कमाई गिनी जाती है, Bing ऐप, Xbox और बोनस समेत, इसलिए एक हफ़्ते का डेटा होते ही यही भरोसेमंद संख्या है।',
+            calcEstimate: 'कामों से अनुमान: {n} अंक/दिन',
+            calcEstimateTip: 'Rewards हर काम के लिए जितना देने की बात कहता है, उससे निकाली गई न्यूनतम रफ़्तार। पहेली चुने गए कामों की हर सात दिन की शृंखला के लिए एक मुहर गिनती है। इसमें शृंखला के सातवें दिन का इनाम, मासिक बोनस और इस साइट के बाहर (Bing ऐप, Xbox, Outlook) की कमाई शामिल नहीं है, इसलिए आम तौर पर आप पहले पहुँच जाएँगे।',
+            calcSrcSearch: 'खोजें',
+            calcSrcStreak: 'शृंखला बोनस',
+            calcSrcPuzzle: 'मुहर पहेली',
+            calcPerDay: '{n}/दिन',
+            calcResult: 'आप {when} पहुँचेंगे, लगभग {date} तक',
+            calcNoSource: 'तारीख निकालने के लिए कम से कम एक काम चुनें।',
+            calcLineTip: 'आपका रिडीम लक्ष्य: कितना बाकी है और अपनी रफ़्तार से आप किस तारीख तक पहुँचेंगे। कैलकुलेटर खोलने के लिए क्लिक करें।',
+            calcGoal: 'लक्ष्य:',
+            calcGoalXbox: 'Xbox बैलेंस (कोई भी राशि)',
+            calcSearch: 'इनाम खोजें…'
         },
         id: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1103,9 +1480,34 @@
             infoName: 'Nama:', infoVersion: 'Versi:', infoDescription: 'Deskripsi:',
             infoDescriptionText: 'Mengotomatiskan pencarian harian di Bing untuk mengumpulkan poin Microsoft Rewards tanpa campur tangan manual. Skrip menanyakan ke Microsoft Rewards berapa poin penelusuran yang masih Anda kurang hari ini, menjalankan hanya penelusuran yang perlu, berhenti sendiri setelah selesai, dan menampilkan nilai poin Anda dalam saldo Xbox; angka pada ⚙ tetap ada sebagai cadangan untuk saat tidak ada sesi Rewards. Jumlah pencarian diatur dengan ⚙ (1-100, bawaan 20) dan tombol mulai / lanjutkan / hentikan / setel ulang berubah sesuai keadaan. Di tab kata kunci Anda bisa menghapus tiap kata dengan sekali klik, menambahkan beberapa sekaligus dipisahkan koma, menyunting semuanya sekaligus, atau mengembalikan daftar aslinya. Panel mengambang bisa dilipat dan mengingat posisi terakhir Anda, dan bahasa skrip dipilih di bagian atas ini. Di bawah tombol ada daftar hal yang diminta Rewards hari ini selain penelusuran — runtunan, absen di aplikasi, set harian — dengan tautan ke setiap yang belum selesai.',
             infoAuthor: 'Penulis:', infoGitHub: 'GitHub:', infoPrivacy: 'Privasi:',
-            infoPrivacyText: 'Kata kunci Anda dan penghitung penelusuran hanya disimpan di penyimpanan lokal pengelola userscript, di peramban Anda. Bila «Gunakan progres Rewards saya» aktif, skrip membuat satu permintaan GET ke bing.com — titik akhir yang sama yang menggerakkan panel poin di kepala halaman Bing — untuk membaca progres hari ini, saldo Anda, dan katalog penukaran; permintaan itu berjalan lewat sesi Bing Anda, dan tidak ada bagian darinya yang pergi ke pihak ketiga maupun ke penulis skrip. Matikan kotak itu dan skrip tidak membuat permintaan jaringan apa pun sendiri: ia hanya membuka URL penelusuran bing.com, persis seperti kalau Anda mengetiknya sendiri. Tugas hari ini yang tampil di daftar itu berasal dari respons yang sama, dan apa yang dibaca juga disimpan secara lokal agar tidak diminta ulang di setiap halaman Bing.',
+            infoPrivacyText: 'Kata kunci Anda dan penghitung penelusuran hanya disimpan di penyimpanan lokal pengelola userscript, di peramban Anda. Bila «Gunakan progres Rewards saya» aktif, skrip membuat satu permintaan GET ke bing.com — titik akhir yang sama yang menggerakkan panel poin di kepala halaman Bing — untuk membaca progres hari ini, saldo Anda, dan katalog penukaran; permintaan itu berjalan lewat sesi Bing Anda, dan tidak ada bagian darinya yang pergi ke pihak ketiga maupun ke penulis skrip. Matikan kotak itu dan skrip tidak membuat permintaan jaringan apa pun sendiri: ia hanya membuka URL penelusuran bing.com, persis seperti kalau Anda mengetiknya sendiri. Tugas hari ini yang tampil di daftar itu berasal dari respons yang sama, dan apa yang dibaca juga disimpan secara lokal agar tidak diminta ulang di setiap halaman Bing. Untuk kalkulator penukaran, skrip juga menyimpan sekali sehari saldo dan penukaran Anda serta target yang Anda pilih, dipisah per akun dengan sidik anonim alih-alih ID akun; dan untuk mengambil target yang Anda tetapkan di Rewards, skrip meminta halaman penukaran rewards.bing.com paling sering setengah jam sekali dengan sesi Anda sendiri.',
             infoHow: 'Cara kerjanya:',
-            infoHowText: 'Skrip menanyakan ke Rewards berapa poin penelusuran yang masih kurang hari ini dan menjalankan hanya yang perlu, lalu berhenti saat Rewards menandai hari ini selesai; jika penghitung tidak bertambah selama beberapa penelusuran berturut-turut, skrip menunggu setengah menit, memeriksa lagi, lalu melanjutkan, karena hampir selalu Rewards hanya terlambat memberi poin. Skrip menyusun kueri dengan menggabungkan 1 sampai 3 kata kunci dan bergantian antara pencarian web (70%), gambar, video, belanja, dan berita untuk menyerupai penjelajahan manusia. Jedanya acak antara 3-10 detik, dengan rehat sesekali 10-25 detik yang meniru pembacaan hasil. Setiap URL memuat parameter yang berganti-ganti (form, cvid, PC) yang dikenali Bing sebagai lalu lintas wajar. Mode seluler dan desktop dideteksi otomatis, kemajuan bertahan melewati pemuatan ulang halaman, dan penghitung disetel ulang setiap hari pada tengah malam. Setelah hari itu selesai, tab ditinggalkan di halaman utama Bing agar kembali ke tab itu tidak dihitung sebagai penelusuran pertama hari berikutnya.'
+            infoHowText: 'Skrip menanyakan ke Rewards berapa poin penelusuran yang masih kurang hari ini dan menjalankan hanya yang perlu, lalu berhenti saat Rewards menandai hari ini selesai; jika penghitung tidak bertambah selama beberapa penelusuran berturut-turut, skrip menunggu setengah menit, memeriksa lagi, lalu melanjutkan, karena hampir selalu Rewards hanya terlambat memberi poin. Skrip menyusun kueri dengan menggabungkan 1 sampai 3 kata kunci dan bergantian antara pencarian web (70%), gambar, video, belanja, dan berita untuk menyerupai penjelajahan manusia. Jedanya acak antara 3-10 detik, dengan rehat sesekali 10-25 detik yang meniru pembacaan hasil. Setiap URL memuat parameter yang berganti-ganti (form, cvid, PC) yang dikenali Bing sebagai lalu lintas wajar. Mode seluler dan desktop dideteksi otomatis, kemajuan bertahan melewati pemuatan ulang halaman, dan penghitung disetel ulang setiap hari pada tengah malam. Setelah hari itu selesai, tab ditinggalkan di halaman utama Bing agar kembali ke tab itu tidak dihitung sebagai penelusuran pertama hari berikutnya. Ikon 🧮 di samping saldo membuka kalkulator penukaran: target Rewards Anda (🎯) sudah terpilih jika Anda punya, atau Anda memilih hadiah dari katalog atau saldo Xbox yang diinginkan, lalu kalkulator memberi tahu berapa poin yang masih kurang dan tanggal Anda mencapainya, dengan laju terukur Anda selama empat minggu terakhir atau, sampai ada catatan seminggu, dengan angka minimum yang diperkirakan dari tugas.',
+            calcBtnTip: 'Kalkulator penukaran: berapa poin lagi yang Anda perlukan untuk hadiah dari katalog atau saldo Xbox, dan tanggal Anda mencapainya.',
+            calcTitle: 'Kalkulator penukaran',
+            calcAmount: 'Saldo Xbox yang Anda inginkan:',
+            calcCost: 'Butuh {n} poin',
+            calcCustom: 'nominal bebas',
+            calcCostTipCustom: 'Pada penukaran nominal bebas, Rewards mengenakan {r} poin per 1 {c}, mulai dari {m} {c}. Di bawah itu hanya ada kartu bernominal tetap, dan dipakai kombinasi termurah yang mencapai saldo yang diminta. Pembulatan pastinya dilakukan Rewards saat penukaran.',
+            calcCostTipCards: 'Pasar Anda tidak punya penukaran nominal bebas, jadi dipakai kombinasi kartu termurah yang mencapai saldo yang diminta.',
+            calcHave: 'Anda punya {n} poin',
+            calcEnough: 'sudah cukup',
+            calcRate: 'Laju poin:',
+            calcMeasured: 'Terukur: {n} poin/hari dalam {d} hari terakhir',
+            calcMeasuredPending: 'Terukur: tersedia setelah 7 hari pencatatan ({d}/7)',
+            calcMeasuredTip: 'Seberapa banyak saldo Anda benar-benar bertambah, dengan menambahkan kembali yang sudah ditukar, menurut catatan harian yang disimpan skrip di browser Anda untuk setiap akun. Semua yang Anda peroleh ikut dihitung, termasuk di aplikasi Bing, Xbox, dan bonus, jadi begitu ada data seminggu, inilah angka yang bisa dipercaya.',
+            calcEstimate: 'Perkiraan dari tugas: {n} poin/hari',
+            calcEstimateTip: 'Angka minimum dari yang menurut Rewards dibayar setiap tugas. Teka-teki menghitung satu stempel untuk setiap runtunan tujuh hari dari tugas yang dicentang. Hadiah hari ketujuh runtunan, bonus bulanan, dan yang Anda peroleh di luar situs ini (aplikasi Bing, Xbox, Outlook) tidak dihitung, jadi biasanya Anda sampai lebih cepat.',
+            calcSrcSearch: 'Pencarian',
+            calcSrcStreak: 'Bonus runtunan',
+            calcSrcPuzzle: 'Teka-teki stempel',
+            calcPerDay: '{n}/hari',
+            calcResult: 'Anda sampai {when}, sekitar {date}',
+            calcNoSource: 'Centang minimal satu tugas untuk menghitung tanggalnya.',
+            calcLineTip: 'Target penukaran Anda: berapa yang masih kurang dan tanggal Anda mencapainya dengan laju Anda. Klik untuk membuka kalkulator.',
+            calcGoal: 'Target:',
+            calcGoalXbox: 'Saldo Xbox (nominal bebas)',
+            calcSearch: 'Cari hadiah…'
         },
         it: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1164,9 +1566,34 @@
             infoName: 'Nome:', infoVersion: 'Versione:', infoDescription: 'Descrizione:',
             infoDescriptionText: 'Automatizza le ricerche quotidiane su Bing per accumulare punti Microsoft Rewards senza interventi manuali. Chiede a Microsoft Rewards quanti punti ricerca ti mancano oggi, esegue solo le ricerche necessarie, si ferma da sé quando sono finite e mostra quanto valgono i tuoi punti in credito Xbox; il numero sotto ⚙ resta come riserva per quando non c’è una sessione Rewards. Il numero di ricerche si imposta con ⚙ (1-100, valore predefinito 20) e i comandi avvia / riprendi / ferma / azzera cambiano a seconda dello stato. Nella scheda delle parole chiave puoi eliminarne una con un clic, aggiungerne diverse separate da virgole, modificarle tutte in una volta o ripristinare l’elenco originale. Il pannello flottante si richiude e ricorda come lo hai lasciato, e la lingua dello script si sceglie qui in alto. Sotto i comandi c’è un elenco di ciò che Rewards chiede oggi oltre alle ricerche — la serie, la registrazione nell’app, il set giornaliero — con un collegamento a tutto quello che manca.',
             infoAuthor: 'Autore:', infoGitHub: 'GitHub:', infoPrivacy: 'Privacy:',
-            infoPrivacyText: 'Le tue parole chiave e il contatore delle ricerche sono salvati solo nella memoria locale del gestore di userscript, nel tuo browser. Con «Usa i miei progressi Rewards» attivo, lo script invia una richiesta GET a bing.com — lo stesso endpoint che alimenta il pannello dei punti nell’intestazione di Bing — per leggere i progressi della giornata, il tuo saldo e il catalogo di conversione; passa dalla tua sessione Bing e nulla di tutto ciò va a terzi né all’autore dello script. Disattiva quella casella e lo script non effettua nessuna richiesta di rete propria: si limita a navigare verso URL di ricerca di bing.com, esattamente come se le digitassi tu. Le attività del giorno mostrate in quell’elenco vengono dalla stessa risposta, e quanto letto resta salvato anche in locale per non richiederlo a ogni pagina di Bing.',
+            infoPrivacyText: 'Le tue parole chiave e il contatore delle ricerche sono salvati solo nella memoria locale del gestore di userscript, nel tuo browser. Con «Usa i miei progressi Rewards» attivo, lo script invia una richiesta GET a bing.com — lo stesso endpoint che alimenta il pannello dei punti nell’intestazione di Bing — per leggere i progressi della giornata, il tuo saldo e il catalogo di conversione; passa dalla tua sessione Bing e nulla di tutto ciò va a terzi né all’autore dello script. Disattiva quella casella e lo script non effettua nessuna richiesta di rete propria: si limita a navigare verso URL di ricerca di bing.com, esattamente come se le digitassi tu. Le attività del giorno mostrate in quell’elenco vengono dalla stessa risposta, e quanto letto resta salvato anche in locale per non richiederlo a ogni pagina di Bing. Per il calcolatore di riscatto salva anche, una volta al giorno, il tuo saldo e ciò che riscatti, e l’obiettivo che scegli, separati per account con un’impronta anonima e non con il suo identificativo; e per recuperare l’obiettivo che hai impostato in Rewards richiede la pagina di riscatto di rewards.bing.com, al massimo ogni mezz’ora e con la tua stessa sessione.',
             infoHow: 'Come funziona:',
-            infoHowText: 'Chiede a Rewards quanti punti ricerca mancano oggi ed esegue solo quelle necessarie, fermandosi quando Rewards segna la giornata come completata; se il contatore non sale per diverse ricerche di seguito, aspetta mezzo minuto, ricontrolla e prosegue, perché quasi sempre è Rewards che accredita in ritardo. Genera query combinando da 1 a 3 parole chiave e alterna tra ricerca web (70%), immagini, video, shopping e notizie per simulare una navigazione umana. Gli intervalli sono casuali tra 3 e 10 s, con pause occasionali di 10-25 s che imitano la lettura dei risultati. Ogni indirizzo include parametri a rotazione (form, cvid, PC) che Bing riconosce come traffico legittimo. Rileva automaticamente mobile o desktop, l’avanzamento sopravvive ai ricaricamenti della pagina e il contatore si azzera ogni giorno a mezzanotte. A giornata completata lascia la scheda sulla home di Bing, così tornarci non conta come la prima ricerca del giorno dopo.'
+            infoHowText: 'Chiede a Rewards quanti punti ricerca mancano oggi ed esegue solo quelle necessarie, fermandosi quando Rewards segna la giornata come completata; se il contatore non sale per diverse ricerche di seguito, aspetta mezzo minuto, ricontrolla e prosegue, perché quasi sempre è Rewards che accredita in ritardo. Genera query combinando da 1 a 3 parole chiave e alterna tra ricerca web (70%), immagini, video, shopping e notizie per simulare una navigazione umana. Gli intervalli sono casuali tra 3 e 10 s, con pause occasionali di 10-25 s che imitano la lettura dei risultati. Ogni indirizzo include parametri a rotazione (form, cvid, PC) che Bing riconosce come traffico legittimo. Rileva automaticamente mobile o desktop, l’avanzamento sopravvive ai ricaricamenti della pagina e il contatore si azzera ogni giorno a mezzanotte. A giornata completata lascia la scheda sulla home di Bing, così tornarci non conta come la prima ricerca del giorno dopo. Il 🧮 accanto al saldo apre il calcolatore di riscatto: se hai un obiettivo in Rewards (🎯) lo trovi già scelto, altrimenti scegli un premio del catalogo o il credito Xbox che vuoi, e ti dice quanti punti ti mancano e in che data ci arriveresti, con il tuo ritmo misurato nelle ultime quattro settimane o, finché non c’è una settimana di registro, con un minimo stimato dalle attività.',
+            calcBtnTip: 'Calcolatore di riscatto: quanti punti ti mancano per un premio del catalogo o un credito Xbox, e in che data ci arriveresti.',
+            calcTitle: 'Calcolatore di riscatto',
+            calcAmount: 'Credito Xbox che vuoi:',
+            calcCost: 'Costa {n} pt',
+            calcCustom: 'importo personalizzato',
+            calcCostTipCustom: 'Con il riscatto a importo personalizzato Rewards chiede {r} punti per 1 {c}, a partire da {m} {c}. Sotto ci sono solo carte a importo fisso, e si prende la combinazione più economica che raggiunge il credito richiesto. L’arrotondamento esatto lo fa Rewards al momento del riscatto.',
+            calcCostTipCards: 'Nel tuo mercato non c’è il riscatto a importo personalizzato, quindi si prende la combinazione di carte più economica che raggiunge il credito richiesto.',
+            calcHave: 'Hai {n} pt',
+            calcEnough: 'ti bastano già',
+            calcRate: 'Ritmo dei punti:',
+            calcMeasured: 'Misurato: {n} pt/giorno negli ultimi {d} giorni',
+            calcMeasuredPending: 'Misurato: disponibile dopo 7 giorni di registro ({d}/7)',
+            calcMeasuredTip: 'Quanto è cresciuto davvero il tuo saldo, sommando ciò che hai riscattato, secondo la lettura giornaliera che lo script salva nel tuo browser per ogni account. Conta tutto ciò che guadagni, anche nell’app di Bing, su Xbox e con i bonus, quindi appena c’è una settimana di dati è il numero di cui fidarsi.',
+            calcEstimate: 'Stimato dalle attività: {n} pt/giorno',
+            calcEstimateTip: 'Un minimo ricavato da quanto Rewards dice di pagare per ogni attività. Il puzzle conta un timbro per ogni serie di sette giorni delle attività spuntate. Restano fuori i premi del settimo giorno delle serie, i bonus mensili e ciò che guadagni fuori da questo sito (app di Bing, Xbox, Outlook), quindi di solito ci arrivi prima.',
+            calcSrcSearch: 'Ricerche',
+            calcSrcStreak: 'Bonus serie',
+            calcSrcPuzzle: 'Puzzle dei timbri',
+            calcPerDay: '{n}/giorno',
+            calcResult: 'Ci arrivi {when}, verso il {date}',
+            calcNoSource: 'Spunta almeno un’attività per calcolare la data.',
+            calcLineTip: 'Il tuo obiettivo di riscatto: quanto ti manca e la data in cui ci arriveresti al tuo ritmo. Clicca per aprire il calcolatore.',
+            calcGoal: 'Obiettivo:',
+            calcGoalXbox: 'Credito Xbox (importo libero)',
+            calcSearch: 'Cerca un premio…'
         },
         nl: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1225,9 +1652,34 @@
             infoName: 'Naam:', infoVersion: 'Versie:', infoDescription: 'Beschrijving:',
             infoDescriptionText: 'Automatiseert de dagelijkse zoekopdrachten op Bing om Microsoft Rewards-punten te sparen zonder handwerk. Het vraagt bij Microsoft Rewards op hoeveel zoekpunten je vandaag nog mist, voert alleen de nodige zoekopdrachten uit, stopt zelf zodra ze klaar zijn en laat zien wat je punten waard zijn aan Xbox-krediet; het aantal onder ⚙ blijft als achtervang voor wanneer er geen Rewards-sessie is. Het aantal zoekopdrachten stel je in met ⚙ (1-100, standaard 20) en de knoppen starten / hervatten / stoppen / opnieuw instellen wisselen mee met de toestand. Op het tabblad met trefwoorden kun je elk trefwoord met één klik verwijderen, er meerdere tegelijk toevoegen gescheiden door komma’s, ze allemaal in één keer bewerken of de oorspronkelijke lijst herstellen. Het zwevende paneel klapt in en onthoudt hoe je het achterliet, en de taal van het script kies je hier bovenaan. Onder de knoppen staat een lijst met wat Rewards vandaag naast de zoekopdrachten vraagt — de reeks, het inchecken in de app, de dagelijkse set — met een link naar alles wat nog openstaat.',
             infoAuthor: 'Auteur:', infoGitHub: 'GitHub:', infoPrivacy: 'Privacy:',
-            infoPrivacyText: 'Je trefwoorden en de zoekteller worden alleen opgeslagen in de lokale opslag van je userscriptbeheerder, in je browser. Staat «Mijn Rewards-voortgang gebruiken» aan, dan doet het script één GET-verzoek aan bing.com — hetzelfde eindpunt dat het puntenpaneel in de Bing-koptekst voedt — om je voortgang van de dag, je saldo en de inwisselcatalogus te lezen; dat verloopt via je Bing-sessie en niets daarvan gaat naar derden of naar de auteur van het script. Zet dat vinkje uit en het script doet geen enkel eigen netwerkverzoek: het navigeert alleen naar zoek-URL\'s van bing.com, precies alsof je ze zelf typte. De dagtaken in die lijst komen uit dezelfde respons, en wat gelezen is wordt ook lokaal bewaard om het niet op elke Bing-pagina opnieuw op te vragen.',
+            infoPrivacyText: 'Je trefwoorden en de zoekteller worden alleen opgeslagen in de lokale opslag van je userscriptbeheerder, in je browser. Staat «Mijn Rewards-voortgang gebruiken» aan, dan doet het script één GET-verzoek aan bing.com — hetzelfde eindpunt dat het puntenpaneel in de Bing-koptekst voedt — om je voortgang van de dag, je saldo en de inwisselcatalogus te lezen; dat verloopt via je Bing-sessie en niets daarvan gaat naar derden of naar de auteur van het script. Zet dat vinkje uit en het script doet geen enkel eigen netwerkverzoek: het navigeert alleen naar zoek-URL\'s van bing.com, precies alsof je ze zelf typte. De dagtaken in die lijst komen uit dezelfde respons, en wat gelezen is wordt ook lokaal bewaard om het niet op elke Bing-pagina opnieuw op te vragen. Voor de inwisselcalculator bewaart het daarnaast eenmaal per dag je saldo en wat je inwisselt, plus het doel dat je kiest, per account gescheiden met een anonieme vingerafdruk in plaats van de account-ID; en om het doel op te halen dat je in Rewards hebt ingesteld, vraagt het hoogstens elk halfuur de inwisselpagina van rewards.bing.com op, met je eigen sessie.',
             infoHow: 'Hoe het werkt:',
-            infoHowText: 'Het vraagt bij Rewards op hoeveel zoekpunten er vandaag nog missen en voert alleen de nodige zoekopdrachten uit, en stopt zodra Rewards de dag als voltooid meldt; blijft de teller over meerdere zoekopdrachten staan, dan wacht het een halve minuut, kijkt opnieuw en gaat door, want bijna altijd schrijft Rewards gewoon later bij. Het stelt zoekopdrachten samen uit 1 tot 3 trefwoorden en wisselt af tussen webzoeken (70%), afbeeldingen, video’s, shopping en nieuws om menselijk surfgedrag na te bootsen. De wachttijden zijn willekeurig tussen 3 en 10 s, met af en toe pauzes van 10-25 s die het lezen van resultaten nabootsen. Elke URL bevat wisselende parameters (form, cvid, PC) die Bing als normaal verkeer herkent. Mobiel en desktop worden automatisch herkend, de voortgang overleeft het herladen van de pagina en de teller wordt elke dag om middernacht op nul gezet. Als de dag klaar is laat het het tabblad op de startpagina van Bing staan, zodat terugkeren niet als de eerste zoekopdracht van de volgende dag telt.'
+            infoHowText: 'Het vraagt bij Rewards op hoeveel zoekpunten er vandaag nog missen en voert alleen de nodige zoekopdrachten uit, en stopt zodra Rewards de dag als voltooid meldt; blijft de teller over meerdere zoekopdrachten staan, dan wacht het een halve minuut, kijkt opnieuw en gaat door, want bijna altijd schrijft Rewards gewoon later bij. Het stelt zoekopdrachten samen uit 1 tot 3 trefwoorden en wisselt af tussen webzoeken (70%), afbeeldingen, video’s, shopping en nieuws om menselijk surfgedrag na te bootsen. De wachttijden zijn willekeurig tussen 3 en 10 s, met af en toe pauzes van 10-25 s die het lezen van resultaten nabootsen. Elke URL bevat wisselende parameters (form, cvid, PC) die Bing als normaal verkeer herkent. Mobiel en desktop worden automatisch herkend, de voortgang overleeft het herladen van de pagina en de teller wordt elke dag om middernacht op nul gezet. Als de dag klaar is laat het het tabblad op de startpagina van Bing staan, zodat terugkeren niet als de eerste zoekopdracht van de volgende dag telt. Het 🧮 naast het saldo opent de inwisselcalculator: je Rewards-doel (🎯) staat al geselecteerd als je er een hebt, of je kiest een beloning uit de catalogus of het Xbox-krediet dat je wilt, en hij vertelt hoeveel punten je nog mist en op welke datum je er bent, met je gemeten tempo van de laatste vier weken of, zolang er geen week registratie is, met een minimum geschat op taken.',
+            calcBtnTip: 'Inwisselcalculator: hoeveel punten je nog nodig hebt voor een beloning uit de catalogus of Xbox-krediet, en op welke datum je er bent.',
+            calcTitle: 'Inwisselcalculator',
+            calcAmount: 'Gewenst Xbox-krediet:',
+            calcCost: 'Kost {n} ptn',
+            calcCustom: 'eigen bedrag',
+            calcCostTipCustom: 'Bij inwisselen voor een eigen bedrag rekent Rewards {r} punten per 1 {c}, vanaf {m} {c}. Daaronder zijn er alleen kaarten met een vast bedrag, en wordt de goedkoopste combinatie genomen die het gevraagde krediet haalt. De exacte afronding doet Rewards bij het inwisselen.',
+            calcCostTipCards: 'Jouw markt heeft geen inwisseling voor een eigen bedrag, dus wordt de goedkoopste kaartcombinatie genomen die het gevraagde krediet haalt.',
+            calcHave: 'Je hebt {n} ptn',
+            calcEnough: 'genoeg',
+            calcRate: 'Puntentempo:',
+            calcMeasured: 'Gemeten: {n} ptn/dag over de laatste {d} dagen',
+            calcMeasuredPending: 'Gemeten: beschikbaar na 7 dagen registratie ({d}/7)',
+            calcMeasuredTip: 'Hoeveel je saldo echt is gegroeid, met wat je inwisselde erbij opgeteld, volgens de dagelijkse meting die het script per account in je browser bewaart. Het telt alles wat je verdient, ook in de Bing-app, op Xbox en met bonussen, dus zodra er een week aan gegevens is, is dit het getal om op te vertrouwen.',
+            calcEstimate: 'Geschat op taken: {n} ptn/dag',
+            calcEstimateTip: 'Een minimum op basis van wat Rewards zegt dat elke taak oplevert. De puzzel telt één stempel voor elke reeks van zeven dagen van de aangevinkte taken. De prijzen van de zevende dag van reeksen, de maandbonussen en wat je buiten deze site verdient (Bing-app, Xbox, Outlook) tellen niet mee, dus meestal ben je er eerder.',
+            calcSrcSearch: 'Zoekopdrachten',
+            calcSrcStreak: 'Reeksbonus',
+            calcSrcPuzzle: 'Stempelpuzzel',
+            calcPerDay: '{n}/dag',
+            calcResult: 'Je haalt het {when}, rond {date}',
+            calcNoSource: 'Vink minstens één taak aan om de datum te berekenen.',
+            calcLineTip: 'Je inwisseldoel: wat je nog mist en op welke datum je het in jouw tempo haalt. Klik om de calculator te openen.',
+            calcGoal: 'Doel:',
+            calcGoalXbox: 'Xbox-krediet (vrij bedrag)',
+            calcSearch: 'Beloning zoeken…'
         },
         sv: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1286,9 +1738,34 @@
             infoName: 'Namn:', infoVersion: 'Version:', infoDescription: 'Beskrivning:',
             infoDescriptionText: 'Automatiserar de dagliga sökningarna på Bing för att samla Microsoft Rewards-poäng utan handpåläggning. Skriptet frågar Microsoft Rewards hur många sökpoäng du saknar i dag, gör bara de sökningar som behövs, stannar av sig själv när de är klara och visar vad dina poäng är värda som Xbox-kredit; talet under ⚙ finns kvar som reserv för när ingen Rewards-session finns. Antalet sökningar ställs in med ⚙ (1-100, standard 20) och knapparna starta / fortsätt / stoppa / nollställ växlar efter tillstånd. På fliken för nyckelord kan du ta bort vart och ett med ett klick, lägga till flera separerade med kommatecken, redigera alla på en gång eller återställa den ursprungliga listan. Den flytande panelen fälls ihop och minns hur du lämnade den, och skriptets språk väljs här uppe. Under knapparna finns en lista över vad Rewards begär i dag utöver sökningarna — sviten, incheckningen i appen, dagens uppsättning — med en länk till allt som återstår.',
             infoAuthor: 'Upphovsperson:', infoGitHub: 'GitHub:', infoPrivacy: 'Integritet:',
-            infoPrivacyText: 'Dina nyckelord och sökräknaren sparas endast i den lokala lagringen för din hanterare av användarskript, i din webbläsare. När ”Använd mina Rewards-framsteg” är på gör skriptet en GET-förfrågan till bing.com — samma slutpunkt som försörjer poängpanelen i Bings sidhuvud — för att läsa dagens framsteg, ditt saldo och inlösenkatalogen; den går via din Bing-session och inget av det skickas till tredje part eller till skriptets upphovsman. Stäng av den kryssrutan och skriptet gör inga egna nätverksanrop: det navigerar bara till sök-URL:er på bing.com, precis som om du skrev in dem själv. Dagens uppgifter i den listan kommer från samma svar, och det som lästs sparas också lokalt för att slippa hämtas på nytt på varje Bing-sida.',
+            infoPrivacyText: 'Dina nyckelord och sökräknaren sparas endast i den lokala lagringen för din hanterare av användarskript, i din webbläsare. När ”Använd mina Rewards-framsteg” är på gör skriptet en GET-förfrågan till bing.com — samma slutpunkt som försörjer poängpanelen i Bings sidhuvud — för att läsa dagens framsteg, ditt saldo och inlösenkatalogen; den går via din Bing-session och inget av det skickas till tredje part eller till skriptets upphovsman. Stäng av den kryssrutan och skriptet gör inga egna nätverksanrop: det navigerar bara till sök-URL:er på bing.com, precis som om du skrev in dem själv. Dagens uppgifter i den listan kommer från samma svar, och det som lästs sparas också lokalt för att slippa hämtas på nytt på varje Bing-sida. För inlösenkalkylatorn sparar det också en gång om dagen ditt saldo och det du löser in, samt det mål du väljer, åtskilt per konto med ett anonymt fingeravtryck i stället för konto-ID:t; och för att hämta det mål du har satt i Rewards begär det inlösensidan på rewards.bing.com högst en gång i halvtimmen, med din egen session.',
             infoHow: 'Så fungerar det:',
-            infoHowText: 'Skriptet frågar Rewards hur många sökpoäng som saknas i dag och gör bara de nödvändiga sökningarna, och stannar när Rewards markerar dagen som klar; om räknaren inte rör sig under flera sökningar i rad väntar det en halv minut, tittar igen och fortsätter, eftersom det nästan alltid bara är Rewards som bokför sent. Det bygger sökfrågor av 1 till 3 nyckelord och växlar mellan webbsökning (70 %), bilder, videor, shopping och nyheter för att efterlikna mänskligt surfande. Fördröjningarna är slumpmässiga mellan 3 och 10 s, med enstaka pauser på 10-25 s som efterliknar läsning av resultat. Varje URL innehåller roterande parametrar (form, cvid, PC) som Bing tolkar som vanlig trafik. Mobil och dator känns igen automatiskt, förloppet överlever omladdningar av sidan och räknaren nollställs varje dag vid midnatt. När dagen är klar lämnas fliken på Bings startsida, så att en återkomst dit inte räknas som nästa dags första sökning.'
+            infoHowText: 'Skriptet frågar Rewards hur många sökpoäng som saknas i dag och gör bara de nödvändiga sökningarna, och stannar när Rewards markerar dagen som klar; om räknaren inte rör sig under flera sökningar i rad väntar det en halv minut, tittar igen och fortsätter, eftersom det nästan alltid bara är Rewards som bokför sent. Det bygger sökfrågor av 1 till 3 nyckelord och växlar mellan webbsökning (70 %), bilder, videor, shopping och nyheter för att efterlikna mänskligt surfande. Fördröjningarna är slumpmässiga mellan 3 och 10 s, med enstaka pauser på 10-25 s som efterliknar läsning av resultat. Varje URL innehåller roterande parametrar (form, cvid, PC) som Bing tolkar som vanlig trafik. Mobil och dator känns igen automatiskt, förloppet överlever omladdningar av sidan och räknaren nollställs varje dag vid midnatt. När dagen är klar lämnas fliken på Bings startsida, så att en återkomst dit inte räknas som nästa dags första sökning. 🧮 bredvid saldot öppnar inlösenkalkylatorn: ditt Rewards-mål (🎯) är redan valt om du har ett, annars väljer du en belöning i katalogen eller den Xbox-kredit du vill ha, och den visar hur många poäng du saknar och vilket datum du når dit, med din uppmätta takt från de senaste fyra veckorna eller, tills det finns en veckas registrering, med ett minimum uppskattat från uppgifterna.',
+            calcBtnTip: 'Inlösenkalkylator: hur många poäng du saknar till en belöning i katalogen eller en Xbox-kredit, och vilket datum du når dit.',
+            calcTitle: 'Inlösenkalkylator',
+            calcAmount: 'Xbox-kredit du vill ha:',
+            calcCost: 'Kostar {n} p',
+            calcCustom: 'valfritt belopp',
+            calcCostTipCustom: 'Vid inlösen av valfritt belopp tar Rewards {r} poäng per 1 {c}, från {m} {c}. Under det finns bara kort med fast belopp, och den billigaste kombinationen som når den önskade krediten används. Den exakta avrundningen gör Rewards vid inlösen.',
+            calcCostTipCards: 'Din marknad har ingen inlösen av valfritt belopp, så den billigaste kortkombinationen som når den önskade krediten används.',
+            calcHave: 'Du har {n} p',
+            calcEnough: 'det räcker redan',
+            calcRate: 'Poängtakt:',
+            calcMeasured: 'Uppmätt: {n} p/dag under de senaste {d} dagarna',
+            calcMeasuredPending: 'Uppmätt: tillgänglig efter 7 dagars registrering ({d}/7)',
+            calcMeasuredTip: 'Hur mycket ditt saldo faktiskt har vuxit, med det du har löst in tillagt, enligt den dagliga avläsning som skriptet sparar i din webbläsare för varje konto. Den räknar allt du tjänar, även i Bing-appen, på Xbox och genom bonusar, så när det finns en veckas data är det siffran att lita på.',
+            calcEstimate: 'Uppskattat från uppgifter: {n} p/dag',
+            calcEstimateTip: 'Ett minimum utifrån vad Rewards säger att varje uppgift ger. Pusslet räknar en stämpel för varje sjudagarssvit av de markerade uppgifterna. Det utelämnar sviternas sjundedagspriser, månadsbonusarna och det du tjänar utanför den här webbplatsen (Bing-appen, Xbox, Outlook), så oftast når du dit tidigare.',
+            calcSrcSearch: 'Sökningar',
+            calcSrcStreak: 'Svitbonus',
+            calcSrcPuzzle: 'Stämpelpussel',
+            calcPerDay: '{n}/dag',
+            calcResult: 'Du når dit {when}, runt {date}',
+            calcNoSource: 'Markera minst en uppgift för att räkna ut datumet.',
+            calcLineTip: 'Ditt inlösenmål: vad du saknar och vilket datum du når dit i din takt. Klicka för att öppna kalkylatorn.',
+            calcGoal: 'Mål:',
+            calcGoalXbox: 'Xbox-kredit (valfritt belopp)',
+            calcSearch: 'Sök belöning…'
         },
         da: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1347,9 +1824,34 @@
             infoName: 'Navn:', infoVersion: 'Version:', infoDescription: 'Beskrivelse:',
             infoDescriptionText: 'Automatiserer de daglige søgninger på Bing, så du kan samle Microsoft Rewards-point uden manuelt arbejde. Scriptet spørger Microsoft Rewards, hvor mange søgepoint du mangler i dag, udfører kun de nødvendige søgninger, stopper af sig selv, når de er klaret, og viser, hvad dine point er værd som Xbox-kredit; tallet under ⚙ bliver stående som reserve til de gange, hvor der ikke er nogen Rewards-session. Antallet af søgninger indstilles med ⚙ (1-100, standard 20), og knapperne start / fortsæt / stop / nulstil skifter efter tilstanden. På fanen med nøgleord kan du slette hvert enkelt med ét klik, tilføje flere adskilt af komma, redigere dem alle på én gang eller gendanne den oprindelige liste. Det flydende panel klapper sammen og husker, hvordan du efterlod det, og scriptets sprog vælges heroppe. Under knapperne står en liste over det, Rewards beder om i dag ud over søgningerne — stimen, tjek ind i appen, dagens sæt — med et link til alt det, der mangler.',
             infoAuthor: 'Forfatter:', infoGitHub: 'GitHub:', infoPrivacy: 'Privatliv:',
-            infoPrivacyText: 'Dine nøgleord og søgetælleren gemmes kun i den lokale lagring i din userscript-manager, i din browser. Når „Brug mine Rewards-fremskridt“ er slået til, sender scriptet en GET-anmodning til bing.com — samme endepunkt, der forsyner pointpanelet i Bings sidehoved — for at læse dagens fremskridt, din saldo og indløsningskataloget; den følger din Bing-session, og intet af det går til tredjeparter eller til scriptets forfatter. Slå det felt fra, og scriptet foretager ingen egne netværksanmodninger: det navigerer kun til søge-URL\'er på bing.com, præcis som hvis du selv skrev dem. Dagens opgaver i den liste kommer fra samme svar, og det læste gemmes også lokalt, så det ikke skal hentes igen på hver Bing-side.',
+            infoPrivacyText: 'Dine nøgleord og søgetælleren gemmes kun i den lokale lagring i din userscript-manager, i din browser. Når „Brug mine Rewards-fremskridt“ er slået til, sender scriptet en GET-anmodning til bing.com — samme endepunkt, der forsyner pointpanelet i Bings sidehoved — for at læse dagens fremskridt, din saldo og indløsningskataloget; den følger din Bing-session, og intet af det går til tredjeparter eller til scriptets forfatter. Slå det felt fra, og scriptet foretager ingen egne netværksanmodninger: det navigerer kun til søge-URL\'er på bing.com, præcis som hvis du selv skrev dem. Dagens opgaver i den liste kommer fra samme svar, og det læste gemmes også lokalt, så det ikke skal hentes igen på hver Bing-side. Til indløsningsberegneren gemmer det desuden én gang om dagen din saldo og det, du indløser, samt det mål, du vælger, adskilt pr. konto med et anonymt fingeraftryk i stedet for konto-id’et; og for at hente det mål, du har sat i Rewards, henter det indløsningssiden på rewards.bing.com højst hver halve time og med din egen session.',
             infoHow: 'Sådan virker det:',
-            infoHowText: 'Scriptet spørger Rewards, hvor mange søgepoint der mangler i dag, og udfører kun de nødvendige søgninger, og stopper når Rewards markerer dagen som fuldført; hvis tælleren ikke rykker sig over flere søgninger i træk, venter det et halvt minut, tjekker igen og fortsætter, for næsten altid krediterer Rewards bare sent. Det danner søgninger ved at kombinere 1 til 3 nøgleord og skifter mellem websøgning (70 %), billeder, videoer, shopping og nyheder for at efterligne menneskelig browsing. Forsinkelserne er tilfældige mellem 3 og 10 s, med lejlighedsvise pauser på 10-25 s, der efterligner læsning af resultater. Hver URL indeholder roterende parametre (form, cvid, PC), som Bing opfatter som almindelig trafik. Mobil og computer registreres automatisk, forløbet overlever genindlæsning af siden, og tælleren nulstilles hver dag ved midnat. Når dagen er færdig, efterlades fanen på Bings forside, så et gensyn med den ikke tæller som næste dags første søgning.'
+            infoHowText: 'Scriptet spørger Rewards, hvor mange søgepoint der mangler i dag, og udfører kun de nødvendige søgninger, og stopper når Rewards markerer dagen som fuldført; hvis tælleren ikke rykker sig over flere søgninger i træk, venter det et halvt minut, tjekker igen og fortsætter, for næsten altid krediterer Rewards bare sent. Det danner søgninger ved at kombinere 1 til 3 nøgleord og skifter mellem websøgning (70 %), billeder, videoer, shopping og nyheder for at efterligne menneskelig browsing. Forsinkelserne er tilfældige mellem 3 og 10 s, med lejlighedsvise pauser på 10-25 s, der efterligner læsning af resultater. Hver URL indeholder roterende parametre (form, cvid, PC), som Bing opfatter som almindelig trafik. Mobil og computer registreres automatisk, forløbet overlever genindlæsning af siden, og tælleren nulstilles hver dag ved midnat. Når dagen er færdig, efterlades fanen på Bings forside, så et gensyn med den ikke tæller som næste dags første søgning. 🧮 ved siden af saldoen åbner indløsningsberegneren: dit Rewards-mål (🎯) er allerede valgt, hvis du har et, ellers vælger du en belønning i kataloget eller den Xbox-kredit, du ønsker, og den fortæller, hvor mange point du mangler, og hvilken dato du når den, med dit målte tempo fra de seneste fire uger eller, indtil der er en uges registrering, med et minimum anslået ud fra opgaverne.',
+            calcBtnTip: 'Indløsningsberegner: hvor mange point du mangler til en belønning i kataloget eller en Xbox-kredit, og hvilken dato du når den.',
+            calcTitle: 'Indløsningsberegner',
+            calcAmount: 'Ønsket Xbox-kredit:',
+            calcCost: 'Koster {n} p',
+            calcCustom: 'valgfrit beløb',
+            calcCostTipCustom: 'Ved indløsning af et valgfrit beløb tager Rewards {r} point pr. 1 {c}, fra {m} {c}. Under det findes kun kort med fast beløb, og den billigste kombination, der når den ønskede kredit, bruges. Den præcise afrunding foretager Rewards ved indløsningen.',
+            calcCostTipCards: 'Dit marked har ingen indløsning af valgfrit beløb, så den billigste kortkombination, der når den ønskede kredit, bruges.',
+            calcHave: 'Du har {n} p',
+            calcEnough: 'det er nok',
+            calcRate: 'Pointtempo:',
+            calcMeasured: 'Målt: {n} p/dag i de seneste {d} dage',
+            calcMeasuredPending: 'Målt: tilgængelig efter 7 dages registrering ({d}/7)',
+            calcMeasuredTip: 'Hvor meget din saldo reelt er vokset, med det du har indløst lagt til igen, ifølge den daglige aflæsning, som scriptet gemmer i din browser for hver konto. Den tæller alt, hvad du tjener, også i Bing-appen, på Xbox og via bonusser, så når der er en uges data, er det tallet at stole på.',
+            calcEstimate: 'Anslået ud fra opgaver: {n} p/dag',
+            calcEstimateTip: 'Et minimum ud fra, hvad Rewards siger, hver opgave giver. Puslespillet tæller ét stempel for hver syvdages stime af de afkrydsede opgaver. Det udelader stimernes syvendedagspræmier, de månedlige bonusser og det, du tjener uden for dette websted (Bing-appen, Xbox, Outlook), så som regel når du det før.',
+            calcSrcSearch: 'Søgninger',
+            calcSrcStreak: 'Stimebonus',
+            calcSrcPuzzle: 'Stempelpuslespil',
+            calcPerDay: '{n}/dag',
+            calcResult: 'Du når det {when}, omkring {date}',
+            calcNoSource: 'Sæt kryds ved mindst én opgave for at beregne datoen.',
+            calcLineTip: 'Dit indløsningsmål: hvad du mangler, og hvilken dato du når det i dit tempo. Klik for at åbne beregneren.',
+            calcGoal: 'Mål:',
+            calcGoalXbox: 'Xbox-kredit (valgfrit beløb)',
+            calcSearch: 'Søg belønning…'
         },
         no: {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1408,9 +1910,34 @@
             infoName: 'Navn:', infoVersion: 'Versjon:', infoDescription: 'Beskrivelse:',
             infoDescriptionText: 'Automatiserer de daglige søkene på Bing slik at du samler Microsoft Rewards-poeng uten manuelt arbeid. Skriptet spør Microsoft Rewards om hvor mange søkepoeng du mangler i dag, utfører bare de nødvendige søkene, stopper av seg selv når de er ferdige, og viser hva poengene dine er verdt som Xbox-kreditt; tallet under ⚙ blir stående som reserve for de gangene det ikke finnes noen Rewards-økt. Antall søk stilles inn med ⚙ (1-100, standard 20), og knappene start / fortsett / stopp / nullstill endrer seg etter tilstanden. I fanen for nøkkelord kan du slette hvert enkelt med ett klikk, legge til flere skilt med komma, redigere alle på én gang eller gjenopprette den opprinnelige listen. Det flytende panelet felles sammen og husker hvordan du forlot det, og språket for skriptet velges her oppe. Under knappene står en liste over det Rewards ber om i dag i tillegg til søkene — rekken, innsjekk i appen, dagens sett — med en lenke til alt som gjenstår.',
             infoAuthor: 'Forfatter:', infoGitHub: 'GitHub:', infoPrivacy: 'Personvern:',
-            infoPrivacyText: 'Nøkkelordene dine og søketelleren lagres bare i det lokale lageret til brukerskript-behandleren, i nettleseren din. Når «Bruk fremgangen min i Rewards» er slått på, sender skriptet en GET-forespørsel til bing.com — samme endepunkt som forsyner poengpanelet i topplinjen på Bing — for å lese dagens fremgang, saldoen din og innløsningskatalogen; den følger Bing-økten din, og ingenting av dette går til tredjeparter eller til forfatteren av skriptet. Slå av den avkrysningsboksen, og skriptet gjør ingen egne nettverksforespørsler: det navigerer bare til søke-URL-er på bing.com, akkurat som om du skrev dem inn selv. Dagens oppgaver i den listen kommer fra samme svar, og det som leses lagres også lokalt for å slippe å hente det på nytt på hver Bing-side.',
+            infoPrivacyText: 'Nøkkelordene dine og søketelleren lagres bare i det lokale lageret til brukerskript-behandleren, i nettleseren din. Når «Bruk fremgangen min i Rewards» er slått på, sender skriptet en GET-forespørsel til bing.com — samme endepunkt som forsyner poengpanelet i topplinjen på Bing — for å lese dagens fremgang, saldoen din og innløsningskatalogen; den følger Bing-økten din, og ingenting av dette går til tredjeparter eller til forfatteren av skriptet. Slå av den avkrysningsboksen, og skriptet gjør ingen egne nettverksforespørsler: det navigerer bare til søke-URL-er på bing.com, akkurat som om du skrev dem inn selv. Dagens oppgaver i den listen kommer fra samme svar, og det som leses lagres også lokalt for å slippe å hente det på nytt på hver Bing-side. For innløsningskalkulatoren lagrer det i tillegg én gang om dagen saldoen din og det du løser inn, samt målet du velger, adskilt per konto med et anonymt fingeravtrykk i stedet for konto-ID-en; og for å hente målet du har satt i Rewards, henter det innløsningssiden på rewards.bing.com høyst hver halvtime og med din egen økt.',
             infoHow: 'Slik virker det:',
-            infoHowText: 'Skriptet spør Rewards om hvor mange søkepoeng som mangler i dag, og utfører bare de nødvendige søkene, og stopper når Rewards markerer dagen som fullført; hvis telleren ikke rører seg over flere søk på rad, venter det et halvt minutt, ser etter på nytt og fortsetter, for nesten alltid er det bare Rewards som godskriver sent. Det bygger søk ved å kombinere 1 til 3 nøkkelord og veksler mellom nettsøk (70 %), bilder, videoer, shopping og nyheter for å etterligne menneskelig surfing. Forsinkelsene er tilfeldige mellom 3 og 10 s, med sporadiske pauser på 10-25 s som etterligner lesing av resultater. Hver URL inneholder roterende parametre (form, cvid, PC) som Bing oppfatter som vanlig trafikk. Mobil og datamaskin oppdages automatisk, framdriften overlever at siden lastes på nytt, og telleren nullstilles hver dag ved midnatt. Når dagen er ferdig, blir fanen liggende på Bings forside, slik at et gjensyn med den ikke teller som neste dags første søk.'
+            infoHowText: 'Skriptet spør Rewards om hvor mange søkepoeng som mangler i dag, og utfører bare de nødvendige søkene, og stopper når Rewards markerer dagen som fullført; hvis telleren ikke rører seg over flere søk på rad, venter det et halvt minutt, ser etter på nytt og fortsetter, for nesten alltid er det bare Rewards som godskriver sent. Det bygger søk ved å kombinere 1 til 3 nøkkelord og veksler mellom nettsøk (70 %), bilder, videoer, shopping og nyheter for å etterligne menneskelig surfing. Forsinkelsene er tilfeldige mellom 3 og 10 s, med sporadiske pauser på 10-25 s som etterligner lesing av resultater. Hver URL inneholder roterende parametre (form, cvid, PC) som Bing oppfatter som vanlig trafikk. Mobil og datamaskin oppdages automatisk, framdriften overlever at siden lastes på nytt, og telleren nullstilles hver dag ved midnatt. Når dagen er ferdig, blir fanen liggende på Bings forside, slik at et gjensyn med den ikke teller som neste dags første søk. 🧮 ved siden av saldoen åpner innløsningskalkulatoren: Rewards-målet ditt (🎯) er allerede valgt hvis du har et, ellers velger du en belønning i katalogen eller Xbox-kreditten du ønsker, og den forteller hvor mange poeng du mangler og hvilken dato du når den, med ditt målte tempo fra de siste fire ukene eller, til det finnes en ukes registrering, med et minimum anslått fra oppgavene.',
+            calcBtnTip: 'Innløsningskalkulator: hvor mange poeng du mangler til en belønning i katalogen eller en Xbox-kreditt, og hvilken dato du når den.',
+            calcTitle: 'Innløsningskalkulator',
+            calcAmount: 'Ønsket Xbox-kreditt:',
+            calcCost: 'Koster {n} p',
+            calcCustom: 'valgfritt beløp',
+            calcCostTipCustom: 'Ved innløsning av valgfritt beløp tar Rewards {r} poeng per 1 {c}, fra {m} {c}. Under det finnes bare kort med fast beløp, og den billigste kombinasjonen som når ønsket kreditt, brukes. Den nøyaktige avrundingen gjør Rewards ved innløsningen.',
+            calcCostTipCards: 'Markedet ditt har ikke innløsning av valgfritt beløp, så den billigste kortkombinasjonen som når ønsket kreditt, brukes.',
+            calcHave: 'Du har {n} p',
+            calcEnough: 'det holder',
+            calcRate: 'Poengtempo:',
+            calcMeasured: 'Målt: {n} p/dag de siste {d} dagene',
+            calcMeasuredPending: 'Målt: tilgjengelig etter 7 dagers registrering ({d}/7)',
+            calcMeasuredTip: 'Hvor mye saldoen din faktisk har vokst, med det du har løst inn lagt til igjen, ifølge den daglige avlesningen skriptet lagrer i nettleseren din for hver konto. Den teller alt du tjener, også i Bing-appen, på Xbox og gjennom bonuser, så når det finnes en ukes data, er dette tallet å stole på.',
+            calcEstimate: 'Anslått fra oppgaver: {n} p/dag',
+            calcEstimateTip: 'Et minimum basert på hva Rewards sier hver oppgave gir. Puslespillet teller ett stempel for hver sjudagersrekke av de avkryssede oppgavene. Det utelater rekkenes sjuendedagspremier, de månedlige bonusene og det du tjener utenfor dette nettstedet (Bing-appen, Xbox, Outlook), så som regel når du det før.',
+            calcSrcSearch: 'Søk',
+            calcSrcStreak: 'Rekkebonus',
+            calcSrcPuzzle: 'Stempelpuslespill',
+            calcPerDay: '{n}/dag',
+            calcResult: 'Du når det {when}, rundt {date}',
+            calcNoSource: 'Kryss av for minst én oppgave for å beregne datoen.',
+            calcLineTip: 'Innløsningsmålet ditt: hva du mangler, og hvilken dato du når det i ditt tempo. Klikk for å åpne kalkulatoren.',
+            calcGoal: 'Mål:',
+            calcGoalXbox: 'Xbox-kreditt (valgfritt beløp)',
+            calcSearch: 'Søk etter belønning…'
         },
         'zh-tw': {
             tabSearch: '🔍', tabKeywords: '🏷️', tabInfo: 'ℹ️',
@@ -1469,9 +1996,34 @@
             infoName: '名稱：', infoVersion: '版本：', infoDescription: '描述：',
             infoDescriptionText: '自動完成每日的 Bing 搜尋，無須手動操作即可累積 Microsoft Rewards 點數。腳本會向 Microsoft Rewards 查詢你今天還差多少搜尋點數，只執行必要的搜尋，完成後自動停止，並顯示你的點數折合多少 Xbox 餘額；⚙ 裡的次數則留作沒有 Rewards 工作階段時的備用。搜尋次數可用 ⚙ 設定（1-100，預設 20），開始／繼續／停止／重設按鈕會隨狀態變化。在關鍵字分頁中，你可以點擊逐一刪除、用逗號分隔一次新增多個、一次編輯全部，或還原原始清單。浮動面板可以收合並記住你上次的狀態，腳本語言就在上方選擇。按鈕下方會列出除了搜尋以外今天 Rewards 要求的事項（連續天數、在應用程式中登記、每日任務），未完成的都附連結。',
             infoAuthor: '作者：', infoGitHub: 'GitHub：', infoPrivacy: '隱私：',
-            infoPrivacyText: '你的關鍵字和搜尋計數器只保存在瀏覽器中使用者腳本管理器的本機儲存裡。開啟「使用我的 Rewards 進度」時，腳本會向 bing.com 發出一次 GET 請求，讀取你今天的進度、餘額和兌換目錄；這個位址就是驅動 Bing 頁首點數面板的同一個端點，請求隨你的 Bing 工作階段送出，其中的內容不會流向任何第三方，也不會傳給腳本作者。關掉這個勾選，腳本就不會發出任何自己的網路請求：它只是跳轉到 bing.com 的搜尋網址，和你自己輸入完全一樣。該清單中當天的任務也來自同一個回應，讀到的內容同樣保存在本機，以免每開一個 Bing 頁面就再問一次。',
+            infoPrivacyText: '你的關鍵字和搜尋計數器只保存在瀏覽器中使用者腳本管理器的本機儲存裡。開啟「使用我的 Rewards 進度」時，腳本會向 bing.com 發出一次 GET 請求，讀取你今天的進度、餘額和兌換目錄；這個位址就是驅動 Bing 頁首點數面板的同一個端點，請求隨你的 Bing 工作階段送出，其中的內容不會流向任何第三方，也不會傳給腳本作者。關掉這個勾選，腳本就不會發出任何自己的網路請求：它只是跳轉到 bing.com 的搜尋網址，和你自己輸入完全一樣。該清單中當天的任務也來自同一個回應，讀到的內容同樣保存在本機，以免每開一個 Bing 頁面就再問一次。為了兌換計算機，它還會每天保存一次你的餘額、兌換記錄和你選擇的目標，依帳戶分開存放，用匿名指紋而非帳戶識別碼區分；為了讀取你在 Rewards 中設定的目標，它還會用你自己的工作階段請求 rewards.bing.com 的兌換頁面，最多每半小時一次。',
             infoHow: '運作方式：',
-            infoHowText: '腳本會向 Rewards 查詢今天還差多少搜尋點數，只做必要的那些，等 Rewards 將今天標記為已完成就停下；若連續幾次搜尋計數都沒上升，它會等半分鐘再看一次然後繼續，因為多半只是 Rewards 發放得晚。 腳本會組合 1 到 3 個關鍵字產生查詢，並在網頁搜尋（70%）、圖片、影片、購物與新聞之間輪替，以模擬人類瀏覽。延遲在 3-10 秒之間隨機，偶爾會有 10-25 秒的停頓來模擬閱讀結果。每個網址都帶有輪替參數（form、cvid、PC），Bing 會將其視為正常流量。腳本會自動辨識行動裝置與桌機，進度在頁面重新載入後仍會保留，計數器每天午夜重設。 當天完成後會把分頁停在 Bing 首頁，這樣再回到該分頁時不會被算成隔天的第一次搜尋。'
+            infoHowText: '腳本會向 Rewards 查詢今天還差多少搜尋點數，只做必要的那些，等 Rewards 將今天標記為已完成就停下；若連續幾次搜尋計數都沒上升，它會等半分鐘再看一次然後繼續，因為多半只是 Rewards 發放得晚。 腳本會組合 1 到 3 個關鍵字產生查詢，並在網頁搜尋（70%）、圖片、影片、購物與新聞之間輪替，以模擬人類瀏覽。延遲在 3-10 秒之間隨機，偶爾會有 10-25 秒的停頓來模擬閱讀結果。每個網址都帶有輪替參數（form、cvid、PC），Bing 會將其視為正常流量。腳本會自動辨識行動裝置與桌機，進度在頁面重新載入後仍會保留，計數器每天午夜重設。 當天完成後會把分頁停在 Bing 首頁，這樣再回到該分頁時不會被算成隔天的第一次搜尋。餘額旁邊的 🧮 會開啟兌換計算機：如果你在 Rewards 中設定了目標，會預先選好（🎯）；也可以選擇目錄中的獎勵或想要的 Xbox 餘額。它會告訴你還差多少點數、哪天能達到，依最近四週的實測速度計算；記錄不滿一週時，則依任務估算的最低值計算。',
+            calcBtnTip: '兌換計算機：距離目錄中的獎勵或一筆 Xbox 餘額還差多少點數，以及哪天能存夠。',
+            calcTitle: '兌換計算機',
+            calcAmount: '想要的 Xbox 餘額：',
+            calcCost: '需要 {n} 分',
+            calcCustom: '自訂金額',
+            calcCostTipCustom: '以自訂金額兌換時，Rewards 每 1 {c} 收取 {r} 點，{m} {c} 起兌。低於這個金額只有固定面額的卡片，會選用能達到所需餘額的最便宜組合。最終的進位由 Rewards 在兌換時處理。',
+            calcCostTipCards: '你所在的市場沒有自訂金額兌換，所以會選用能達到所需餘額的最便宜卡片組合。',
+            calcHave: '你有 {n} 分',
+            calcEnough: '已經夠了',
+            calcRate: '點數速度：',
+            calcMeasured: '實測：最近 {d} 天每天 {n} 分',
+            calcMeasuredPending: '實測：記錄滿 7 天後可用（{d}/7）',
+            calcMeasuredTip: '把兌換掉的點數加回去後，你的餘額實際漲了多少，依據的是腳本為每個帳戶保存在瀏覽器裡的每日讀數。它會計入你賺到的一切，包括 Bing 應用程式、Xbox 和各種獎勵，所以一旦有一週的資料，這就是可靠的數字。',
+            calcEstimate: '依任務估算：每天 {n} 分',
+            calcEstimateTip: '根據 Rewards 標示的每項任務點數得出的最低值。拼圖按所勾選任務每完成一次 7 天連續記錄算一枚印章。不包括連續記錄第 7 天的獎勵、每月獎勵，以及你在本網站以外（Bing 應用程式、Xbox、Outlook）賺到的點數，所以通常會更早達到。',
+            calcSrcSearch: '搜尋',
+            calcSrcStreak: '連續獎勵',
+            calcSrcPuzzle: '印章拼圖',
+            calcPerDay: '每天 {n}',
+            calcResult: '{when}達到，大約在 {date}',
+            calcNoSource: '至少勾選一項任務才能計算日期。',
+            calcLineTip: '你的兌換目標：還差多少，以及依你的速度哪天能達到。點擊開啟計算機。',
+            calcGoal: '目標：',
+            calcGoalXbox: 'Xbox 餘額（金額自選）',
+            calcSearch: '搜尋獎勵…'
         }
     };
     // Merge sobre `en`: una clave que falte en un idioma cae al inglés en vez de
@@ -1533,6 +2085,43 @@
     // y el contador desde el que se forzó, que es lo que hace que ▶ signifique
     // «busca otras N» y no «vuelve a empezar»: el contador del día no se toca.
     const KEY_FORCE = 'bing-rewards-force';
+
+    // Calculadora de canje. El objetivo de cada cuenta —un saldo Xbox con su
+    // importe, o un premio del catálogo— y el registro de lo ganado, una
+    // lectura por día y por cuenta, que es de donde sale el ritmo medido. Ver
+    // `recordEarnings`. Los dos van por cuenta porque se puede tener más de
+    // una en el mismo navegador, y cada una persigue su propio premio.
+    const KEY_GOAL = 'bing-rewards-goal';
+    const KEY_EARN_LOG = 'bing-rewards-earn-log';
+    // Días de registro que se conservan, la ventana con la que se mide el ritmo
+    // y el mínimo para fiarse de él. Cuatro semanas justas, como el simulador
+    // del pase de Alienware: cualquier semana lleva sus séptimos días y su parte
+    // del rompecabezas, y una ventana más corta los cuenta o no según el día en
+    // que caiga. Con menos de una semana el ritmo depende de qué días tocaron.
+    const EARN_LOG_KEEP = 60;
+    const RATE_WINDOW_DAYS = 28;
+    const RATE_MIN_DAYS = 7;
+
+    // La meta que el usuario pone en la web de Rewards («Tu objetivo»). NO viaja
+    // en el flyout (ver `readGoalItems`), pero sí en el HTML de la página de
+    // canje, así que se pide esa página. Es el ÚNICO recurso de fuera de
+    // www.bing.com que toca el script, y por eso el `@connect` y el
+    // `GM_xmlhttpRequest`: rewards.bing.com es otro origen y no manda CORS.
+    //
+    // Pesa unos 280 KB, así que no se pide en cada búsqueda: como mucho cada
+    // media hora al cargar Bing, siempre que se recarga a mano (que es una
+    // orden de releer, como en el resto del panel) y al abrir la calculadora si
+    // la lectura tiene más de cinco minutos —que es cuando el usuario puede
+    // venir de cambiar la meta—.
+    const KEY_SITE_GOAL = 'bing-rewards-site-goal';
+    const SITE_GOAL_URL = 'https://rewards.bing.com/redeem';
+    const SITE_GOAL_TTL = 30 * 60 * 1000;
+    const SITE_GOAL_TTL_CALC = 5 * 60 * 1000;
+    const SITE_GOAL_TIMEOUT = 15000;
+    // Diferencia de saldo tolerada entre la página de canje y el flyout para
+    // dar la meta por de la MISMA cuenta: las dos lecturas van casi seguidas,
+    // y en ese rato lo único que mueve el saldo es alguna búsqueda (3 puntos).
+    const SITE_GOAL_SLACK = 30;
 
     // Tope absoluto de búsquedas por día. En modo automático quien manda es la
     // API, pero si su contador se quedara congelado el bucle no tendría freno,
@@ -2057,10 +2646,21 @@
         });
         if (!live) return null;
         const text = stripTags(live.attributes.description);
+        const total = num(live.attributes.activity_max);
+        // Lo que paga el bono, para la calculadora. No viaja en ningún campo
+        // numérico —volcado el 2026-11-19: la promo trae `activity_max`,
+        // `activity_progress` y `bonus_earned`, que vale 0—, así que sale de la
+        // frase, que lleva dos cifras: los días que faltan y los puntos. La
+        // mayor es el premio, porque los días nunca pasan del ciclo; y si no
+        // supera al ciclo es que la frase no es la esperada y no se da cifra.
+        // Solo dígitos ASCII: un mercado que escribiera otros numerales se queda
+        // sin esta fuente en la calculadora, que es mejor que una cifra inventada.
+        const prize = (text.match(/\d+/g) || []).map(Number).reduce((m, n) => (n > m ? n : m), 0);
         return text ? {
             text: text,
             done: num(live.attributes.activity_progress),
-            total: num(live.attributes.activity_max)
+            total: total,
+            points: (total > 0 && prize > total) ? prize : 0
         } : null;
     }
 
@@ -2476,8 +3076,93 @@
 
         return {
             value: value,
-            cheapest: cheapest ? { price: cheapest.price, title: (cheapest.attributes || {}).title || '' } : null
+            cheapest: cheapest ? { price: cheapest.price, title: (cheapest.attributes || {}).title || '' } : null,
+            redeem: readRedeemOptions(family, exactRatio > 0 ? anchor : null, value),
+            items: readGoalItems(shop)
         };
+    }
+
+    /**
+     * Los premios del catálogo que se pueden elegir como objetivo, con su
+     * precio exacto.
+     *
+     * Hace falta porque la meta que el usuario fija en la web de Rewards NO
+     * llega al flyout: verificado el 2026-11-19 con una cuenta cuya meta era
+     * «Tarjeta digital de Roblox—1050 Robux», puesta ese mismo día
+     * (`profile.attributes.goal_upd`), y `userInfo.catalogGoal` seguía siendo
+     * el relleno de «sin meta» (una donación a precio 0). Esa tarjeta sí viene
+     * en `catalogItems` a 16.750, que es lo que la web pedía. Así que el
+     * objetivo lo elige el usuario de esta lista, que es la misma que ve allí.
+     *
+     * Fuera los ítems de importe variable: su título es una plantilla con
+     * `{0}` y su precio es el del mínimo, no el de un premio. El saldo Xbox de
+     * importe libre ya tiene su propia opción en la calculadora.
+     *
+     * @param {object[]} shop - Ítems de la tienda ya filtrados (sin sorteos ni ocultos).
+     * @returns {{id:string,title:string,price:number}[]}
+     */
+    function readGoalItems(shop) {
+        const seen = new Set();
+        const out = [];
+        for (const it of shop || []) {
+            const title = String((it.attributes || {}).title || '').replace(/\s+/g, ' ').trim();
+            const id = String(it.name || '');
+            if (!title || !id || title.includes('{0}') || seen.has(id)) continue;
+            seen.add(id);
+            out.push({ id: id, title: title, price: it.price });
+        }
+        return out.sort((x, y) => x.price - y.price);
+    }
+
+    /**
+     * Lo que la calculadora necesita para poner precio a un saldo: las
+     * tarjetas de importe fijo de la familia y, si existe, el canje de importe
+     * personalizado.
+     *
+     * Catálogo de mx el 2026-11-19: XBOX de MXN 20 (1145), 40 (1960) y 100
+     * (4895), más el ítem «Personalizado» —título con `{0}`, `variableItem_title`
+     * y tasa 48,94—. Ese ítem trae `price` 4895, el mismo que la tarjeta de
+     * MXN 100, y 4895 / 48,94 = 100,02: el precio es el de su importe MÍNIMO.
+     * Es una lectura del dato, no una regla publicada, así que se usa solo como
+     * umbral —por debajo, tarjetas fijas— y el aviso del coste dice que el
+     * redondeo final es cosa de Rewards.
+     *
+     * Las fijas se reconocen por su importe, con el mismo `amountFrom` que la
+     * tasa de reserva; el ítem variable cae solo, porque su `{0}` da importe 0.
+     *
+     * @param {object[]} family - Los ítems de la familia de saldo.
+     * @param {object|null} variable - El ítem de canje variable, si lo hay.
+     * @param {object|null} value - La tasa ya leída, por la moneda.
+     * @returns {{cards:{amount:number,price:number}[],custom:{ratio:number,min:number,label:string}|null,currency:string}|null}
+     */
+    function readRedeemOptions(family, variable, value) {
+        const byAmount = new Map();
+        for (const it of family) {
+            if (it === variable) continue;
+            const a = it.attributes || {};
+            const amount = amountFrom(a['desc.group_text'] || a.title);
+            if (amount <= 0) continue;
+            // Si el catálogo repitiera un importe, vale el precio más bajo.
+            const prev = byAmount.get(amount);
+            if (!prev || it.price < prev.price) byAmount.set(amount, { amount: amount, price: it.price });
+        }
+        const cards = [...byAmount.values()].sort((x, y) => x.amount - y.amount);
+
+        let custom = null;
+        if (variable) {
+            const a = variable.attributes || {};
+            const ratio = num(a.variableItemPointsToCurrencyConversionRatio);
+            const min = (variable.price > 0 && ratio > 0) ? Math.round(variable.price / ratio) : 0;
+            // `price` va aparte porque es el único coste EXACTO que se conoce del
+            // personalizado: 100 × 48,94 da 4894 y Rewards pide 4895.
+            // Sin `variableItem_title` («Personalizado»): llega en el idioma del
+            // MERCADO, y para eso el panel ya tiene `calcCustom` en el suyo. Con
+            // la UI en inglés salía «Costs 53,834 pts · Personalizado».
+            if (ratio > 0) custom = { ratio: ratio, min: min, price: variable.price > 0 ? variable.price : 0 };
+        }
+
+        if (!cards.length && !custom) return null;
+        return { cards: cards, custom: custom, currency: (value && value.currency) || '' };
     }
 
     /**
@@ -2517,6 +3202,16 @@
         const points = num(info.balance);
         const catalog = readCatalog(info.catalogItems, points);
 
+        // El registro del ritmo va aquí y no en `writeSnapshot` porque necesita
+        // dos cosas que el snapshot no guarda: los pedidos y la cuenta. Solo
+        // llega aquí una lectura buena, que es lo único que debe apuntarse.
+        const acct = acctKey(data.userId);
+        try {
+            recordEarnings(acct, points, info.orders);
+        } catch (e) {
+            console.error('(bing-rewards-auto-search): registro de puntos:', e);
+        }
+
         return {
             ...stamp,
             ok: true,
@@ -2551,7 +3246,12 @@
             level: readLevel(info.promotions),
             dayMax: readDayMax(info.promotions),
             value: catalog.value,
-            cheapest: catalog.cheapest
+            cheapest: catalog.cheapest,
+            // Los tres de la calculadora. Un snapshot de una versión anterior no
+            // los trae y el 🧮 no sale hasta la siguiente lectura.
+            redeem: catalog.redeem,
+            catalog: catalog.items,
+            acct: acct
         };
     }
 
@@ -2618,6 +3318,415 @@
             if (performance.navigation) return performance.navigation.type === 1;
         } catch (e) { /* sin dato, se sigue mirando el TTL */ }
         return false;
+    }
+
+    // =============================================
+    // CALCULADORA DE CANJE
+    // =============================================
+
+    /**
+     * Clave corta de la cuenta, para no mezclar registros. Hace falta porque se
+     * puede cambiar de cuenta de Microsoft en el mismo navegador, y el saldo de
+     * otra cuenta leído como «lo de hoy» daría un ritmo disparatado —hacia
+     * arriba o hacia abajo—. Se guarda un hash y no el `userId`: para separar
+     * cuentas basta, y así el almacenamiento no lleva el identificador.
+     * @param {string} id
+     * @returns {string} '' sin identificador.
+     */
+    function acctKey(id) {
+        const s = String(id || '');
+        if (!s) return '';
+        let h = 5381;
+        for (let i = 0; i < s.length; i++) h = ((h * 33) ^ s.charCodeAt(i)) >>> 0;
+        return h.toString(36);
+    }
+
+    /** Días entre dos fechas 'AAAA-MM-DD' locales (b - a). */
+    function dayDiff(a, b) {
+        const at = (d) => {
+            const [y, m, dd] = String(d).split('-').map(Number);
+            return Date.UTC(y, m - 1, dd);
+        };
+        return Math.round((at(b) - at(a)) / 864e5);
+    }
+
+    /**
+     * Apunta lo ganado hasta ahora, una entrada por día (la última lectura del
+     * día pisa a las anteriores).
+     *
+     * «Ganado» es el saldo MÁS lo canjeado desde que empezó el registro, y no
+     * el saldo a secas: un canje baja el saldo y se leería como un día con
+     * puntos negativos. Lo canjeado sale de `userInfo.orders`, que trae `id` y
+     * `p` (puntos) pero NO la fecha —`ts` llega como `0001-01-01T00:00:00` en
+     * las 22 órdenes del volcado del 2026-11-19—, así que no se puede fechar
+     * cada canje: se cuentan los pedidos que no estaban en la lectura anterior.
+     * El primer día se toman todos como vistos, que son canjes de antes.
+     *
+     * Se descartó `level_info.current_year_progress`, que parece justo esto
+     * —77.281 puntos «del año» sin bajar con los canjes— porque no está
+     * comprobado qué cuenta ni cuándo se reinicia. El saldo y los precios sí
+     * significan lo que dicen.
+     *
+     * @param {string} acct - `acctKey` de la cuenta.
+     * @param {number} balance
+     * @param {object[]} orders
+     */
+    function recordEarnings(acct, balance, orders) {
+        if (!acct || typeof balance !== 'number') return;
+        let all = GM_getValue(KEY_EARN_LOG, null);
+        if (!all || typeof all !== 'object') all = {};
+        const prev = (all[acct] && Array.isArray(all[acct].days)) ? all[acct] : null;
+
+        const list = (orders || []).filter((o) => o && o.id);
+        let spent = prev ? num(prev.spent) : 0;
+        if (prev) {
+            const known = new Set(prev.ids || []);
+            for (const o of list) {
+                if (!known.has(String(o.id))) spent += Math.max(0, num(o.p));
+            }
+        }
+
+        const day = getToday();
+        const days = (prev ? prev.days : []).filter((e) => e && e.day !== day);
+        days.push({ day: day, at: Date.now(), earned: balance + spent });
+        all[acct] = {
+            ids: list.map((o) => String(o.id)),
+            spent: spent,
+            days: days.slice(-EARN_LOG_KEEP)
+        };
+        GM_setValue(KEY_EARN_LOG, all);
+    }
+
+    /**
+     * El ritmo de verdad, en puntos por día, de la ventana de las últimas
+     * cuatro semanas del registro.
+     *
+     * Se divide por el tiempo entre las DOS LECTURAS y no por los días de
+     * calendario: la última de hoy puede ser de las nueve de la mañana, con el
+     * día a medias, y contarla como un día entero lo rebajaría.
+     *
+     * @param {string} acct
+     * @returns {{rate:number|null,days:number}} `days` es lo que abarca el
+     *     registro; sin la semana mínima, `rate` es null.
+     */
+    function measuredRate(acct) {
+        const all = GM_getValue(KEY_EARN_LOG, null);
+        const log = (acct && all && typeof all === 'object') ? all[acct] : null;
+        const days = (log && Array.isArray(log.days)) ? log.days.filter((e) => e && e.day) : [];
+        if (!days.length) return { rate: null, days: 0 };
+
+        const last = days[days.length - 1];
+        const span = dayDiff(days[0].day, getToday());
+        const anchor = days.find((e) => dayDiff(e.day, last.day) <= RATE_WINDOW_DAYS) || last;
+        const covered = dayDiff(anchor.day, last.day);
+        if (covered < RATE_MIN_DAYS) return { rate: null, days: Math.max(0, span) };
+
+        const elapsed = (last.at - anchor.at) / 864e5;
+        const rate = elapsed > 0 ? (num(last.earned) - num(anchor.earned)) / elapsed : 0;
+        // Un ritmo nulo o negativo no da fecha ninguna: sería un registro roto
+        // (una devolución, un pedido que no estaba en la lista), no un dato.
+        return { rate: rate > 0 ? rate : null, days: covered };
+    }
+
+    /** Máximo común divisor, para trabajar las tarjetas en su unidad común. */
+    function gcd(a, b) {
+        while (b) [a, b] = [b, a % b];
+        return a;
+    }
+
+    /**
+     * La combinación de tarjetas fijas más barata que llega AL MENOS al importe
+     * pedido. Con tarjetas de MXN 20, 40 y 100, MXN 60 sale 40 + 20 (3105) y
+     * MXN 30 sale 40 (1960): no hay forma de canjear 30 justos.
+     *
+     * Programación dinámica sobre la unidad común de los importes (20 en mx),
+     * con un tope de estados; por encima, la tarjeta de mejor tasa rellena lo
+     * que sobra hasta caer bajo el tope. En los mercados con canje personalizado
+     * esto solo decide los importes pequeños, que es donde importa.
+     *
+     * @param {number} amount
+     * @param {{amount:number,price:number}[]} cards
+     * @returns {{points:number,parts:{amount:number,count:number}[]}|null}
+     */
+    function cardCombo(amount, cards) {
+        const list = (cards || []).filter((c) => c.amount > 0 && c.price > 0);
+        if (!list.length || !(amount > 0)) return null;
+        // En céntimos, para que un importe con decimales no rompa el divisor.
+        const cents = list.map((c) => Math.round(c.amount * 100));
+        const unit = cents.reduce((g, c) => gcd(g, c), 0);
+        const units = cents.map((c) => c / unit);
+        let target = Math.ceil(Math.round(amount * 100) / unit);
+
+        const LIMIT = 5000;
+        let best = 0;
+        for (let i = 1; i < list.length; i++) {
+            if (list[i].price / units[i] < list[best].price / units[best]) best = i;
+        }
+        let prefill = 0;
+        if (target > LIMIT) {
+            prefill = Math.ceil((target - LIMIT) / units[best]);
+            target -= prefill * units[best];
+        }
+
+        const top = target + Math.max(...units);
+        const cost = new Array(top + 1).fill(Infinity);
+        const from = new Array(top + 1).fill(-1);
+        cost[0] = 0;
+        for (let x = 1; x <= top; x++) {
+            for (let i = 0; i < list.length; i++) {
+                if (units[i] <= x && cost[x - units[i]] + list[i].price < cost[x]) {
+                    cost[x] = cost[x - units[i]] + list[i].price;
+                    from[x] = i;
+                }
+            }
+        }
+        let pick = -1;
+        for (let x = Math.max(0, target); x <= top; x++) {
+            if (cost[x] < Infinity && (pick < 0 || cost[x] < cost[pick])) pick = x;
+        }
+        if (pick < 0) return null;
+
+        const counts = list.map(() => 0);
+        counts[best] += prefill;
+        for (let x = pick; x > 0; x -= units[from[x]]) counts[from[x]]++;
+        return {
+            points: cost[pick] + prefill * list[best].price,
+            parts: list.map((c, i) => ({ amount: c.amount, count: counts[i] }))
+                .filter((p) => p.count > 0)
+                .sort((x, y) => y.amount - x.amount)
+        };
+    }
+
+    /**
+     * Lo que cuesta en puntos un saldo, por la vía más barata: el canje
+     * personalizado si el importe llega a su mínimo, o la mejor combinación de
+     * tarjetas fijas. Se comparan las dos porque la tarjeta redonda puede salir
+     * igual o mejor que el personalizado justo en su importe.
+     *
+     * @param {number} amount
+     * @param {object} redeem - `readRedeemOptions`.
+     * @returns {{points:number,custom:boolean,parts:{amount:number,count:number}[]}|null}
+     */
+    function goalCost(amount, redeem) {
+        if (!redeem || !(amount > 0)) return null;
+        const c = redeem.custom;
+        // Nunca por debajo del precio de su importe mínimo, que es el único que
+        // trae el catálogo: la multiplicación se queda un punto corta ahí.
+        const viaCustom = (c && c.ratio > 0 && amount >= c.min)
+            ? { points: Math.max(Math.ceil(amount * c.ratio), num(c.price)), custom: true, parts: [] } : null;
+        const combo = cardCombo(amount, redeem.cards);
+        const viaCards = combo ? { points: combo.points, custom: false, parts: combo.parts } : null;
+        if (viaCustom && (!viaCards || viaCustom.points <= viaCards.points)) return viaCustom;
+        return viaCards;
+    }
+
+    /**
+     * Las tareas con las que se estima el ritmo cuando aún no hay registro, cada
+     * una con lo que paga al día según el propio flyout. Es un SUELO, con el
+     * mismo criterio que `readDayMax`:
+     *
+     *  - Búsquedas y conjunto diario: su máximo del día (60 y 30 en mx), que
+     *    juntos son el «Puntos de hoy 60/90» de la app.
+     *  - Bonificación de racha: el premio entre los días del ciclo (150 / 10).
+     *  - Rompecabezas: `point_max` entre los sellos (1000 / 12) por cada racha de
+     *    siete días que se cierra, y una racha es un sello (probado el
+     *    2026-08-25). Cuenta solo las rachas de las tareas marcadas, `bing` y
+     *    `dset`, y solo si están habilitadas en la cuenta.
+     *
+     * Y deja FUERA el premio del séptimo paso de cada racha (100 en búsquedas y
+     * en conjunto diario), porque sigue sin estar claro si se suma a lo del día
+     * o lo sustituye; las bonificaciones mensuales, que dependen del nivel; y lo
+     * que se gana fuera de esta web. Todo eso lo recoge el ritmo medido.
+     *
+     * @param {object} s - Snapshot.
+     * @returns {{id:string,perDay:number,ladder:string}[]}
+     */
+    function estimateSources(s) {
+        const out = [];
+        if (!s) return out;
+        const partners = (s.checkIn && s.checkIn.partners) || [];
+        const ladderOn = (key) => partners.some((p) => p.key === key && p.enabled);
+        if (s.search && num(s.search.max) > 0) {
+            out.push({ id: 'search', perDay: num(s.search.max), ladder: ladderOn('bing') ? 'bing' : '' });
+        }
+        if (s.dailySet && num(s.dailySet.points) > 0) {
+            out.push({ id: 'dset', perDay: num(s.dailySet.points), ladder: ladderOn('dset') ? 'dset' : '' });
+        }
+        const b = s.streakBonus;
+        if (b && num(b.points) > 0 && num(b.total) > 0) {
+            out.push({ id: 'streak', perDay: num(b.points) / num(b.total), ladder: '' });
+        }
+        return out;
+    }
+
+    /**
+     * Lo que da el rompecabezas al día con las rachas que se cierran cada
+     * semana. 0 si la cuenta no tiene sellos o no se marca ninguna racha.
+     * @param {object} s - Snapshot.
+     * @param {number} ladders - Rachas que se cierran cada semana.
+     */
+    /** El objetivo guardado de una cuenta (clave `acct`, o '_' sin cuenta). */
+    function goalStoreGet(acct) {
+        const all = GM_getValue(KEY_GOAL, null);
+        const g = (all && typeof all === 'object') ? all[acct || '_'] : null;
+        return (g && typeof g === 'object') ? g : null;
+    }
+
+    /** Guarda (o, con null, quita) el objetivo de una cuenta. */
+    function goalStoreSet(acct, goal) {
+        let all = GM_getValue(KEY_GOAL, null);
+        if (!all || typeof all !== 'object') all = {};
+        const k = acct || '_';
+        if (goal) all[k] = goal; else delete all[k];
+        GM_setValue(KEY_GOAL, all);
+    }
+
+    /** La última lectura de la meta de la web para una cuenta, o null. */
+    function siteGoalGet(acct) {
+        const all = GM_getValue(KEY_SITE_GOAL, null);
+        const g = (all && typeof all === 'object') ? all[acct || '_'] : null;
+        return (g && typeof g === 'object') ? g : null;
+    }
+
+    /**
+     * Saca la meta de la página de canje.
+     *
+     * La tarjeta «Tu objetivo» viene en el payload de React Server Components
+     * del HTML (`self.__next_f.push`), con las comillas escapadas. Volcado del
+     * 2026-11-19, cuenta con meta:
+     *
+     *   "href":"/redeem/sku/000418000051?" … "instrument":{"name":"RedeemGoalCard",
+     *   "data":{"isSignedIn":true,…}} … "children":"Tu objetivo" …
+     *   "children":"Tarjeta digital de Roblox—1050 Robux" … "value":6159,
+     *   "maxValue":16750 … "label":"10.591 para seguir" … "alt":"Tarjeta digital…"
+     *
+     * Y sin meta, la misma tarjeta con `"href":"/redeem/mx?section=shop"` y
+     * «Establecer un objetivo de Rewards». O sea: el `href` del enlace, que va
+     * JUSTO ANTES del nombre de la tarjeta, dice si hay meta, y su SKU es el
+     * `name` del ítem en `catalogItems` del flyout (comprobado: 000418000051 es
+     * la de 1050 Robux en los dos). `value` es el saldo y `maxValue` el precio.
+     *
+     * Lo que va DESPUÉS del nombre se corta en el siguiente `"instrument":{`,
+     * que es el de la tarjeta de al lado: sin ese tope, un `"value":` de otro
+     * componente se leería como el saldo.
+     *
+     * @param {string} html
+     * @returns {{state:'unknown'}|{state:'none'}|{state:'goal',sku:string,title:string,price:number,value:number}}
+     *     `unknown` si la página no trae la tarjeta o no hay sesión: entonces no
+     *     se sabe nada y no se toca lo que hubiera.
+     */
+    function parseSiteGoal(html) {
+        const text = String(html || '')
+            .replace(/\\u([0-9a-fA-F]{4})/g, (m, h) => String.fromCharCode(parseInt(h, 16)))
+            .replace(/\\"/g, '"');
+        const at = text.indexOf('"name":"RedeemGoalCard"');
+        if (at < 0) return { state: 'unknown' };
+        if (!/"isSignedIn":true/.test(text.slice(at, at + 300))) return { state: 'unknown' };
+
+        const hrefs = text.slice(Math.max(0, at - 400), at).match(/"href":"[^"]*"/g) || [];
+        const href = hrefs.length ? hrefs[hrefs.length - 1].slice(8, -1) : '';
+        const sku = /^\/redeem\/sku\/([A-Za-z0-9_-]+)/.exec(href);
+        if (!sku) return { state: 'none' };
+
+        let tail = text.slice(at + 20, at + 6000);
+        const next = tail.indexOf('"instrument":{');
+        if (next > 0) tail = tail.slice(0, next);
+        const int = (re) => { const m = re.exec(tail); return m ? Number(m[1]) : 0; };
+        const alt = /"alt":"([^"]{1,200})"/.exec(tail);
+        return {
+            state: 'goal',
+            sku: sku[1],
+            title: alt ? alt[1] : '',
+            price: int(/"maxValue":(\d+)/),
+            value: int(/"value":(\d+)/)
+        };
+    }
+
+    /** Pide la página de canje. null ante cualquier fallo; nunca lanza. */
+    function requestSiteGoal() {
+        return new Promise((resolve) => {
+            if (typeof GM_xmlhttpRequest !== 'function') { resolve(null); return; }
+            try {
+                GM_xmlhttpRequest({
+                    method: 'GET',
+                    url: SITE_GOAL_URL,
+                    timeout: SITE_GOAL_TIMEOUT,
+                    onload: (r) => resolve(r && r.status >= 200 && r.status < 300 ? String(r.responseText || '') : null),
+                    onerror: () => resolve(null),
+                    ontimeout: () => resolve(null),
+                    onabort: () => resolve(null)
+                });
+            } catch (e) {
+                resolve(null);
+            }
+        });
+    }
+
+    /**
+     * Relee la meta de la web si la última lectura de esa cuenta tiene más de
+     * `maxAge`, y la aplica al objetivo de la calculadora.
+     *
+     * Cómo conviven las dos: la meta de la web manda cuando CAMBIA (o cuando el
+     * usuario no tiene ningún objetivo en la calculadora), porque cambiarla allí
+     * es lo último que hizo. Si después elige otra cosa en la calculadora, esa
+     * elección se respeta hasta que la meta de la web vuelva a cambiar. Y si la
+     * quita de la web, se quita también aquí, pero solo si el objetivo actual
+     * salió de ella (`site: true`).
+     *
+     * La cuenta se comprueba por el saldo: la página de canje trae el suyo
+     * (`value`, que la barra topa en el precio), y si no cuadra con el del
+     * flyout, la página es de OTRA sesión y no se aplica nada.
+     *
+     * @param {object} snap - Snapshot bueno del flyout.
+     * @param {number} maxAge - 0 para releer siempre.
+     * @returns {Promise<boolean>} true si cambió el objetivo de la cuenta.
+     */
+    async function refreshSiteGoal(snap, maxAge) {
+        if (!snap || !snap.ok) return false;
+        const k = snap.acct || '_';
+        const prev = siteGoalGet(k);
+        if (prev && maxAge > 0 && Date.now() - num(prev.at) < maxAge) return false;
+
+        const html = await requestSiteGoal();
+        if (html == null) return false;
+        const g = parseSiteGoal(html);
+        if (g.state === 'unknown') return false;
+        if (g.state === 'goal') {
+            const bal = num(snap.points);
+            const same = g.value >= g.price
+                ? bal >= g.price - SITE_GOAL_SLACK
+                : Math.abs(g.value - bal) <= SITE_GOAL_SLACK;
+            if (!same || !(g.price > 0)) return false;
+        }
+
+        let all = GM_getValue(KEY_SITE_GOAL, null);
+        if (!all || typeof all !== 'object') all = {};
+        all[k] = g.state === 'goal'
+            ? { state: 'goal', sku: g.sku, title: g.title, price: g.price, at: Date.now() }
+            : { state: 'none', at: Date.now() };
+        GM_setValue(KEY_SITE_GOAL, all);
+
+        const cur = goalStoreGet(k);
+        if (g.state === 'goal') {
+            const changed = !prev || prev.state !== 'goal' || prev.sku !== g.sku;
+            const already = cur && cur.kind === 'item' && cur.id === g.sku;
+            if ((changed || !cur) && !already) {
+                goalStoreSet(k, { kind: 'item', id: g.sku, title: g.title, price: g.price, site: true });
+                return true;
+            }
+            return false;
+        }
+        if (cur && cur.site) {
+            goalStoreSet(k, null);
+            return true;
+        }
+        return false;
+    }
+
+    function puzzlePerDay(s, ladders) {
+        const st = s && s.checkIn && s.checkIn.stamps;
+        if (!st || !(num(st.max) > 0) || !(num(st.points) > 0) || !(ladders > 0)) return 0;
+        return num(st.points) / num(st.max) * ladders / 7;
     }
 
     // =============================================
@@ -4163,19 +5272,37 @@
             }
             valueBox.style.display = 'block';
 
+            // La línea del saldo lleva el 🧮 al final, y por eso el texto va en
+            // su propio span: el aviso de la tasa es del número, no del botón.
             const line1 = document.createElement('div');
+            Object.assign(line1.style, { display: 'flex', alignItems: 'baseline', gap: '6px' });
+            const line1Text = document.createElement('span');
             const v = rewards.value;
             if (v) {
                 const cur = v.currency ? `${v.currency} ` : '';
-                line1.textContent = `${fmt(rewards.points)} ${t.pointsShort} ≈ ${cur}${fmt(v.amount)}`;
-                line1.title = (v.exact ? t.valueTipExact : t.valueTipApprox)
+                line1Text.textContent = `${fmt(rewards.points)} ${t.pointsShort} ≈ ${cur}${fmt(v.amount)}`;
+                line1Text.title = (v.exact ? t.valueTipExact : t.valueTipApprox)
                     .replace('{r}', fmt(Math.round(v.ratio * 100) / 100))
                     .replace('{c}', v.currency || '?');
-                line1.style.cursor = 'help';
+                line1Text.style.cursor = 'help';
             } else {
-                line1.textContent = `${fmt(rewards.points)} ${t.pointsShort}`;
+                line1Text.textContent = `${fmt(rewards.points)} ${t.pointsShort}`;
             }
             line1.style.color = colors.text;
+            line1.appendChild(line1Text);
+            if (canCalculate(rewards)) {
+                const calcBtn = document.createElement('span');
+                calcBtn.textContent = '\u{1F9EE}';
+                calcBtn.title = t.calcBtnTip;
+                calcBtn.setAttribute('role', 'button');
+                calcBtn.tabIndex = 0;
+                Object.assign(calcBtn.style, { cursor: 'pointer', marginInlineStart: 'auto' });
+                calcBtn.onclick = openCalculator;
+                calcBtn.onkeydown = (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCalculator(); }
+                };
+                line1.appendChild(calcBtn);
+            }
             valueBox.appendChild(line1);
 
             const sub = document.createElement('div');
@@ -4194,6 +5321,521 @@
                     : `${t.cheapestCard} ${fmt(c.price)} ${t.pointsShort} · ${t.needMore.replace('{n}', fmt(c.price - rewards.points))}`;
                 line2.style.color = affordable ? colors.green : colors.gray;
                 valueBox.appendChild(line2);
+            }
+
+            // El objetivo, solo si el usuario ya puso uno en la calculadora:
+            // quien no la abre nunca no ve una línea más.
+            const goal = getGoal(rewards);
+            const fc = goal ? forecast(rewards, goal, defaultRate(rewards)) : null;
+            if (fc) {
+                const line3 = document.createElement('div');
+                line3.style.marginTop = '4px';
+                line3.style.cursor = 'pointer';
+                line3.title = t.calcLineTip;
+                const head = `\u{1F3AF} ${goalLabel(rewards, goal)}`;
+                if (fc.missing <= 0) {
+                    line3.textContent = `${head} ✓`;
+                    line3.style.color = colors.green;
+                } else {
+                    line3.textContent = [head, t.needMore.replace('{n}', fmt(fc.missing)),
+                        fc.days != null ? dateText(fc.days) : ''].filter(Boolean).join(' · ');
+                    line3.style.color = colors.text;
+                }
+                line3.onclick = openCalculator;
+                valueBox.appendChild(line3);
+            }
+        }
+
+        // --- Calculadora de canje ---
+
+        /** ¿Hay con qué calcular? Saldo Xbox o, al menos, premios del catálogo. */
+        function canCalculate(snap) {
+            return !!(snap && (snap.redeem || (snap.catalog && snap.catalog.length)));
+        }
+
+        /**
+         * El objetivo guardado para la cuenta del snapshot, o null.
+         * `{kind:'xbox', amount}` o `{kind:'item', id, title, price}`; del premio
+         * se guardan título y precio para poder pintarlo aunque un día no venga
+         * en el catálogo (se agota, rota), y manda el precio de hoy si viene.
+         * @param {object} snap
+         */
+        function getGoal(snap) {
+            const g = goalStoreGet(snap.acct);
+            if (!g) return null;
+            if (g.kind === 'xbox' && num(g.amount) > 0) return { kind: 'xbox', amount: num(g.amount) };
+            if (g.kind === 'item' && g.id && num(g.price) > 0) return g;
+            return null;
+        }
+
+        /** Guarda (o, con null, quita) el objetivo de la cuenta del snapshot. */
+        function setGoal(snap, goal) {
+            goalStoreSet(snap.acct, goal);
+        }
+
+        /** El SKU de la meta de la web de esta cuenta, o ''. */
+        function siteGoalSku(snap) {
+            const s = siteGoalGet(snap.acct);
+            return (s && s.state === 'goal') ? String(s.sku || '') : '';
+        }
+
+        /** El premio del catálogo de hoy con ese id, o null. */
+        function catalogItem(snap, id) {
+            return ((snap && snap.catalog) || []).find((it) => it.id === id) || null;
+        }
+
+        /** Cómo se nombra el objetivo en la línea 🎯. */
+        function goalLabel(snap, goal) {
+            if (goal.kind === 'xbox') return money(goal.amount, snap.redeem);
+            const it = catalogItem(snap, goal.id);
+            return (it && it.title) || goal.title || '';
+        }
+
+        /**
+         * Lo que cuesta el objetivo, con la misma forma que `goalCost`.
+         * @returns {{points:number,custom:boolean,parts:object[]}|null}
+         */
+        function goalPoints(snap, goal) {
+            if (!goal) return null;
+            if (goal.kind === 'xbox') return goalCost(goal.amount, snap.redeem);
+            const it = catalogItem(snap, goal.id);
+            const price = it ? it.price : num(goal.price);
+            return price > 0 ? { points: price, custom: false, parts: [] } : null;
+        }
+
+        /** Un importe con la moneda del mercado, como la línea del saldo. */
+        function money(amount, redeem) {
+            const cur = redeem && redeem.currency ? `${redeem.currency} ` : '';
+            return `${cur}${fmt(amount)}`;
+        }
+
+        /**
+         * El ritmo con el que se pinta la línea del objetivo: el medido si ya
+         * hay semana de registro y, si no, el estimado con todas las tareas.
+         * @param {object} snap
+         */
+        function defaultRate(snap) {
+            const m = measuredRate(snap.acct);
+            if (m.rate) return m.rate;
+            const src = estimateSources(snap);
+            return src.reduce((n, s) => n + s.perDay, 0) +
+                puzzlePerDay(snap, src.filter((s) => s.ladder).length);
+        }
+
+        /**
+         * Coste, lo que falta y en cuántos días se llega a un ritmo dado.
+         * @returns {{cost:object,missing:number,days:number|null}|null}
+         */
+        function forecast(snap, goal, rate) {
+            const cost = goalPoints(snap, goal);
+            if (!cost) return null;
+            const missing = cost.points - num(snap.points);
+            const days = (missing > 0 && rate > 0) ? Math.ceil(missing / rate) : null;
+            return { cost: cost, missing: missing, days: days };
+        }
+
+        /** «dentro de 63 días», sin cadenas propias: lo traduce el navegador. */
+        function whenText(days) {
+            try {
+                return new Intl.RelativeTimeFormat(LANG, { numeric: 'auto' }).format(days, 'day');
+            } catch (e) {
+                return `+${days}d`;
+            }
+        }
+
+        /** La fecha de dentro de N días, en el formato del idioma del panel. */
+        function dateText(days) {
+            const d = new Date();
+            d.setDate(d.getDate() + days);
+            try {
+                return new Intl.DateTimeFormat(LANG, { day: 'numeric', month: 'short', year: 'numeric' }).format(d);
+            } catch (e) {
+                return d.toLocaleDateString();
+            }
+        }
+
+        /**
+         * El modal de la calculadora: cuánto cuesta en puntos un saldo Xbox,
+         * cuánto falta y en qué fecha se llega.
+         *
+         * El ritmo sale de dos sitios, y se elige con un radio: el MEDIDO
+         * (`measuredRate`, el registro de las últimas cuatro semanas) y el
+         * ESTIMADO por tareas, con una casilla por tarea. El medido manda en
+         * cuanto hay una semana de registro, porque es el único que ve lo que se
+         * gana fuera de esta web; el estimado es lo que hay mientras tanto, y un
+         * suelo. Las casillas no se guardan: son para preguntar «¿y si no hago
+         * esto?», no una preferencia.
+         *
+         * El objetivo sí se guarda, por cuenta, porque es lo que pinta la línea
+         * 🎯 del panel. Y solo cuando el usuario lo toca: abrir la calculadora
+         * para mirar no debe dejar una línea nueva en el panel.
+         *
+         * El objetivo es un saldo Xbox de importe libre o un premio del
+         * catálogo. No se lee la meta que el usuario tenga puesta en la web de
+         * Rewards porque no llega al flyout (ver `readGoalItems`).
+         */
+        function openCalculator() {
+            if (!rewards || !rewards.ok || !canCalculate(rewards)) return;
+            const snap = rewards;
+            const redeem = snap.redeem;   // null si el mercado no vende saldo Xbox
+            const items = snap.catalog || [];
+            const saved = getGoal(snap);
+            const { overlay, box } = createModal();
+            box.style.maxWidth = '380px';
+            box.style.lineHeight = '1.5';
+
+            let closed = false;
+            // ¿Ha tocado el usuario el objetivo? Si la meta de la web llega
+            // mientras el modal está abierto, solo se reabre con ella si no.
+            let touched = false;
+            function close() {
+                if (closed) return;
+                closed = true;
+                document.removeEventListener('keydown', onKey, true);
+                closeModal(overlay);
+                renderValue();
+            }
+            function onKey(e) {
+                if (e.key === 'Escape') { e.preventDefault(); close(); }
+            }
+            document.addEventListener('keydown', onKey, true);
+            overlay.addEventListener('mousedown', (e) => { if (e.target === overlay) close(); });
+
+            // Bing pinta a su manera algunos controles de formulario, así que
+            // cada pieza lleva su color y su tipografía explícitos.
+            const textStyle = { color: colors.text, fontFamily: 'inherit', fontSize: '13px' };
+            const rule = () => {
+                const hr = document.createElement('div');
+                Object.assign(hr.style, { borderTop: `1px solid ${colors.border}`, margin: '10px 0' });
+                return hr;
+            };
+
+            const title = document.createElement('div');
+            title.textContent = `\u{1F9EE} ${t.calcTitle}`;
+            Object.assign(title.style, { fontWeight: 'bold', color: colors.primary, marginBottom: '10px' });
+            box.appendChild(title);
+
+            // --- Objetivo ---
+            const goalRow = document.createElement('div');
+            Object.assign(goalRow.style, textStyle, {
+                display: 'flex', flexDirection: 'column', gap: '4px', margin: '0 0 8px'
+            });
+            const goalHead = document.createElement('span');
+            goalHead.textContent = t.calcGoal;
+            const fieldStyle = Object.assign({}, textStyle, {
+                width: '100%', padding: '4px 6px', boxSizing: 'border-box',
+                borderRadius: '6px', border: `1px solid ${colors.primary}`,
+                background: colors.bg, margin: '0'
+            });
+            // Buscador: un <select> solo salta por la primera letra, y con una
+            // treintena de premios eso no sirve para encontrar «Roblox».
+            const search = document.createElement('input');
+            search.type = 'search';
+            search.placeholder = t.calcSearch;
+            search.setAttribute('aria-label', t.calcSearch);
+            Object.assign(search.style, fieldStyle);
+            const select = document.createElement('select');
+            select.setAttribute('aria-label', t.calcGoal);
+            Object.assign(select.style, fieldStyle);
+
+            // Sin tildes ni mayúsculas, para que «busqueda» encuentre «Búsqueda».
+            const fold = (s) => String(s).normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+            const choices = [];
+            const addChoice = (value, label) => choices.push({ value: value, label: label, key: fold(label) });
+            // La meta de la web de Rewards se marca con el mismo 🎯 de la línea
+            // del panel y va la primera de los premios, para que se reconozca
+            // sin texto nuevo.
+            const site = siteGoalGet(snap.acct);
+            const siteSku = siteGoalSku(snap);
+            const mark = (id, label) => (id === siteSku ? `\u{1F3AF} ${label}` : label);
+            if (redeem) addChoice('xbox', t.calcGoalXbox);
+            const ordered = siteSku
+                ? items.filter((it) => it.id === siteSku).concat(items.filter((it) => it.id !== siteSku))
+                : items;
+            for (const it of ordered) addChoice(`item:${it.id}`, mark(it.id, `${it.title} · ${fmt(it.price)} ${t.pointsShort}`));
+            // La meta de la web o un premio guardado que hoy no vienen en el
+            // catálogo del flyout (agotado, rotó, o una donación) se conservan
+            // con su último precio conocido en vez de perderse.
+            if (siteSku && !catalogItem(snap, siteSku)) {
+                addChoice(`item:${siteSku}`, mark(siteSku, `${site.title} · ${fmt(num(site.price))} ${t.pointsShort}`));
+            }
+            if (saved && saved.kind === 'item' && saved.id !== siteSku && !catalogItem(snap, saved.id)) {
+                addChoice(`item:${saved.id}`, `${saved.title} · ${fmt(saved.price)} ${t.pointsShort}`);
+            }
+
+            // Las opciones se rehacen en vez de ocultarse: Safari no esconde un
+            // <option> con `hidden` ni con `display:none`.
+            function fill(list, value) {
+                select.innerHTML = '';
+                for (const c of list) {
+                    const o = document.createElement('option');
+                    o.value = c.value;
+                    o.textContent = c.label;
+                    // Sin esto, algunos navegadores pintan la lista desplegada
+                    // con el fondo del sistema y el texto claro del panel encima.
+                    o.style.background = colors.bg;
+                    o.style.color = colors.text;
+                    select.appendChild(o);
+                }
+                select.value = value;
+            }
+            fill(choices, saved
+                ? (saved.kind === 'xbox' ? 'xbox' : `item:${saved.id}`)
+                : choices[0].value);
+
+            // Todas las palabras tienen que aparecer, en cualquier orden:
+            // «roblox 1050» encuentra la de 1050 Robux. Con resultados, se elige
+            // el primero —el más barato— y la lista se queda con esos; sin
+            // ninguno, se deja todo como estaba y el borde lo avisa en rojo: un
+            // término que no casa no puede borrarle el objetivo al usuario.
+            search.addEventListener('input', () => {
+                touched = true;
+                const words = fold(search.value).split(/\s+/).filter(Boolean);
+                const hits = words.length ? choices.filter((c) => words.every((wd) => c.key.includes(wd))) : choices;
+                search.style.borderColor = hits.length ? colors.primary : colors.red;
+                if (!hits.length) return;
+                const keep = hits.some((c) => c.value === select.value) ? select.value : hits[0].value;
+                const changed = keep !== select.value;
+                fill(hits, keep);
+                if (changed) update({ target: select });
+            });
+            search.addEventListener('keydown', (e) => {
+                // Enter baja al selector, para abrirlo con el teclado si hay
+                // varios resultados.
+                if (e.key === 'Enter') { e.preventDefault(); select.focus(); }
+            });
+
+            goalRow.appendChild(goalHead);
+            goalRow.appendChild(search);
+            goalRow.appendChild(select);
+            box.appendChild(goalRow);
+
+            // --- Importe (solo saldo Xbox) ---
+            const amountRow = document.createElement('label');
+            Object.assign(amountRow.style, textStyle, {
+                display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', margin: '0'
+            });
+            const amountLabel = document.createElement('span');
+            amountLabel.textContent = t.calcAmount;
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.min = '1';
+            input.step = 'any';
+            input.inputMode = 'decimal';
+            const largest = (redeem && redeem.cards.length) ? redeem.cards[redeem.cards.length - 1].amount : 0;
+            input.value = String((saved && saved.kind === 'xbox' && saved.amount) ||
+                (redeem && redeem.custom && redeem.custom.min) || largest || '');
+            Object.assign(input.style, textStyle, {
+                width: '96px', padding: '4px 8px', boxSizing: 'border-box',
+                borderRadius: '6px', border: `1px solid ${colors.primary}`,
+                background: colors.bg, margin: '0'
+            });
+            const cur = document.createElement('span');
+            cur.textContent = (redeem && redeem.currency) || '';
+            amountRow.appendChild(amountLabel);
+            amountRow.appendChild(cur);
+            amountRow.appendChild(input);
+            box.appendChild(amountRow);
+
+            const costLine = document.createElement('div');
+            costLine.style.marginTop = '8px';
+            costLine.style.cursor = 'help';
+            const xboxCostTip = !redeem ? '' : redeem.custom
+                ? t.calcCostTipCustom
+                    .replace('{r}', fmt(Math.round(redeem.custom.ratio * 100) / 100))
+                    .replace(/\{c\}/g, redeem.currency || '?')
+                    .replace('{m}', fmt(redeem.custom.min))
+                : t.calcCostTipCards;
+            const haveLine = document.createElement('div');
+            box.appendChild(costLine);
+            box.appendChild(haveLine);
+
+            box.appendChild(rule());
+
+            // --- Ritmo ---
+            const rateHead = document.createElement('div');
+            rateHead.textContent = t.calcRate;
+            Object.assign(rateHead.style, { color: colors.gray, marginBottom: '4px' });
+            box.appendChild(rateHead);
+
+            const radioName = 'bing-rewards-calc-rate';
+            function choice(type, name, checked, disabled) {
+                const row = document.createElement('label');
+                Object.assign(row.style, textStyle, {
+                    display: 'flex', alignItems: 'center', gap: '6px', margin: '2px 0',
+                    cursor: disabled ? 'default' : 'pointer'
+                });
+                const el = document.createElement('input');
+                el.type = type;
+                if (name) el.name = name;
+                el.checked = checked;
+                el.disabled = disabled;
+                Object.assign(el.style, { margin: '0', accentColor: colors.primary, flexShrink: '0' });
+                const txt = document.createElement('span');
+                row.appendChild(el);
+                row.appendChild(txt);
+                return { row: row, input: el, text: txt };
+            }
+
+            const measured = measuredRate(snap.acct);
+            const mChoice = choice('radio', radioName, !!measured.rate, !measured.rate);
+            mChoice.row.title = t.calcMeasuredTip;
+            mChoice.text.textContent = measured.rate
+                ? t.calcMeasured.replace('{n}', fmt(Math.round(measured.rate))).replace('{d}', fmt(measured.days))
+                : t.calcMeasuredPending.replace('{d}', fmt(measured.days));
+            if (!measured.rate) mChoice.row.style.color = colors.gray;
+            box.appendChild(mChoice.row);
+
+            const eChoice = choice('radio', radioName, !measured.rate, false);
+            eChoice.row.title = t.calcEstimateTip;
+            box.appendChild(eChoice.row);
+
+            const sources = estimateSources(snap);
+            const labels = { search: t.calcSrcSearch, dset: t.dailySet, streak: t.calcSrcStreak };
+            const srcBox = document.createElement('div');
+            srcBox.style.paddingInlineStart = '22px';
+            const picks = {};
+            for (const s of sources) {
+                const c = choice('checkbox', '', true, false);
+                c.text.textContent = `${labels[s.id]} · ${t.calcPerDay.replace('{n}', fmt(Math.round(s.perDay)))}`;
+                c.input.addEventListener('change', update);
+                picks[s.id] = c;
+                srcBox.appendChild(c.row);
+            }
+            const hasPuzzle = puzzlePerDay(snap, 1) > 0;
+            const puzzle = hasPuzzle ? choice('checkbox', '', true, false) : null;
+            if (puzzle) {
+                puzzle.input.addEventListener('change', update);
+                srcBox.appendChild(puzzle.row);
+            }
+            box.appendChild(srcBox);
+
+            box.appendChild(rule());
+
+            const verdict = document.createElement('div');
+            verdict.style.fontWeight = '600';
+            box.appendChild(verdict);
+
+            const actions = document.createElement('div');
+            Object.assign(actions.style, { display: 'flex', justifyContent: 'center', marginTop: '14px' });
+            const okBtn = createModalBtn(t.accept, colors.primary, close);
+            actions.appendChild(okBtn);
+            box.appendChild(actions);
+
+            function estimateRate() {
+                let n = 0;
+                let ladders = 0;
+                for (const s of sources) {
+                    if (!picks[s.id].input.checked) continue;
+                    n += s.perDay;
+                    if (s.ladder) ladders++;
+                }
+                const pz = puzzlePerDay(snap, ladders);
+                if (puzzle) {
+                    puzzle.text.textContent = `${t.calcSrcPuzzle} · ${t.calcPerDay.replace('{n}', fmt(Math.round(pz)))}`;
+                    if (puzzle.input.checked) n += pz;
+                }
+                return n;
+            }
+
+            function update(e) {
+                const est = estimateRate();
+                eChoice.text.textContent = t.calcEstimate.replace('{n}', fmt(Math.round(est)));
+                // Las casillas solo pintan con el estimado elegido; con el medido
+                // se quedan a la vista, en gris, para comparar.
+                srcBox.style.opacity = eChoice.input.checked ? '1' : '0.55';
+
+                const isXbox = select.value === 'xbox';
+                amountRow.style.display = isXbox ? 'flex' : 'none';
+                let goal = null;
+                if (isXbox) {
+                    const amount = num(input.value);
+                    if (amount > 0) goal = { kind: 'xbox', amount: amount };
+                } else {
+                    const id = select.value.slice('item:'.length);
+                    const it = catalogItem(snap, id) ||
+                        (site && site.state === 'goal' && site.sku === id ? { title: site.title, price: num(site.price) } : null) ||
+                        (saved && saved.id === id ? saved : null);
+                    if (it) goal = { kind: 'item', id: id, title: it.title, price: it.price };
+                }
+                // Se guarda solo cuando lo cambia el usuario. Vaciar el importe
+                // es la forma de quitar la línea 🎯 del panel.
+                if (e && (e.target === input || e.target === select)) {
+                    touched = true;
+                    setGoal(snap, goal);
+                }
+
+                const rate = mChoice.input.checked ? measured.rate : est;
+                const fc = goal ? forecast(snap, goal, rate) : null;
+                if (!fc) {
+                    costLine.textContent = '';
+                    haveLine.textContent = '';
+                    verdict.textContent = '';
+                    return;
+                }
+
+                const cost = t.calcCost.replace('{n}', fmt(fc.cost.points));
+                if (isXbox) {
+                    const how = fc.cost.custom
+                        ? t.calcCustom
+                        : fc.cost.parts.map((p) => `${p.count > 1 ? `${p.count} × ` : ''}${money(p.amount, redeem)}`).join(' + ');
+                    costLine.textContent = `${cost} · ${how}`;
+                    costLine.title = xboxCostTip;
+                } else {
+                    // El premio ya tiene su precio en el catálogo: no hay
+                    // combinación ni redondeo que explicar.
+                    costLine.textContent = cost;
+                    costLine.title = goal.title;
+                }
+                costLine.style.color = colors.text;
+
+                const enough = fc.missing <= 0;
+                haveLine.textContent = `${t.calcHave.replace('{n}', fmt(num(snap.points)))} · ` +
+                    (enough ? `${t.calcEnough} ✓` : t.needMore.replace('{n}', fmt(fc.missing)));
+                haveLine.style.color = enough ? colors.green : colors.text;
+
+                if (enough) {
+                    verdict.textContent = '';
+                } else if (fc.days == null) {
+                    verdict.textContent = t.calcNoSource;
+                    verdict.style.color = colors.gray;
+                } else {
+                    verdict.textContent = t.calcResult
+                        .replace('{when}', whenText(fc.days))
+                        .replace('{date}', dateText(fc.days));
+                    verdict.style.color = colors.primary;
+                }
+            }
+
+            input.addEventListener('input', update);
+            select.addEventListener('change', update);
+            mChoice.input.addEventListener('change', update);
+            eChoice.input.addEventListener('change', update);
+            update(null);
+
+            showModal(overlay, box);
+            // El foco va al importe si el objetivo es saldo Xbox, que es lo que
+            // se viene a escribir; si es un premio, al buscador.
+            setTimeout(() => {
+                if (select.value === 'xbox') { input.focus(); input.select(); } else search.focus();
+            }, 50);
+
+            // Quien abre la calculadora puede venir de cambiar la meta en la web
+            // hace un minuto, así que aquí la lectura vale cinco minutos y no
+            // media hora. Si cambia y el usuario aún no ha tocado nada, el modal
+            // se reabre con ella; si ya la tocó, manda lo suyo y solo se
+            // repinta la línea del panel al cerrar.
+            const siteAge = site ? Date.now() - num(site.at) : Infinity;
+            if (siteAge > SITE_GOAL_TTL_CALC) {
+                refreshSiteGoal(snap, 0).then((changed) => {
+                    if (!changed) return;
+                    if (!closed && !touched) {
+                        close();
+                        setTimeout(openCalculator, 220);
+                    } else if (closed) {
+                        renderValue();
+                    }
+                }).catch((e) => console.error('(bing-rewards-auto-search): meta de Rewards:', e));
             }
         }
 
@@ -4552,7 +6194,7 @@
         // Activar tab de búsqueda por defecto
         activateTab(0);
 
-        return { updateUI };
+        return { updateUI, renderValue };
     }
 
     // =============================================
@@ -4561,7 +6203,7 @@
     try {
         checkDailyReset();
 
-        const { updateUI } = buildPanel();
+        const { updateUI, renderValue } = buildPanel();
         initOwnTooltips();
         const count = GM_getValue(KEY_COUNT, 0);
         const active = GM_getValue(KEY_ACTIVE, false);
@@ -4584,6 +6226,14 @@
                 rewards = snap;
                 writeSnapshot(snap);
                 trackProgress(snap);
+                // La meta de la web va aparte y sin esperarla: no decide nada de
+                // las búsquedas. Con sesión activa no se pide, porque cada
+                // búsqueda es una carga de página y serían 280 KB por búsqueda.
+                if (!active && snap.ok) {
+                    refreshSiteGoal(snap, reloadedByHand() ? 0 : SITE_GOAL_TTL)
+                        .then((changed) => { if (changed) renderValue(); })
+                        .catch((e) => console.error('(bing-rewards-auto-search): meta de Rewards:', e));
+                }
                 if (active) {
                     // La API es quien dice si quedan búsquedas, así que la sesión
                     // no continúa hasta tener su respuesta (o su fallo).
